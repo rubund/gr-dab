@@ -13,6 +13,7 @@
 #include "dab/ofdm_sampler.h"
 #include "dab/ofdm_coarse_frequency_correct.h"
 #include "dab/diff_phasor_vcc.h"
+#include "dab/ofdm_remove_first_symbol_vcc.h"
 %}
 
 
@@ -26,3 +27,5 @@ GR_SWIG_BLOCK_MAGIC2(dab, ofdm_sampler);
 GR_SWIG_BLOCK_MAGIC2(dab, ofdm_coarse_frequency_correct);
 %include "dab/diff_phasor_vcc.h"
 GR_SWIG_BLOCK_MAGIC2(dab, diff_phasor_vcc);
+%include "dab/ofdm_remove_first_symbol_vcc.h"
+GR_SWIG_BLOCK_MAGIC2(dab, ofdm_remove_first_symbol_vcc);
