@@ -30,5 +30,6 @@ install(FILES
     ofdm_remove_first_symbol_vcc.h
     frequency_interleaver_vcc.h
     qpsk_demapper_vcb.h
-    complex_to_interleaved_float_vcf.h DESTINATION include/dab
+    complex_to_interleaved_float_vcf.h
+    modulo_ff.h DESTINATION include/dab
 )

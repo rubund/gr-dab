@@ -17,6 +17,7 @@
 #include "dab/frequency_interleaver_vcc.h"
 #include "dab/qpsk_demapper_vcb.h"
 #include "dab/complex_to_interleaved_float_vcf.h"
+#include "dab/modulo_ff.h"
 %}
 
 
@@ -38,3 +39,5 @@ GR_SWIG_BLOCK_MAGIC2(dab, frequency_interleaver_vcc);
 GR_SWIG_BLOCK_MAGIC2(dab, qpsk_demapper_vcb);
 %include "dab/complex_to_interleaved_float_vcf.h"
 GR_SWIG_BLOCK_MAGIC2(dab, complex_to_interleaved_float_vcf);
+%include "dab/modulo_ff.h"
+GR_SWIG_BLOCK_MAGIC2(dab, modulo_ff);

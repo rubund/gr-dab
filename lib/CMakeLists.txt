@@ -35,6 +35,7 @@ list(APPEND dab_sources
     frequency_interleaver_vcc_impl.cc
     qpsk_demapper_vcb_impl.cc
     complex_to_interleaved_float_vcf_impl.cc
+    modulo_ff_impl.cc
 )
 
 set(dab_sources "${dab_sources}" PARENT_SCOPE)
