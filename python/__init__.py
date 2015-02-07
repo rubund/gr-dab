@@ -34,4 +34,5 @@ except ImportError:
 from ofdm_sync_dab import ofdm_sync_dab
 from ofdm_sync_dab2 import ofdm_sync_dab2
 from detect_null import detect_null
+from parameters import dab_parameters
 #
