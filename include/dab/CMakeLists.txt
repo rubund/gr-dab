@@ -31,5 +31,6 @@ install(FILES
     frequency_interleaver_vcc.h
     qpsk_demapper_vcb.h
     complex_to_interleaved_float_vcf.h
-    modulo_ff.h DESTINATION include/dab
+    modulo_ff.h
+    measure_processing_rate.h DESTINATION include/dab
 )

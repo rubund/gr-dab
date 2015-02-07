@@ -30,5 +30,6 @@ install(FILES
     dab_frequency_interleaver_vcc.xml
     dab_qpsk_demapper_vcb.xml
     dab_complex_to_interleaved_float_vcf.xml
-    dab_modulo_ff.xml DESTINATION share/gnuradio/grc/blocks
+    dab_modulo_ff.xml
+    dab_measure_processing_rate.xml DESTINATION share/gnuradio/grc/blocks
 )
