@@ -46,6 +46,8 @@ class usrp_dab_rx(gr.top_block):
 		     help="set receive gain in dB (default is midpoint)")
 		parser.add_option('-v', '--verbose', action="store_true", default=False,
 		     help="verbose output")
+		parser.add_option('-a', '--antenna', type="string", default="TX/RX",
+		     help="select antenna")
         	(options, args) = parser.parse_args ()
 
 		# if len(args)!=1:
@@ -66,6 +68,7 @@ class usrp_dab_rx(gr.top_block):
 		
 		self.sample_rate = 2e6#self.src.adc_rate()/options.decim
 		self.src.set_samp_rate(self.sample_rate)
+		self.src.set_antenna(options.antenna)
 		self.dab_params = dab.parameters.dab_parameters(mode=options.dab_mode, sample_rate=self.sample_rate, verbose=options.verbose)
 		self.rx_params = dab.parameters.receiver_parameters(mode=options.dab_mode, softbits=True, input_fft_filter=options.filter_input, autocorrect_sample_rate=options.autocorrect_sample_rate, sample_rate_correction_factor=options.resample_fixed, verbose=options.verbose, correct_ffe=options.correct_ffe, equalize_magnitude=options.equalize_magnitude)
 
@@ -87,9 +90,10 @@ class usrp_dab_rx(gr.top_block):
 		# set gain      
 		if options.rx_gain is None:
 			# if no gain was specified, use the mid-point in dB
-			g = self.subdev.gain_range()
+			g = [0,100]
 			options.rx_gain = float(g[0]+g[1])/2
-		self.subdev.set_gain(options.rx_gain)
+		self.src.set_gain(options.rx_gain)
+		#self.subdev.set_gain(options.rx_gain)
 
 		self.update_ui = options.verbose
 		if self.update_ui:
@@ -124,7 +128,7 @@ class usrp_dab_rx(gr.top_block):
 			time.sleep(1./self.rx_params.usrp_ffc_retune_frequency)
 
 	def set_freq(self, freq):
-		if self.src.tune(0, self.subdev, freq):
+		if self.src.set_center_freq(freq): #src.tune(0, self.subdev, freq):
 			if self.verbose:
 				print "--> retuned to " + str(freq) + " Hz"
 			return True

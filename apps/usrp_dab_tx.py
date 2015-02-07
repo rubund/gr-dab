@@ -30,6 +30,8 @@ class usrp_dab_tx(gr.top_block):
 		     help="set transmit gain in dB (default is midpoint)")
 		parser.add_option('-v', '--verbose', action="store_true", default=False,
 		     help="verbose output")
+		parser.add_option('-a', '--antenna', type="string", default="TX/RX",
+		     help="select antenna")
 
         	(options, args) = parser.parse_args ()
 		if len(args)!=1:
@@ -55,6 +57,7 @@ class usrp_dab_tx(gr.top_block):
         	self.sink.set_mux(usrp.determine_tx_mux_value(self.sink, options.tx_subdev_spec))
         	self.subdev = usrp.selected_subdev(self.sink, options.tx_subdev_spec)
 		self.sample_rate = self.sink.dac_rate()/interp
+		self.src.set_antenna(options.antenna)
 		
 		print "--> using sample rate: " + str(self.sample_rate)
 

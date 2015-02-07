@@ -36,5 +36,6 @@ install(FILES
     select_vectors.h
     repartition_vectors.h
     unpuncture_vff.h
-    prune_vectors.h DESTINATION include/dab
+    prune_vectors.h
+    fib_sink_vb.h DESTINATION include/dab
 )
