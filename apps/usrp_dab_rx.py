@@ -1,3 +1,4 @@
+#!/usr/bin/env python2
 # -*- coding: utf8 -*-
 
 # Andreas Müller, 2008

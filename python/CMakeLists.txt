@@ -32,7 +32,8 @@ GR_PYTHON_INSTALL(
     FILES
     __init__.py
     ofdm_sync_dab.py
-    ofdm_sync_dab2.py DESTINATION ${GR_PYTHON_DIR}/dab
+    ofdm_sync_dab2.py
+    detect_null.py DESTINATION ${GR_PYTHON_DIR}/dab
 )
 
 ########################################################################
