@@ -231,7 +231,7 @@ class ofdm_demod(gr.hier_block2):
 			self.connect((self.remove_pilot,0), self.deinterleave)
 		if self.rp.softbits:
 			if verbose: print "--> using soft bits"
-			self.softbit_interleaver = dab_swig.complex_to_interleaved_float_vcf(self.dp.num_carriers)
+			self.softbit_interleaver = dab.complex_to_interleaved_float_vcf(self.dp.num_carriers)
 			self.connect(self.deinterleave, self.softbit_interleaver, (self,0))
 		else:
 			self.connect(self.deinterleave, self.demapper, (self,0))
@@ -244,10 +244,10 @@ class ofdm_demod(gr.hier_block2):
 			self.connect((self.remove_pilot,1), (self,1))
 			
 		# calculate an estimate of the SNR
-		self.phase_var_decim   = gr.keep_one_in_n(gr.sizeof_gr_complex*self.dp.num_carriers, self.rp.phase_var_estimate_downsample)
-		self.phase_var_arg     = gr.complex_to_arg(dp.num_carriers)
-		self.phase_var_v2s     = gr.vector_to_stream(gr.sizeof_float, dp.num_carriers)
-		self.phase_var_mod     = dab_swig.modulo_ff(pi/2)
+		self.phase_var_decim   = blocks.keep_one_in_n(gr.sizeof_gr_complex*self.dp.num_carriers, self.rp.phase_var_estimate_downsample)
+		self.phase_var_arg     = blocks.complex_to_arg(dp.num_carriers)
+		self.phase_var_v2s     = blocks.vector_to_stream(gr.sizeof_float, dp.num_carriers)
+		self.phase_var_mod     = dab.modulo_ff(pi/2)
 		self.phase_var_avg_mod = gr.iir_filter_ffd([rp.phase_var_estimate_alpha], [0,1-rp.phase_var_estimate_alpha]) 
 		self.phase_var_sub_avg = gr.sub_ff()
 		self.phase_var_sqr     = gr.multiply_ff()
