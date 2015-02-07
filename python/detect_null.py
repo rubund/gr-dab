@@ -21,7 +21,7 @@
 # Andreas Mueller, 2008
 # andrmuel@ee.ethz.ch
 
-from gnuradio import gr
+from gnuradio import gr, blocks
 import dab
 
 class detect_null(gr.hier_block2):
@@ -44,7 +44,7 @@ class detect_null(gr.hier_block2):
 
 
 		# get the magnitude squared
-		self.ns_c2magsquared = gr.complex_to_mag_squared()
+		self.ns_c2magsquared = blocks.complex_to_mag_squared()
 		
 		# this wastes cpu cycles:
 		# ns_detect_taps = [1]*length
@@ -52,7 +52,7 @@ class detect_null(gr.hier_block2):
 		# this isn't better:
 		#self.ns_filter = gr.iir_filter_ffd([1]+[0]*(length-1)+[-1],[0,1])
 		# this does the same again, but is actually faster (outsourced to an independent block ..):
-		self.ns_moving_sum = dab_swig.moving_sum_ff(length)
+		self.ns_moving_sum = dab.moving_sum_ff(length)
 		self.ns_invert = gr.multiply_const_ff(-1)
 
 		# peak detector on the inverted, summed up signal -> we get the nulls (i.e. the position of the start of a frame)

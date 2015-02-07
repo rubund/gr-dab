@@ -23,7 +23,7 @@
 # Andreas Mueller, 2008
 # andrmuel@ee.ethz.ch
 
-from gnuradio import gr
+from gnuradio import gr, blocks
 import dab
 import sys
 from math import pi
@@ -53,7 +53,8 @@ class ofdm_sync_dab2(gr.hier_block2):
 					gr.io_signature2(2, 2, gr.sizeof_gr_complex, gr.sizeof_char)) # output signature
 
 		# workaround for a problem that prevents connecting more than one block directly (see trac ticket #161)
-		self.input = gr.kludge_copy(gr.sizeof_gr_complex)
+		#self.input = gr.kludge_copy(gr.sizeof_gr_complex)
+		self.input = blocks.multiply_const_cc(1) # FIXME
 		self.connect(self, self.input)
 
 		#
@@ -61,7 +62,7 @@ class ofdm_sync_dab2(gr.hier_block2):
 		#
 		# (outsourced to detect_zero.py)
 		
-		self.ns_detect = detect_null.detect_null(dp.ns_length, debug)
+		self.ns_detect = dab.detect_null(dp.ns_length, debug)
 		self.connect(self.input, self.ns_detect)
 
 		#

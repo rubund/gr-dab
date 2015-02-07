@@ -27,7 +27,7 @@
 # Andreas Mueller, 2008
 # andrmuel@ee.ethz.ch
 
-from gnuradio import gr
+from gnuradio import gr, blocks
 import dab
 from threading import Timer
 from time import sleep
@@ -144,7 +144,8 @@ class ofdm_demod(gr.hier_block2):
 		
 
 		# workaround for a problem that prevents connecting more than one block directly (see trac ticket #161)
-		self.input = gr.kludge_copy(gr.sizeof_gr_complex)
+		#self.input = gr.kludge_copy(gr.sizeof_gr_complex)
+		self.input = blocks.multiply_const_cc(1.0) # FIXME
 		self.connect(self, self.input)
 		
 		# input filtering
@@ -180,7 +181,7 @@ class ofdm_demod(gr.hier_block2):
 				self.resample = gr.fractional_interpolator_cc(0, self.rp.sample_rate_correction_factor)
 
 		# timing and fine frequency synchronisation
-		self.sync = ofdm_sync_dab2.ofdm_sync_dab(self.dp, self.rp, debug)
+		self.sync = dab.ofdm_sync_dab2(self.dp, self.rp, debug)
 
 		# ofdm symbol sampler
 		self.sampler = dab_swig.ofdm_sampler(dp.fft_length, dp.cp_length, dp.symbols_per_frame, rp.cp_gap)
