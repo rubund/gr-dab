@@ -34,5 +34,6 @@ install(FILES
     modulo_ff.h
     measure_processing_rate.h
     select_vectors.h
-    repartition_vectors.h DESTINATION include/dab
+    repartition_vectors.h
+    unpuncture_vff.h DESTINATION include/dab
 )

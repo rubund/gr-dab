@@ -61,12 +61,12 @@ class fic_decode(gr.hier_block2):
 		self.repartition_fic = dab.repartition_vectors(gr.sizeof_float, self.dp.num_carriers*2, self.dp.fic_punctured_codeword_length, self.dp.num_fic_syms, self.dp.num_cifs)
 
 		# unpuncturing
-		self.unpuncture = dab_swig.unpuncture_vff(self.dp.assembled_fic_puncturing_sequence)
+		self.unpuncture = dab.unpuncture_vff(self.dp.assembled_fic_puncturing_sequence,0)
 
 		# convolutional coding
 		# self.fsm = trellis.fsm(self.dp.conv_code_in_bits, self.dp.conv_code_out_bits, self.dp.conv_code_generator_polynomials)
 		self.fsm = trellis.fsm(1, 4, [0133, 0171, 0145, 0133]) # OK (dumped to text and verified partially)
-		self.conv_v2s = gr.vector_to_stream(gr.sizeof_float, self.dp.fic_conv_codeword_length)
+		self.conv_v2s = blocks.vector_to_stream(gr.sizeof_float, self.dp.fic_conv_codeword_length)
 		# self.conv_decode = trellis.viterbi_combined_fb(self.fsm, 20, 0, 0, 1, [1./sqrt(2),-1/sqrt(2)] , trellis.TRELLIS_EUCLIDEAN)
 		table = [ 
 			  0,0,0,0,
@@ -89,8 +89,8 @@ class fic_decode(gr.hier_block2):
 		assert(len(table)/4==self.fsm.O())
 		table = [(1-2*x)/sqrt(2) for x in table]
 		self.conv_decode = trellis.viterbi_combined_fb(self.fsm, 774, 0, 0, 4, table, trellis.TRELLIS_EUCLIDEAN)
-		self.conv_s2v = gr.stream_to_vector(gr.sizeof_char, 774)
-		self.conv_prune = dab_swig.prune_vectors(gr.sizeof_char, self.dp.fic_conv_codeword_length/4, 0, self.dp.conv_code_add_bits_input)
+		self.conv_s2v = blocks.stream_to_vector(gr.sizeof_char, 774)
+		self.conv_prune = dab.prune_vectors(gr.sizeof_char, self.dp.fic_conv_codeword_length/4, 0, self.dp.conv_code_add_bits_input)
 
 		# energy dispersal
 		self.prbs_src   = gr.vector_source_b(self.dp.prbs(self.dp.energy_dispersal_fic_vector_length), True)
