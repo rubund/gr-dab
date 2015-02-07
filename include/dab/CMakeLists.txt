@@ -26,5 +26,6 @@ install(FILES
     ofdm_ffe_all_in_one.h
     ofdm_sampler.h
     ofdm_coarse_frequency_correct.h
-    diff_phasor_vcc.h DESTINATION include/dab
+    diff_phasor_vcc.h
+    ofdm_remove_first_symbol_vcc.h DESTINATION include/dab
 )

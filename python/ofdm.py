@@ -196,7 +196,7 @@ class ofdm_demod(gr.hier_block2):
 		self.phase_diff = dab.diff_phasor_vcc(dp.num_carriers)
 
 		# remove pilot symbol
-		self.remove_pilot = dab_swig.ofdm_remove_first_symbol_vcc(dp.num_carriers)
+		self.remove_pilot = dab.ofdm_remove_first_symbol_vcc(dp.num_carriers)
 
 		# magnitude equalisation
 		if self.rp.equalize_magnitude:
