@@ -22,5 +22,5 @@
 ########################################################################
 install(FILES
     api.h
-    DESTINATION include/dab
+    moving_sum_ff.h DESTINATION include/dab
 )

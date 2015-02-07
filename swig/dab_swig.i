@@ -8,6 +8,9 @@
 %include "dab_swig_doc.i"
 
 %{
+#include "dab/moving_sum_ff.h"
 %}
 
 
+%include "dab/moving_sum_ff.h"
+GR_SWIG_BLOCK_MAGIC2(dab, moving_sum_ff);
