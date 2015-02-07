@@ -259,7 +259,7 @@ class ofdm_demod(gr.hier_block2):
 		self.connect(self.phase_var_sqr, self.phase_var_avg, self.probe_phase_var)
 
 		# measure processing rate
-		self.measure_rate = dab_swig.measure_processing_rate(gr.sizeof_gr_complex, 2000000) 
+		self.measure_rate = dab.measure_processing_rate(gr.sizeof_gr_complex, 2000000) 
 		self.connect(self.input, self.measure_rate)
 
 		# debugging

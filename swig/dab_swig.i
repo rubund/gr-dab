@@ -18,6 +18,7 @@
 #include "dab/qpsk_demapper_vcb.h"
 #include "dab/complex_to_interleaved_float_vcf.h"
 #include "dab/modulo_ff.h"
+#include "dab/measure_processing_rate.h"
 %}
 
 
@@ -41,3 +42,5 @@ GR_SWIG_BLOCK_MAGIC2(dab, qpsk_demapper_vcb);
 GR_SWIG_BLOCK_MAGIC2(dab, complex_to_interleaved_float_vcf);
 %include "dab/modulo_ff.h"
 GR_SWIG_BLOCK_MAGIC2(dab, modulo_ff);
+%include "dab/measure_processing_rate.h"
+GR_SWIG_BLOCK_MAGIC2(dab, measure_processing_rate);
