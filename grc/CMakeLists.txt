@@ -23,5 +23,6 @@ install(FILES
     dab_detect_null.xml
     dab_moving_sum_ff.xml
     dab_ofdm_ffe_all_in_one.xml
-    dab_ofdm_sampler.xml DESTINATION share/gnuradio/grc/blocks
+    dab_ofdm_sampler.xml
+    dab_ofdm_coarse_frequency_correct.xml DESTINATION share/gnuradio/grc/blocks
 )

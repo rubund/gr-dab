@@ -29,6 +29,7 @@ list(APPEND dab_sources
     moving_sum_ff_impl.cc
     ofdm_ffe_all_in_one_impl.cc
     ofdm_sampler_impl.cc
+    ofdm_coarse_frequency_correct_impl.cc
 )
 
 set(dab_sources "${dab_sources}" PARENT_SCOPE)
