@@ -19,6 +19,7 @@
 #include "dab/complex_to_interleaved_float_vcf.h"
 #include "dab/modulo_ff.h"
 #include "dab/measure_processing_rate.h"
+#include "dab/select_vectors.h"
 %}
 
 
@@ -44,3 +45,5 @@ GR_SWIG_BLOCK_MAGIC2(dab, complex_to_interleaved_float_vcf);
 GR_SWIG_BLOCK_MAGIC2(dab, modulo_ff);
 %include "dab/measure_processing_rate.h"
 GR_SWIG_BLOCK_MAGIC2(dab, measure_processing_rate);
+%include "dab/select_vectors.h"
+GR_SWIG_BLOCK_MAGIC2(dab, select_vectors);

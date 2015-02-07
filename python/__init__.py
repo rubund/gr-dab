@@ -37,4 +37,5 @@ from detect_null import detect_null
 from parameters import dab_parameters
 from ofdm import ofdm_mod
 from ofdm import ofdm_demod
+from fic_decode import fic_decode
 #

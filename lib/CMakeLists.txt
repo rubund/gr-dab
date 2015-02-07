@@ -37,6 +37,7 @@ list(APPEND dab_sources
     complex_to_interleaved_float_vcf_impl.cc
     modulo_ff_impl.cc
     measure_processing_rate_impl.cc
+    select_vectors_impl.cc
 )
 
 set(dab_sources "${dab_sources}" PARENT_SCOPE)
