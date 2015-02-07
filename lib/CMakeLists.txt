@@ -33,6 +33,7 @@ list(APPEND dab_sources
     diff_phasor_vcc_impl.cc
     ofdm_remove_first_symbol_vcc_impl.cc
     frequency_interleaver_vcc_impl.cc
+    qpsk_demapper_vcb_impl.cc
 )
 
 set(dab_sources "${dab_sources}" PARENT_SCOPE)
