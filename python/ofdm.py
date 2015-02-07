@@ -162,12 +162,12 @@ class ofdm_demod(gr.hier_block2):
 		# correct sample rate offset, if enabled
 		if self.rp.autocorrect_sample_rate:
 			if verbose: print "--> dynamic sample rate correction enabled"
-			self.rate_detect_ns = detect_null.detect_null(dp.ns_length, False)
-			self.rate_estimator = dab_swig.estimate_sample_rate_bf(dp.sample_rate, dp.frame_length)
-			self.rate_prober = gr.probe_signal_f()
+			self.rate_detect_ns = dab.detect_null(dp.ns_length, False)
+			self.rate_estimator = dab.estimate_sample_rate_bf(dp.sample_rate, dp.frame_length)
+			self.rate_prober = blocks.probe_signal_f()
 			self.connect(self.input, self.rate_detect_ns, self.rate_estimator, self.rate_prober)
 			# self.resample = gr.fractional_interpolator_cc(0, 1)
-			self.resample = dab_swig.fractional_interpolator_triggered_update_cc(0,1)
+			self.resample = dab.fractional_interpolator_triggered_update_cc(0,1)
 			self.connect(self.rate_detect_ns, (self.resample,1))
 			self.updater = Timer(0.1,self.update_correction)
 			# self.updater = threading.Thread(target=self.update_correction)
