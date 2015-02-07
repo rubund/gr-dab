@@ -18,5 +18,7 @@
 # Boston, MA 02110-1301, USA.
 
 install(FILES
-    dab_ofdm_sync_dab.xml DESTINATION share/gnuradio/grc/blocks
+    dab_ofdm_sync_dab.xml
+    dab_ofdm_sync_dab2.xml
+    dab_detect_null.xml DESTINATION share/gnuradio/grc/blocks
 )
