@@ -47,6 +47,8 @@ namespace gr {
        * creating new instances.
        */
       static sptr make(float phase_shift, float interp_ratio);
+
+    void set_interp_ratio (float interp_ratio);
     };
 
   } // namespace dab
