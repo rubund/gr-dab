@@ -27,7 +27,7 @@
 # Andreas Mueller, 2008
 # andrmuel@ee.ethz.ch
 
-from gnuradio import gr, blocks
+from gnuradio import gr, blocks, fft
 import dab
 from threading import Timer
 from time import sleep
@@ -187,10 +187,10 @@ class ofdm_demod(gr.hier_block2):
 		self.sampler = dab.ofdm_sampler(dp.fft_length, dp.cp_length, dp.symbols_per_frame, rp.cp_gap)
 		
 		# fft for symbol vectors
-		self.fft = gr.fft_vcc(dp.fft_length, True, [], True)
+		self.fft = fft.fft_vcc(dp.fft_length, True, [], True)
 
 		# coarse frequency synchronisation
-		self.cfs = dab_swig.ofdm_coarse_frequency_correct(dp.fft_length, dp.num_carriers, dp.cp_length)
+		self.cfs = dab.ofdm_coarse_frequency_correct(dp.fft_length, dp.num_carriers, dp.cp_length)
 
 		# diff phasor
 		self.phase_diff = dab_swig.diff_phasor_vcc(dp.num_carriers)
