@@ -102,8 +102,8 @@ class ofdm_sync_dab2(gr.hier_block2):
 			self.connect(self.ns_detect, (self,1))
 
 		if debug:
-			self.connect(self.ffe, gr.multiply_const_ff(1./(dp.T*2*pi)), gr.file_sink(gr.sizeof_float, "debug/ofdm_sync_dab_fine_freq_err_f.dat"))
-			self.connect(self.ffs_mixer, gr.file_sink(gr.sizeof_gr_complex, "debug/ofdm_sync_dab_fine_freq_corrected_c.dat"))
+			self.connect(self.ffe, blocks.multiply_const_ff(1./(dp.T*2*pi)), blocks.file_sink(gr.sizeof_float, "debug/ofdm_sync_dab_fine_freq_err_f.dat"))
+			#self.connect(self.ffs_mixer, blocks.file_sink(gr.sizeof_gr_complex, "debug/ofdm_sync_dab_fine_freq_corrected_c.dat"))
 	
 	def clear_state(self):
 		self.ns_detect.clear_state()
