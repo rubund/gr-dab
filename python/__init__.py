@@ -32,4 +32,5 @@ except ImportError:
 
 # import any pure python here
 from ofdm_sync_dab import ofdm_sync_dab
+from ofdm_sync_dab2 import ofdm_sync_dab2
 #
