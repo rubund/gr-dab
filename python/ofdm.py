@@ -193,7 +193,7 @@ class ofdm_demod(gr.hier_block2):
 		self.cfs = dab.ofdm_coarse_frequency_correct(dp.fft_length, dp.num_carriers, dp.cp_length)
 
 		# diff phasor
-		self.phase_diff = dab_swig.diff_phasor_vcc(dp.num_carriers)
+		self.phase_diff = dab.diff_phasor_vcc(dp.num_carriers)
 
 		# remove pilot symbol
 		self.remove_pilot = dab_swig.ofdm_remove_first_symbol_vcc(dp.num_carriers)
