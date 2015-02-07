@@ -21,6 +21,7 @@
 #include "dab/measure_processing_rate.h"
 #include "dab/select_vectors.h"
 #include "dab/repartition_vectors.h"
+#include "dab/unpuncture_vff.h"
 %}
 
 
@@ -50,3 +51,5 @@ GR_SWIG_BLOCK_MAGIC2(dab, measure_processing_rate);
 GR_SWIG_BLOCK_MAGIC2(dab, select_vectors);
 %include "dab/repartition_vectors.h"
 GR_SWIG_BLOCK_MAGIC2(dab, repartition_vectors);
+%include "dab/unpuncture_vff.h"
+GR_SWIG_BLOCK_MAGIC2(dab, unpuncture_vff);
