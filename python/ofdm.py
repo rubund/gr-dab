@@ -184,7 +184,7 @@ class ofdm_demod(gr.hier_block2):
 		self.sync = dab.ofdm_sync_dab2(self.dp, self.rp, debug)
 
 		# ofdm symbol sampler
-		self.sampler = dab_swig.ofdm_sampler(dp.fft_length, dp.cp_length, dp.symbols_per_frame, rp.cp_gap)
+		self.sampler = dab.ofdm_sampler(dp.fft_length, dp.cp_length, dp.symbols_per_frame, rp.cp_gap)
 		
 		# fft for symbol vectors
 		self.fft = gr.fft_vcc(dp.fft_length, True, [], True)

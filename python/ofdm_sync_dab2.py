@@ -76,7 +76,7 @@ class ofdm_sync_dab2(gr.hier_block2):
 		# Magnus Sandell, Per Ola Börjesson, see
 		# http://www.sm.luth.se/csee/sp/research/report/bsb96r.html
 
-		self.ffe = dab_swig.ofdm_ffe_all_in_one(dp.symbol_length, dp.fft_length, rp.symbols_for_ffs_estimation, rp.ffs_alpha, dp.sample_rate)
+		self.ffe = dab.ofdm_ffe_all_in_one(dp.symbol_length, dp.fft_length, rp.symbols_for_ffs_estimation, rp.ffs_alpha, int(dp.sample_rate))
 		if rp.correct_ffe:
 			self.ffs_delay_input_for_correction = gr.delay(gr.sizeof_gr_complex, dp.symbol_length*rp.symbols_for_ffs_estimation) # by delaying the input, we can use the ff offset estimation from the first symbol to correct the first symbol itself
 			self.ffs_delay_frame_start = gr.delay(gr.sizeof_char, dp.symbol_length*rp.symbols_for_ffs_estimation) # sample the value at the end of the symbol ..
@@ -96,7 +96,7 @@ class ofdm_sync_dab2(gr.hier_block2):
 			self.connect(self.ns_detect, self.ffs_delay_frame_start, (self, 1))
 		else: 
 			# just patch the signal through
-			self.connect(self.ffe, gr.null_sink(gr.sizeof_float))
+			self.connect(self.ffe, blocks.null_sink(gr.sizeof_float))
 			self.connect(self.input, (self,0))
 			# frame start still needed ..
 			self.connect(self.ns_detect, (self,1))
