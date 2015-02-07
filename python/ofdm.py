@@ -207,7 +207,7 @@ class ofdm_demod(gr.hier_block2):
 		self.deinterleave = dab.frequency_interleaver_vcc(dp.frequency_deinterleaving_sequence_array)
 		
 		# symbol demapping
-		self.demapper = dab_swig.qpsk_demapper_vcb(dp.num_carriers)
+		self.demapper = dab.qpsk_demapper_vcb(dp.num_carriers)
 
 		#
 		# connect everything

@@ -15,6 +15,7 @@
 #include "dab/diff_phasor_vcc.h"
 #include "dab/ofdm_remove_first_symbol_vcc.h"
 #include "dab/frequency_interleaver_vcc.h"
+#include "dab/qpsk_demapper_vcb.h"
 %}
 
 
@@ -32,3 +33,5 @@ GR_SWIG_BLOCK_MAGIC2(dab, diff_phasor_vcc);
 GR_SWIG_BLOCK_MAGIC2(dab, ofdm_remove_first_symbol_vcc);
 %include "dab/frequency_interleaver_vcc.h"
 GR_SWIG_BLOCK_MAGIC2(dab, frequency_interleaver_vcc);
+%include "dab/qpsk_demapper_vcb.h"
+GR_SWIG_BLOCK_MAGIC2(dab, qpsk_demapper_vcb);
