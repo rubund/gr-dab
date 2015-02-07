@@ -22,6 +22,7 @@
 #include "dab/select_vectors.h"
 #include "dab/repartition_vectors.h"
 #include "dab/unpuncture_vff.h"
+#include "dab/prune_vectors.h"
 %}
 
 
@@ -53,3 +54,5 @@ GR_SWIG_BLOCK_MAGIC2(dab, select_vectors);
 GR_SWIG_BLOCK_MAGIC2(dab, repartition_vectors);
 %include "dab/unpuncture_vff.h"
 GR_SWIG_BLOCK_MAGIC2(dab, unpuncture_vff);
+%include "dab/prune_vectors.h"
+GR_SWIG_BLOCK_MAGIC2(dab, prune_vectors);

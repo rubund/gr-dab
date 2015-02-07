@@ -93,16 +93,16 @@ class fic_decode(gr.hier_block2):
 		self.conv_prune = dab.prune_vectors(gr.sizeof_char, self.dp.fic_conv_codeword_length/4, 0, self.dp.conv_code_add_bits_input)
 
 		# energy dispersal
-		self.prbs_src   = gr.vector_source_b(self.dp.prbs(self.dp.energy_dispersal_fic_vector_length), True)
-		self.energy_v2s = gr.vector_to_stream(gr.sizeof_char, self.dp.energy_dispersal_fic_vector_length)
-		self.add_mod_2  = gr.xor_bb()
-		self.energy_s2v = gr.stream_to_vector(gr.sizeof_char, self.dp.energy_dispersal_fic_vector_length)
-		self.cut_into_fibs = dab_swig.repartition_vectors(gr.sizeof_char, self.dp.energy_dispersal_fic_vector_length, self.dp.fib_bits, 1, self.dp.energy_dispersal_fic_fibs_per_vector)
+		self.prbs_src   = blocks.vector_source_b(self.dp.prbs(self.dp.energy_dispersal_fic_vector_length), True)
+		self.energy_v2s = blocks.vector_to_stream(gr.sizeof_char, self.dp.energy_dispersal_fic_vector_length)
+		self.add_mod_2  = blocks.xor_bb()
+		self.energy_s2v = blocks.stream_to_vector(gr.sizeof_char, self.dp.energy_dispersal_fic_vector_length)
+		self.cut_into_fibs = dab.repartition_vectors(gr.sizeof_char, self.dp.energy_dispersal_fic_vector_length, self.dp.fib_bits, 1, self.dp.energy_dispersal_fic_fibs_per_vector)
 		
 		# connect all
-		self.nullsink = gr.null_sink(gr.sizeof_char)
+		self.nullsink = blocks.null_sink(gr.sizeof_char)
 		# self.filesink = gr.file_sink(gr.sizeof_char, "debug/fic.dat")
-		self.fibsink = dab_swig.fib_sink_vb()
+		self.fibsink = dab.fib_sink_vb()
 		
 		# self.connect((self,0), (self.select_fic_syms,0), (self.repartition_fic,0), self.unpuncture, self.conv_v2s, self.conv_decode, self.conv_s2v, self.conv_prune, self.energy_v2s, self.add_mod_2, self.energy_s2v, (self.cut_into_fibs,0), gr.vector_to_stream(1,256), gr.unpacked_to_packed_bb(1,gr.GR_MSB_FIRST), self.filesink)
 		self.connect((self,0), (self.select_fic_syms,0), (self.repartition_fic,0), self.unpuncture, self.conv_v2s, self.conv_decode, self.conv_s2v, self.conv_prune, self.energy_v2s, self.add_mod_2, self.energy_s2v, (self.cut_into_fibs,0), gr.vector_to_stream(1,256), gr.unpacked_to_packed_bb(1,gr.GR_MSB_FIRST), gr.stream_to_vector(1,32), self.fibsink)

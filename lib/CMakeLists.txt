@@ -40,6 +40,7 @@ list(APPEND dab_sources
     select_vectors_impl.cc
     repartition_vectors_impl.cc
     unpuncture_vff_impl.cc
+    prune_vectors_impl.cc
 )
 
 set(dab_sources "${dab_sources}" PARENT_SCOPE)

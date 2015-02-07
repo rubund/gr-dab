@@ -35,5 +35,6 @@ install(FILES
     dab_fic_decode.xml
     dab_select_vectors.xml
     dab_repartition_vectors.xml
-    dab_unpuncture_vff.xml DESTINATION share/gnuradio/grc/blocks
+    dab_unpuncture_vff.xml
+    dab_prune_vectors.xml DESTINATION share/gnuradio/grc/blocks
 )
