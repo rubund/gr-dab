@@ -23,5 +23,6 @@
 install(FILES
     api.h
     moving_sum_ff.h
-    ofdm_ffe_all_in_one.h DESTINATION include/dab
+    ofdm_ffe_all_in_one.h
+    ofdm_sampler.h DESTINATION include/dab
 )
