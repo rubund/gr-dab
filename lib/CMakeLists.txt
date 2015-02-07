@@ -44,6 +44,7 @@ list(APPEND dab_sources
     fib_sink_vb_impl.cc
     crc16.cc
     estimate_sample_rate_bf_impl.cc
+    fractional_interpolator_triggered_update_cc_impl.cc
 )
 
 set(dab_sources "${dab_sources}" PARENT_SCOPE)
