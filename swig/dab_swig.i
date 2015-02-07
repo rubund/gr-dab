@@ -20,6 +20,7 @@
 #include "dab/modulo_ff.h"
 #include "dab/measure_processing_rate.h"
 #include "dab/select_vectors.h"
+#include "dab/repartition_vectors.h"
 %}
 
 
@@ -47,3 +48,5 @@ GR_SWIG_BLOCK_MAGIC2(dab, modulo_ff);
 GR_SWIG_BLOCK_MAGIC2(dab, measure_processing_rate);
 %include "dab/select_vectors.h"
 GR_SWIG_BLOCK_MAGIC2(dab, select_vectors);
+%include "dab/repartition_vectors.h"
+GR_SWIG_BLOCK_MAGIC2(dab, repartition_vectors);

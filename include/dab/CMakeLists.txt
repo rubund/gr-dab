@@ -33,5 +33,6 @@ install(FILES
     complex_to_interleaved_float_vcf.h
     modulo_ff.h
     measure_processing_rate.h
-    select_vectors.h DESTINATION include/dab
+    select_vectors.h
+    repartition_vectors.h DESTINATION include/dab
 )
