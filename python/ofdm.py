@@ -204,7 +204,7 @@ class ofdm_demod(gr.hier_block2):
 			self.equalizer = dab_swig.magnitude_equalizer_vcc(dp.num_carriers, rp.symbols_for_magnitude_equalization)
 
 		# frequency deinterleaving
-		self.deinterleave = dab_swig.frequency_interleaver_vcc(dp.frequency_deinterleaving_sequence_array)
+		self.deinterleave = dab.frequency_interleaver_vcc(dp.frequency_deinterleaving_sequence_array)
 		
 		# symbol demapping
 		self.demapper = dab_swig.qpsk_demapper_vcb(dp.num_carriers)
