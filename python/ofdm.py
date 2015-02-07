@@ -99,14 +99,14 @@ class ofdm_mod(gr.hier_block2):
 		self.connect((self,1), (self.insert_pilot,1), (self.sum_phase,1), (self.insert_null,1))
 
 		if debug:
-			self.connect(self.mapper, gr.file_sink(gr.sizeof_gr_complex*dp.num_carriers, "debug/generated_signal_mapper.dat"))
-			self.connect(self.insert_pilot, gr.file_sink(gr.sizeof_gr_complex*dp.num_carriers, "debug/generated_signal_insert_pilot.dat"))
-			self.connect(self.sum_phase, gr.file_sink(gr.sizeof_gr_complex*dp.num_carriers, "debug/generated_signal_sum_phase.dat"))
-			self.connect(self.interleave, gr.file_sink(gr.sizeof_gr_complex*dp.num_carriers, "debug/generated_signal_interleave.dat"))
-			self.connect(self.move_and_insert_carrier, gr.file_sink(gr.sizeof_gr_complex*dp.fft_length, "debug/generated_signal_move_and_insert_carrier.dat"))
-			self.connect(self.ifft, gr.file_sink(gr.sizeof_gr_complex*dp.fft_length, "debug/generated_signal_ifft.dat"))
-			self.connect(self.prefixer, gr.file_sink(gr.sizeof_gr_complex, "debug/generated_signal_prefixer.dat"))
-			self.connect(self.insert_null, gr.file_sink(gr.sizeof_gr_complex, "debug/generated_signal.dat"))
+			self.connect(self.mapper, blocks.file_sink(gr.sizeof_gr_complex*dp.num_carriers, "debug/generated_signal_mapper.dat"))
+			self.connect(self.insert_pilot, blocks.file_sink(gr.sizeof_gr_complex*dp.num_carriers, "debug/generated_signal_insert_pilot.dat"))
+			self.connect(self.sum_phase, blocks.file_sink(gr.sizeof_gr_complex*dp.num_carriers, "debug/generated_signal_sum_phase.dat"))
+			self.connect(self.interleave, blocks.file_sink(gr.sizeof_gr_complex*dp.num_carriers, "debug/generated_signal_interleave.dat"))
+			self.connect(self.move_and_insert_carrier, blocks.file_sink(gr.sizeof_gr_complex*dp.fft_length, "debug/generated_signal_move_and_insert_carrier.dat"))
+			self.connect(self.ifft, blocks.file_sink(gr.sizeof_gr_complex*dp.fft_length, "debug/generated_signal_ifft.dat"))
+			self.connect(self.prefixer, blocks.file_sink(gr.sizeof_gr_complex, "debug/generated_signal_prefixer.dat"))
+			self.connect(self.insert_null, blocks.file_sink(gr.sizeof_gr_complex, "debug/generated_signal.dat"))
 
 
 
@@ -264,16 +264,16 @@ class ofdm_demod(gr.hier_block2):
 
 		# debugging
 		if debug:
-			self.connect(self.fft, gr.file_sink(gr.sizeof_gr_complex*dp.fft_length, "debug/ofdm_after_fft.dat"))
-			self.connect((self.cfs,0), gr.file_sink(gr.sizeof_gr_complex*dp.num_carriers, "debug/ofdm_after_cfs.dat"))
-			self.connect(self.phase_diff, gr.file_sink(gr.sizeof_gr_complex*dp.num_carriers, "debug/ofdm_diff_phasor.dat"))
-			self.connect((self.remove_pilot,0), gr.file_sink(gr.sizeof_gr_complex*dp.num_carriers, "debug/ofdm_pilot_removed.dat"))
-			self.connect((self.remove_pilot,1), gr.file_sink(gr.sizeof_char, "debug/ofdm_after_cfs_trigger.dat"))
-			self.connect(self.deinterleave, gr.file_sink(gr.sizeof_gr_complex*dp.num_carriers, "debug/ofdm_deinterleaved.dat"))
+			self.connect(self.fft, blocks.file_sink(gr.sizeof_gr_complex*dp.fft_length, "debug/ofdm_after_fft.dat"))
+			self.connect((self.cfs,0), blocks.file_sink(gr.sizeof_gr_complex*dp.num_carriers, "debug/ofdm_after_cfs.dat"))
+			self.connect(self.phase_diff, blocks.file_sink(gr.sizeof_gr_complex*dp.num_carriers, "debug/ofdm_diff_phasor.dat"))
+			self.connect((self.remove_pilot,0), blocks.file_sink(gr.sizeof_gr_complex*dp.num_carriers, "debug/ofdm_pilot_removed.dat"))
+			self.connect((self.remove_pilot,1), blocks.file_sink(gr.sizeof_char, "debug/ofdm_after_cfs_trigger.dat"))
+			self.connect(self.deinterleave, blocks.file_sink(gr.sizeof_gr_complex*dp.num_carriers, "debug/ofdm_deinterleaved.dat"))
 			if self.rp.equalize_magnitude:
-				self.connect(self.equalizer, gr.file_sink(gr.sizeof_gr_complex*dp.num_carriers, "debug/ofdm_equalizer.dat"))
+				self.connect(self.equalizer, blocks.file_sink(gr.sizeof_gr_complex*dp.num_carriers, "debug/ofdm_equalizer.dat"))
 			if self.rp.softbits:
-				self.connect(self.softbit_interleaver, gr.file_sink(gr.sizeof_float*dp.num_carriers*2, "debug/softbits.dat"))
+				self.connect(self.softbit_interleaver, blocks.file_sink(gr.sizeof_float*dp.num_carriers*2, "debug/softbits.dat"))
 	
 	def clear_state(self):
 		self.sync.clear_state()
