@@ -27,7 +27,7 @@
 # Andreas Mueller, 2008
 # andrmuel@ee.ethz.ch
 
-from gnuradio import gr, blocks, fft
+from gnuradio import gr, blocks, fft, filter
 import dab
 from threading import Timer
 from time import sleep
@@ -248,11 +248,11 @@ class ofdm_demod(gr.hier_block2):
 		self.phase_var_arg     = blocks.complex_to_arg(dp.num_carriers)
 		self.phase_var_v2s     = blocks.vector_to_stream(gr.sizeof_float, dp.num_carriers)
 		self.phase_var_mod     = dab.modulo_ff(pi/2)
-		self.phase_var_avg_mod = gr.iir_filter_ffd([rp.phase_var_estimate_alpha], [0,1-rp.phase_var_estimate_alpha]) 
-		self.phase_var_sub_avg = gr.sub_ff()
-		self.phase_var_sqr     = gr.multiply_ff()
-		self.phase_var_avg     = gr.iir_filter_ffd([rp.phase_var_estimate_alpha], [0,1-rp.phase_var_estimate_alpha]) 
-		self.probe_phase_var   = gr.probe_signal_f()
+		self.phase_var_avg_mod = filter.iir_filter_ffd([rp.phase_var_estimate_alpha], [0,1-rp.phase_var_estimate_alpha]) 
+		self.phase_var_sub_avg = blocks.sub_ff()
+		self.phase_var_sqr     = blocks.multiply_ff()
+		self.phase_var_avg     = filter.iir_filter_ffd([rp.phase_var_estimate_alpha], [0,1-rp.phase_var_estimate_alpha]) 
+		self.probe_phase_var   = blocks.probe_signal_f()
 		self.connect((self.remove_pilot,0), self.phase_var_decim, self.phase_var_arg, self.phase_var_v2s, self.phase_var_mod, (self.phase_var_sub_avg,0), (self.phase_var_sqr,0))
 		self.connect(self.phase_var_mod, self.phase_var_avg_mod, (self.phase_var_sub_avg,1))
 		self.connect(self.phase_var_sub_avg, (self.phase_var_sqr,1))
