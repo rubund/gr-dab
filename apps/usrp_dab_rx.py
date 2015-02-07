@@ -87,9 +87,10 @@ class usrp_dab_rx(gr.top_block):
 		# set gain      
 		if options.rx_gain is None:
 			# if no gain was specified, use the mid-point in dB
-			g = self.subdev.gain_range()
+			g = [0,100]
 			options.rx_gain = float(g[0]+g[1])/2
-		self.subdev.set_gain(options.rx_gain)
+		self.src.set_gain(options.rx_gain)
+		#self.subdev.set_gain(options.rx_gain)
 
 		self.update_ui = options.verbose
 		if self.update_ui:
@@ -124,7 +125,7 @@ class usrp_dab_rx(gr.top_block):
 			time.sleep(1./self.rx_params.usrp_ffc_retune_frequency)
 
 	def set_freq(self, freq):
-		if self.src.tune(0, self.subdev, freq):
+		if self.src.set_center_freq(freq): #src.tune(0, self.subdev, freq):
 			if self.verbose:
 				print "--> retuned to " + str(freq) + " Hz"
 			return True
