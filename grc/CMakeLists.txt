@@ -37,5 +37,6 @@ install(FILES
     dab_repartition_vectors.xml
     dab_unpuncture_vff.xml
     dab_prune_vectors.xml
-    dab_fib_sink_vb.xml DESTINATION share/gnuradio/grc/blocks
+    dab_fib_sink_vb.xml
+    dab_estimate_sample_rate_bf.xml DESTINATION share/gnuradio/grc/blocks
 )

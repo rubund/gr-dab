@@ -37,5 +37,6 @@ install(FILES
     repartition_vectors.h
     unpuncture_vff.h
     prune_vectors.h
-    fib_sink_vb.h DESTINATION include/dab
+    fib_sink_vb.h
+    estimate_sample_rate_bf.h DESTINATION include/dab
 )
