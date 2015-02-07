@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# _*_ coding: utf8 _*_
+# -*- coding: utf8 -*-
 
 # Andreas Müller, 2008
 # andrmuel@ee.ethz.ch

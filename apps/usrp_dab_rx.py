@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# _*_ coding: utf8 _*_
+# -*- coding: utf8 -*-
 
 # Andreas Müller, 2008
 # andrmuel@ee.ethz.ch
@@ -10,9 +9,9 @@
 receive DAB with USRP
 """
 
-from gnuradio import gr, usrp, blks2
-from gnuradio.eng_option import eng_option
+from gnuradio import gr, uhd, blocks
 import dab
+from gnuradio.eng_option import eng_option
 from optparse import OptionParser
 import sys, time, threading, math
 
@@ -59,12 +58,13 @@ class usrp_dab_rx(gr.top_block):
 
 		self.verbose = options.verbose
 
-		self.src = usrp.source_c(decim_rate=options.decim)
-        	self.src.set_mux(usrp.determine_rx_mux_value(self.src, options.rx_subdev_spec))
-        	self.subdev = usrp.selected_subdev(self.src, options.rx_subdev_spec)
-        	print "--> using RX dboard " + self.subdev.side_and_name()
+		self.src = uhd.usrp_source("",uhd.io_type.COMPLEX_FLOAT32,1)
+        	#self.src.set_mux(usrp.determine_rx_mux_value(self.src, options.rx_subdev_spec))
+        	#self.subdev = uhd.selected_subdev(self.src, options.rx_subdev_spec)
+        	#print "--> using RX dboard " + self.subdev.side_and_name()
 		
-		self.sample_rate = self.src.adc_rate()/options.decim
+		self.sample_rate = 2e6#self.src.adc_rate()/options.decim
+		self.src.set_samp_rate(self.sample_rate)
 		self.dab_params = dab.parameters.dab_parameters(mode=options.dab_mode, sample_rate=self.sample_rate, verbose=options.verbose)
 		self.rx_params = dab.parameters.receiver_parameters(mode=options.dab_mode, softbits=True, input_fft_filter=options.filter_input, autocorrect_sample_rate=options.autocorrect_sample_rate, sample_rate_correction_factor=options.resample_fixed, verbose=options.verbose, correct_ffe=options.correct_ffe, equalize_magnitude=options.equalize_magnitude)
 
