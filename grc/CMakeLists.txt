@@ -21,5 +21,6 @@ install(FILES
     dab_ofdm_sync_dab.xml
     dab_ofdm_sync_dab2.xml
     dab_detect_null.xml
-    dab_moving_sum_ff.xml DESTINATION share/gnuradio/grc/blocks
+    dab_moving_sum_ff.xml
+    dab_ofdm_ffe_all_in_one.xml DESTINATION share/gnuradio/grc/blocks
 )
