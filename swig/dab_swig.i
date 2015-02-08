@@ -27,6 +27,7 @@
 #include "dab/estimate_sample_rate_bf.h"
 #include "dab/fractional_interpolator_triggered_update_cc.h"
 #include "dab/magnitude_equalizer_vcc.h"
+#include "dab/qpsk_mapper_vbc.h"
 %}
 
 
@@ -68,3 +69,5 @@ GR_SWIG_BLOCK_MAGIC2(dab, estimate_sample_rate_bf);
 GR_SWIG_BLOCK_MAGIC2(dab, fractional_interpolator_triggered_update_cc);
 %include "dab/magnitude_equalizer_vcc.h"
 GR_SWIG_BLOCK_MAGIC2(dab, magnitude_equalizer_vcc);
+%include "dab/qpsk_mapper_vbc.h"
+GR_SWIG_BLOCK_MAGIC2(dab, qpsk_mapper_vbc);

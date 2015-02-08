@@ -46,6 +46,7 @@ list(APPEND dab_sources
     estimate_sample_rate_bf_impl.cc
     fractional_interpolator_triggered_update_cc_impl.cc
     magnitude_equalizer_vcc_impl.cc
+    qpsk_mapper_vbc_impl.cc
 )
 
 set(dab_sources "${dab_sources}" PARENT_SCOPE)

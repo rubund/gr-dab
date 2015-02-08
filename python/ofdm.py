@@ -61,10 +61,10 @@ class ofdm_mod(gr.hier_block2):
 
 
 		# symbol mapping
-		self.mapper = dab_swig.qpsk_mapper_vbc(dp.num_carriers)
+		self.mapper = dab.qpsk_mapper_vbc(dp.num_carriers)
 
 		# add pilot symbol
-		self.insert_pilot = dab_swig.ofdm_insert_pilot_vcc(dp.prn)
+		self.insert_pilot = dab.ofdm_insert_pilot_vcc(dp.prn)
 
 		# phase sum
 		self.sum_phase = dab_swig.sum_phasor_trig_vcc(dp.num_carriers)
