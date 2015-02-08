@@ -23,7 +23,7 @@
 # Andreas Mueller, 2008
 # andrmuel@ee.ethz.ch
 
-from gnuradio import gr, blocks
+from gnuradio import gr, blocks, analog
 import dab
 import sys
 from math import pi
@@ -78,10 +78,10 @@ class ofdm_sync_dab2(gr.hier_block2):
 
 		self.ffe = dab.ofdm_ffe_all_in_one(dp.symbol_length, dp.fft_length, rp.symbols_for_ffs_estimation, rp.ffs_alpha, int(dp.sample_rate))
 		if rp.correct_ffe:
-			self.ffs_delay_input_for_correction = gr.delay(gr.sizeof_gr_complex, dp.symbol_length*rp.symbols_for_ffs_estimation) # by delaying the input, we can use the ff offset estimation from the first symbol to correct the first symbol itself
-			self.ffs_delay_frame_start = gr.delay(gr.sizeof_char, dp.symbol_length*rp.symbols_for_ffs_estimation) # sample the value at the end of the symbol ..
-			self.ffs_nco = gr.frequency_modulator_fc(1) # ffs_sample_and_hold directly outputs phase error per sample
-			self.ffs_mixer = gr.multiply_cc()
+			self.ffs_delay_input_for_correction = blocks.delay(gr.sizeof_gr_complex, dp.symbol_length*rp.symbols_for_ffs_estimation) # by delaying the input, we can use the ff offset estimation from the first symbol to correct the first symbol itself
+			self.ffs_delay_frame_start = blocks.delay(gr.sizeof_char, dp.symbol_length*rp.symbols_for_ffs_estimation) # sample the value at the end of the symbol ..
+			self.ffs_nco = analog.frequency_modulator_fc(1) # ffs_sample_and_hold directly outputs phase error per sample
+			self.ffs_mixer = blocks.multiply_cc()
 
 		# calculate fine frequency error
 		self.connect(self.input, (self.ffe, 0))
