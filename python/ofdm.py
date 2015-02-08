@@ -201,7 +201,7 @@ class ofdm_demod(gr.hier_block2):
 		# magnitude equalisation
 		if self.rp.equalize_magnitude:
 			if verbose: print "--> magnitude equalization enabled"
-			self.equalizer = dab_swig.magnitude_equalizer_vcc(dp.num_carriers, rp.symbols_for_magnitude_equalization)
+			self.equalizer = dab.magnitude_equalizer_vcc(dp.num_carriers, rp.symbols_for_magnitude_equalization)
 
 		# frequency deinterleaving
 		self.deinterleave = dab.frequency_interleaver_vcc(dp.frequency_deinterleaving_sequence_array)

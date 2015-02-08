@@ -39,5 +39,6 @@ install(FILES
     prune_vectors.h
     fib_sink_vb.h
     estimate_sample_rate_bf.h
-    fractional_interpolator_triggered_update_cc.h DESTINATION include/dab
+    fractional_interpolator_triggered_update_cc.h
+    magnitude_equalizer_vcc.h DESTINATION include/dab
 )
