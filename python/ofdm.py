@@ -67,13 +67,13 @@ class ofdm_mod(gr.hier_block2):
 		self.insert_pilot = dab.ofdm_insert_pilot_vcc(dp.prn)
 
 		# phase sum
-		self.sum_phase = dab_swig.sum_phasor_trig_vcc(dp.num_carriers)
+		self.sum_phase = dab.sum_phasor_trig_vcc(dp.num_carriers)
 
 		# frequency interleaving
-		self.interleave = dab_swig.frequency_interleaver_vcc(dp.frequency_interleaving_sequence_array)
+		self.interleave = dab.frequency_interleaver_vcc(dp.frequency_interleaving_sequence_array)
 
 		# add central carrier & move to middle
-		self.move_and_insert_carrier = dab_swig.ofdm_move_and_insert_zero(dp.fft_length, dp.num_carriers)
+		self.move_and_insert_carrier = dab.ofdm_move_and_insert_zero(dp.fft_length, dp.num_carriers)
 
 		# ifft
 		self.ifft = gr.fft_vcc(dp.fft_length, False, [], True)

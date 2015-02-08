@@ -41,5 +41,6 @@ install(FILES
     estimate_sample_rate_bf.h
     fractional_interpolator_triggered_update_cc.h
     magnitude_equalizer_vcc.h
-    qpsk_mapper_vbc.h DESTINATION include/dab
+    qpsk_mapper_vbc.h
+    ofdm_insert_pilot_vcc.h DESTINATION include/dab
 )

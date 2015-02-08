@@ -28,6 +28,7 @@
 #include "dab/fractional_interpolator_triggered_update_cc.h"
 #include "dab/magnitude_equalizer_vcc.h"
 #include "dab/qpsk_mapper_vbc.h"
+#include "dab/ofdm_insert_pilot_vcc.h"
 %}
 
 
@@ -71,3 +72,5 @@ GR_SWIG_BLOCK_MAGIC2(dab, fractional_interpolator_triggered_update_cc);
 GR_SWIG_BLOCK_MAGIC2(dab, magnitude_equalizer_vcc);
 %include "dab/qpsk_mapper_vbc.h"
 GR_SWIG_BLOCK_MAGIC2(dab, qpsk_mapper_vbc);
+%include "dab/ofdm_insert_pilot_vcc.h"
+GR_SWIG_BLOCK_MAGIC2(dab, ofdm_insert_pilot_vcc);
