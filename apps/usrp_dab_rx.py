@@ -90,8 +90,8 @@ class usrp_dab_rx(gr.top_block):
 		# set gain      
 		if options.rx_gain is None:
 			# if no gain was specified, use the mid-point in dB
-			g = [0,100]
-			options.rx_gain = float(g[0]+g[1])/2
+			g = self.src.get_gain_range()
+			options.rx_gain = float(g.start()+g.stop())/2
 		self.src.set_gain(options.rx_gain)
 		#self.subdev.set_gain(options.rx_gain)
 

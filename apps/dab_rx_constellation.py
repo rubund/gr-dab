@@ -75,8 +75,8 @@ class usrp_dab_gui_rx(stdgui2.std_top_block):
 			# set gain      
 			if options.rx_gain is None:
 				# if no gain was specified, use the mid-point in dB
-				g = [0,100]
-				options.rx_gain = float(g[0]+g[1])/2
+				g = self.src.get_gain_range()
+				options.rx_gain = float(g.start()+g.stop())/2
 			self.src.set_gain(options.rx_gain)
 			self.sample_rate = 2e6#self.src.adc_rate()/options.decim
 			self.src.set_samp_rate(self.sample_rate)
