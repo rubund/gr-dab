@@ -43,5 +43,6 @@ install(FILES
     dab_magnitude_equalizer_vcc.xml
     dab_qpsk_mapper_vbc.xml
     dab_ofdm_insert_pilot_vcc.xml
-    dab_sum_phasor_trig_vcc.xml DESTINATION share/gnuradio/grc/blocks
+    dab_sum_phasor_trig_vcc.xml
+    dab_ofdm_move_and_insert_zero.xml DESTINATION share/gnuradio/grc/blocks
 )

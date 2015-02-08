@@ -43,5 +43,6 @@ install(FILES
     magnitude_equalizer_vcc.h
     qpsk_mapper_vbc.h
     ofdm_insert_pilot_vcc.h
-    sum_phasor_trig_vcc.h DESTINATION include/dab
+    sum_phasor_trig_vcc.h
+    ofdm_move_and_insert_zero.h DESTINATION include/dab
 )

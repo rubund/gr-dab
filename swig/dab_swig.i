@@ -30,6 +30,7 @@
 #include "dab/qpsk_mapper_vbc.h"
 #include "dab/ofdm_insert_pilot_vcc.h"
 #include "dab/sum_phasor_trig_vcc.h"
+#include "dab/ofdm_move_and_insert_zero.h"
 %}
 
 
@@ -77,3 +78,5 @@ GR_SWIG_BLOCK_MAGIC2(dab, qpsk_mapper_vbc);
 GR_SWIG_BLOCK_MAGIC2(dab, ofdm_insert_pilot_vcc);
 %include "dab/sum_phasor_trig_vcc.h"
 GR_SWIG_BLOCK_MAGIC2(dab, sum_phasor_trig_vcc);
+%include "dab/ofdm_move_and_insert_zero.h"
+GR_SWIG_BLOCK_MAGIC2(dab, ofdm_move_and_insert_zero);

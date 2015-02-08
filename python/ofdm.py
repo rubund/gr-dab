@@ -27,7 +27,7 @@
 # Andreas Mueller, 2008
 # andrmuel@ee.ethz.ch
 
-from gnuradio import gr, blocks, fft, filter
+from gnuradio import gr, blocks, fft, filter, digital
 import dab
 from threading import Timer
 from time import sleep
@@ -76,16 +76,16 @@ class ofdm_mod(gr.hier_block2):
 		self.move_and_insert_carrier = dab.ofdm_move_and_insert_zero(dp.fft_length, dp.num_carriers)
 
 		# ifft
-		self.ifft = gr.fft_vcc(dp.fft_length, False, [], True)
+		self.ifft = fft.fft_vcc(dp.fft_length, False, [], True)
 
 		# cyclic prefixer
-		self.prefixer = gr.ofdm_cyclic_prefixer(dp.fft_length, dp.symbol_length)
+		self.prefixer = digital.ofdm_cyclic_prefixer(dp.fft_length, dp.symbol_length)
 
 		# convert back to vectors
-		self.s2v = gr.stream_to_vector(gr.sizeof_gr_complex, dp.symbol_length)
+		self.s2v = blocks.stream_to_vector(gr.sizeof_gr_complex, dp.symbol_length)
 
 		# add null symbol
-		self.insert_null = dab_swig.insert_null_symbol(dp.ns_length, dp.symbol_length)
+		self.insert_null = dab.insert_null_symbol(dp.ns_length, dp.symbol_length)
 
 		#
 		# connect it all
