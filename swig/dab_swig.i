@@ -31,6 +31,7 @@
 #include "dab/ofdm_insert_pilot_vcc.h"
 #include "dab/sum_phasor_trig_vcc.h"
 #include "dab/ofdm_move_and_insert_zero.h"
+#include "dab/insert_null_symbol.h"
 %}
 
 
@@ -80,3 +81,5 @@ GR_SWIG_BLOCK_MAGIC2(dab, ofdm_insert_pilot_vcc);
 GR_SWIG_BLOCK_MAGIC2(dab, sum_phasor_trig_vcc);
 %include "dab/ofdm_move_and_insert_zero.h"
 GR_SWIG_BLOCK_MAGIC2(dab, ofdm_move_and_insert_zero);
+%include "dab/insert_null_symbol.h"
+GR_SWIG_BLOCK_MAGIC2(dab, insert_null_symbol);
