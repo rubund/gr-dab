@@ -42,5 +42,6 @@ install(FILES
     fractional_interpolator_triggered_update_cc.h
     magnitude_equalizer_vcc.h
     qpsk_mapper_vbc.h
-    ofdm_insert_pilot_vcc.h DESTINATION include/dab
+    ofdm_insert_pilot_vcc.h
+    sum_phasor_trig_vcc.h DESTINATION include/dab
 )

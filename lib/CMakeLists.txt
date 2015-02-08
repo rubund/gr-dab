@@ -48,6 +48,7 @@ list(APPEND dab_sources
     magnitude_equalizer_vcc_impl.cc
     qpsk_mapper_vbc_impl.cc
     ofdm_insert_pilot_vcc_impl.cc
+    sum_phasor_trig_vcc_impl.cc
 )
 
 set(dab_sources "${dab_sources}" PARENT_SCOPE)

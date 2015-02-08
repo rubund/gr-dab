@@ -29,6 +29,7 @@
 #include "dab/magnitude_equalizer_vcc.h"
 #include "dab/qpsk_mapper_vbc.h"
 #include "dab/ofdm_insert_pilot_vcc.h"
+#include "dab/sum_phasor_trig_vcc.h"
 %}
 
 
@@ -74,3 +75,5 @@ GR_SWIG_BLOCK_MAGIC2(dab, magnitude_equalizer_vcc);
 GR_SWIG_BLOCK_MAGIC2(dab, qpsk_mapper_vbc);
 %include "dab/ofdm_insert_pilot_vcc.h"
 GR_SWIG_BLOCK_MAGIC2(dab, ofdm_insert_pilot_vcc);
+%include "dab/sum_phasor_trig_vcc.h"
+GR_SWIG_BLOCK_MAGIC2(dab, sum_phasor_trig_vcc);
