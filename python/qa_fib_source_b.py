@@ -21,7 +21,6 @@
 
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
-import numpy as np
 import dab
 
 class qa_fib_source_b (gr_unittest.TestCase):
@@ -32,16 +31,18 @@ class qa_fib_source_b (gr_unittest.TestCase):
     def tearDown (self):
         self.tb = None
 
+#manual check if labels are printed from fibsink properly
     def test_001_t (self):
-        FIB_length = 240 #length of FIB in bit without CRC16
         src = dab.fib_source_b(1, 2, '__Galaxy_News', '_Galaxy_Radio1', 'Awesome_Mix_Vol1')
-        throttle = blocks.throttle(gr.sizeof_char*1, 32000, True)
-        dst = blocks.vector_sink_b();
-        self.tb.run(240) #2880 bit = 12 FIBs
-        result = dst.data()
-        #FIB = result[:10]
-        #print result
-        assert (1)
+        fib_unpacked_to_packed = blocks.unpacked_to_packed_bb(1, gr.GR_MSB_FIRST)
+        s2v = blocks.stream_to_vector(gr.sizeof_char, 32)
+        crc16 = dab.crc16_bb(32, 0x1021, 0xffff)
+        v2s = blocks.vector_to_stream(gr.sizeof_char, 32)
+        fibout = blocks.stream_to_vector(1, 32)
+        fibsink = dab.fib_sink_vb()
+        self.tb.connect(src, fib_unpacked_to_packed, blocks.head(gr.sizeof_char, 1000), s2v, crc16, v2s, fibout, fibsink)
+        self.tb.run()
+        pass
 
 
 if __name__ == '__main__':
