@@ -24,6 +24,7 @@
 
 #include <gnuradio/io_signature.h>
 #include "fib_source_b_impl.h"
+#include "FIC.h"
 
 namespace gr {
     namespace dab {
@@ -60,7 +61,7 @@ namespace gr {
  * SI-FIGs, ready to transmit
 */////////////////////////////////////////////
         //Ensemble label (bit 17 changed to 0)
-        const char fib_source_b_impl::ensemble_label[176] = {0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
+        char fib_source_b_impl::def_ensemble_label[176] = {0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
                                                                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1,
                                                                         0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0,
                                                                         0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1,
@@ -73,7 +74,7 @@ namespace gr {
         //"001 10101  0000 0 000 0100 000000000000 01011111 01011111 01000111 01100001 01101100 01100001 01111000 01111001 01011111 01001110 01100101 01110111 01110011 01011111 01011111 01011111 0011100011111000"; // Ensemble label: "__Galaxy_News___"
 
         //Programme Service label
-        const char fib_source_b_impl::service_label[176] = {0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0,
+        char fib_source_b_impl::def_programme_service_label[176] = {0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0,
                                                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0,
                                                                        0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1,
                                                                        1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1,
@@ -84,8 +85,8 @@ namespace gr {
         //001 10101 0000 0 001 0100000000000000 01011111 01000111 01100001 01101100 01100001 01111000 01111001 01011111 01010010 01100001 01100100 01101001 01101111 00110001 01011111 01011111 0111000111100100
 
         //Programme Service Component label
-        const char fib_source_b_impl::service_component_label[184] = {0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
-                                                                                 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        char fib_source_b_impl::def_service_comp_label[184] = {0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
+                                                                                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                                                                                  0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0,
                                                                                  1, 1, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0,
                                                                                  1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0,
@@ -97,14 +98,16 @@ namespace gr {
         //001 10110 0000 0 100 0 000 0000 0100000000000000 01000001 01110111 01100101 01110011 01101111 01101101 01100101 01011111 01001101 01101001 01111000 01011111 01010110 01101111 01101100 00110001 0000000011111111
 
         //service component language
-        const char fib_source_b_impl::service_comp_language[32] = {0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0,
+        const char fib_source_b_impl::def_service_comp_language[32] = {0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0,
                                                                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
                                                                               0}; //language German
-        //"000 00011  0 0 0 00101 0 0 000000 00001000"; //language German
+        //"000 00011  000 00101 0 0 000000 00001000"; //language German
 
         //SI_pointer array
-        const char* fib_source_b_impl::SI_pointer[num_SI] = {ensemble_label, service_label, service_component_label, service_comp_language};
-        const int fib_source_b_impl::SI_size[4] = {176, 176, 184, 32};
+        const char* fib_source_b_impl::SI_pointer[num_SI] = {def_ensemble_label, def_programme_service_label};
+        const int fib_source_b_impl::SI_size[num_SI] = {176, 176};
+        const char* fib_source_b_impl::SI_subch_pointer[num_SI_subch] = {def_service_comp_language, def_service_comp_label};
+        const int fib_source_b_impl::SI_subch_size[num_SI_subch] = {32, 184};
 
         fib_source_b::sptr
         fib_source_b::make(int transmission_mode, int number_subchannels, std::string ensemble_label,
@@ -126,8 +129,11 @@ namespace gr {
             num_subch = number_subchannels;
             nFIBs_written = 0;
             nSI_written = 0;
-            if(t_mode != 3) set_output_multiple(FIB_size * 3);
-            else set_output_multiple(FIB_size * 4);
+            if(t_mode != 3) set_output_multiple((8*FIB_LENGTH) * 3);
+            else set_output_multiple((8*FIB_LENGTH) * 4);
+            write_label(def_ensemble_label + 32, ensemble_label);
+            write_label(def_programme_service_label + 32, programme_service_label);
+            write_label(def_service_comp_label + 40, service_comp_label);
         }
 
         /*
@@ -232,18 +238,18 @@ namespace gr {
                         if (subch_count >= 1) { //change SubChID and Start Address of SubChannel
                             //the SubChannel ID has to increase, to be different
                             bit_adaption(out + offset - 18, subch_count, 6);
-                            //the Start Adress of the next subCh is increased about size_subCh = 140
+                            //the Start Adress of the next subCh is increased about size_subch = 140
                             bit_adaption(out + offset - 8, size_subch*subch_count, 10);
                         }
                     }
                     //MCI is set, set EndMarker and padding
-                    if (FIB_size -16 - offset >= 8) {//add EndMarker (111 11111) if there is minimum one byte left in FIG (FIG without 16 bit crc16)
+                    if ((8*FIB_DATA_FIELD_LENGTH) - offset >= 8) {//add EndMarker (111 11111) if there is minimum one byte left in FIG (FIG without 16 bit crc16)
                         for (int i = 0; i < 8; i++) { //find:: binde FIC.h ein und verwende die konstaten statt FIB_size
                             out[i + offset] = 1;
                         }
                     }
                     offset += 8;
-                    while (offset % FIB_size != 0) {//padding (fill rest of FIB with zeroes, as well the last 16 crc bits)
+                    while (offset % (8*FIB_LENGTH) != 0) {//padding (fill rest of FIB with zeroes, as well the last 16 crc bits)
                         out[offset] = 0;
                         offset++;
                     }
@@ -254,32 +260,39 @@ namespace gr {
  * write a not primary FIB with SI
  *///////////////////////////////////////////////
                     do {//write SI-FIG in FIB
-                        std::memcpy(out + offset, SI_pointer[nSI_written], SI_size[nSI_written]); //write SI in FIB
-                        offset += SI_size[nSI_written];
+                        if(nSI_written < num_SI) {//write SI from source arrays in FIB
+                            std::memcpy(out + offset, SI_pointer[nSI_written], SI_size[nSI_written]);
+                            offset += SI_size[nSI_written];
+                        }
+                        else{//write SI for subchannels (e.g. service component labels)
+                            std::memcpy(out + offset, SI_subch_pointer[nSI_written-num_SI], SI_size[nSI_written-num_SI]);
+                            offset += SI_subch_size[nSI_written-num_SI];
+                        }
                         nSI_written++;
-                        if(nSI_written >= num_SI) nSI_written = 0; //iterate over SI_data so every SI gets to be transmitted some time find:: num_SI ersetzten durch sizeof(SI_size)
-                    }while(FIB_size-(offset%FIB_size) - 16 >= SI_size[nSI_written]);
+                        //if(nSI_written >= num_SI + num_SI_subch) nSI_written = 0; //cyclic iteration over SI_data so every SI gets to be transmitted some time
+                        if(nSI_written >= num_SI + num_SI_subch) nSI_written = 0;
+                    }while(0);
+                    //while((nSI_written < num_SI && 8*FIB_DATA_FIELD_LENGTH - offset%(8*FIB_LENGTH) >= SI_size[nSI_written]) || (nSI_written < num_SI + num_SI_subch && 8*FIB_DATA_FIELD_LENGTH - offset%(8*FIB_LENGTH) >= SI_subch_size[nSI_written-num_SI]));
+
                     //FIB is filled, set endmarker and padding
-                    if (FIB_size - 16 - (offset%FIB_size) >= 8) {//add EndMarker (111 11111) if there is minimum one byte left in FIG
+                    if ((8*FIB_DATA_FIELD_LENGTH) - (offset%(8*FIB_LENGTH)) >= 8) {//add EndMarker (111 11111) if there is minimum one byte left in FIG
                         for (int i = 0; i < 8; i++) {
                             out[i + offset] = 1;
                         }
                     }
                     offset += 8;
-                    while (offset%FIB_size != 0) {//padding (fill rest of FIB with zeroes, as well the last 16 crc bits)
+                    while (offset%(8*FIB_LENGTH) != 0) {//padding (fill rest of FIB with zeroes, as well the last 16 crc bits)
                         out[offset] = 0;
                         offset++;
                     }
-
-                    if(nSI_written >= num_SI) nSI_written = 0; //iterate over SI_data so every SI gets to be transmitted some time find:: num_SI ersetzten durch sizeof(SI_size)
                     nFIBs_written++;
                 }//FIB finished
 
             }while((nFIBs_written%3 != 0 && t_mode != 3) || (nFIBs_written%4 != 0 && t_mode == 3)); //finished writing a row of FIBs (3 or 4) (number of FIBS for 1 Transmission Frame)
 
             // Tell runtime system how many output items we produced.
-            if(t_mode != 3) return 3 * FIB_size;
-            else return 4 * FIB_size;
+            if(t_mode != 3) return 3 * (8*FIB_LENGTH);
+            else return 4 * (8*FIB_LENGTH);
         }
 
     } /* namespace dab */

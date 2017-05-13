@@ -32,7 +32,6 @@ namespace gr {
         int t_mode; //transmission mode
         int offset; //offset for writing info to FIBs
         uint16_t nFIBs_written; //FIBs totally written
-        const static int FIB_size = 256; //32 byte
         void bit_adaption(char* out_ptr, int number, int num_bits); //writes an integer value to num_bits bits, beginning at (overwrites default zeros)
 
         //Multiplex Channel Info
@@ -51,17 +50,20 @@ namespace gr {
         const static int size_subchannel_orga_field = 24;
 
         //Service Information
-        const static char ensemble_label[176]; //21*8+8, ensemble label (FIG 1/0)
+        static char def_ensemble_label[176]; //21*8+8, ensemble label (FIG 1/0)
         const static int size_ensemble_label = 176;
-        const static char service_label[176]; //21*8+8, service label (FIG 1/0)
+        static char def_programme_service_label[176]; //21*8+8, service label (FIG 1/0)
         const static int size_service_label = 176;
-        const static char service_component_label[184]; //21*8+8, service component label (FIG 1/0)
-        const static int size_service_component_label = 184;
-        const static char service_comp_language[32]; //3*8+8, service component language; short form (FIG 0/5)
+        static char def_service_comp_label[184]; //21*8+8, service component label (FIG 1/0)
+        const static int size_service_comp_label = 184;
+        const static char def_service_comp_language[32]; //3*8+8, service component language; short form (FIG 0/5)
         const static int size_service_comp_language = 32;
-        const static int num_SI = 4;
+        const static int num_SI = 2; //SI without SI from subchannels
         const static char* SI_pointer[num_SI]; //pointer to iterate the SI data in non-primary FIBs, saves the start adress from each SI_Array
-        const static int SI_size[4]; //Saves the lengths of the SI_Arrays
+        const static int SI_size[num_SI]; //Saves the lengths of the SI_Arrays
+        const static int num_SI_subch = 2; //SI without SI from subchannels
+        const static char* SI_subch_pointer[num_SI_subch]; //pointer to iterate the SI data in non-primary FIBs, saves the start adress from each SI_Array
+        const static int SI_subch_size[num_SI_subch]; //Saves the lengths of the SI_Arrays
         int nSI_written;
         int write_label(char* out_ptr, std::string label, int num_chars = 16);//default for 16 characters (16 byte)
 
