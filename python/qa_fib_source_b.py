@@ -33,14 +33,12 @@ class qa_fib_source_b (gr_unittest.TestCase):
 
 #manual check if labels are printed from fibsink properly
     def test_001_t (self):
-        src = dab.fib_source_b(1, 2, '__Galaxy_News', '_Galaxy_Radio1', 'Awesome_Mix_Vol1')
+        src = dab.fib_source_b(1, 1, '__Galaxy_News', '_Galaxy_Radio1', 'Awesome_Mix_Vol1')
         fib_unpacked_to_packed = blocks.unpacked_to_packed_bb(1, gr.GR_MSB_FIRST)
         s2v = blocks.stream_to_vector(gr.sizeof_char, 32)
         crc16 = dab.crc16_bb(32, 0x1021, 0xffff)
-        v2s = blocks.vector_to_stream(gr.sizeof_char, 32)
-        fibout = blocks.stream_to_vector(1, 32)
         fibsink = dab.fib_sink_vb()
-        self.tb.connect(src, fib_unpacked_to_packed, blocks.head(gr.sizeof_char, 1000), s2v, crc16, v2s, fibout, fibsink)
+        self.tb.connect(src, fib_unpacked_to_packed, blocks.head(gr.sizeof_char, 500), s2v, crc16, fibsink)
         self.tb.run()
         pass
 
