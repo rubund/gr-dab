@@ -63,4 +63,4 @@ class msc_decode(gr.hier_block2):
 
 
             # Define blocks and connect them
-            #self.connect()
+        self.connect(self.select_msc_syms, self.repartition_msc, self.select_subch)
