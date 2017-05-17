@@ -25,7 +25,9 @@
 
 namespace gr {
     namespace dab {
-/*! applies time interleaving to a vector
+/*! \brief applies time interleaving to a vector
+ *
+ * applies time interleaving to a vector with its max[vector_length] followers, the scrambling_vector describes which vector element comes from which follower
  *
  * @param vector_length length of input vectors
  * @param scrambling_vector vector with scrambling parameters (see DAB standard p.138)
