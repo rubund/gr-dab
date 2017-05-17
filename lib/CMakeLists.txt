@@ -51,6 +51,7 @@ list(APPEND dab_sources
     sum_phasor_trig_vcc_impl.cc
     ofdm_move_and_insert_zero_impl.cc
     insert_null_symbol_impl.cc
+    time_interleave_bb_impl.cc
 )
 
 set(dab_sources "${dab_sources}" PARENT_SCOPE)
