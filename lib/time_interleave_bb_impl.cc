@@ -64,12 +64,13 @@ namespace gr {
             // produce output vectors
             for (int i = 0; i < noutput_items - scrambling_length-1; i++) { //iteration over produced output vectors
                 for (int j = 0; j < vec_length; j++) { //iteration over elements of vector
-                    *out++ = in[vec_length * (noutput_items - i - d_scrambling_vector[j % scrambling_length]) + j];
+                    *out++ = in[vec_length * (i + d_scrambling_vector[j%scrambling_length]) + j];
+                    //*out++ = in[vec_length * (noutput_items-1 - i - d_scrambling_vector[j % scrambling_length]) + j];
                 }
             }
 
             // Tell runtime system how many output items we produced.
-            return noutput_items-scrambling_length-1;
+            return noutput_items - (scrambling_length+1);
         }
 
     } /* namespace dab */
