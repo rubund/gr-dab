@@ -36,6 +36,7 @@ namespace gr {
         {
         private:
             int scrambling_length, vec_length;
+            std::vector<unsigned char> d_scrambling_vector;
 
         public:
             time_interleave_bb_impl(int vector_length, const std::vector<unsigned char> &scrambling_vector);

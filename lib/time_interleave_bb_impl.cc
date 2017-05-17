@@ -38,15 +38,14 @@ namespace gr {
         /*
          * The private constructor
          */
-        time_interleave_bb_impl::time_interleave_bb_impl(int vector_length,
-                                                           const std::vector<unsigned char> &scrambling_vector)
+        time_interleave_bb_impl::time_interleave_bb_impl(int vector_length, const std::vector<unsigned char> &scrambling_vector)
                 : gr::sync_block("time_interleave_bb",
                                  gr::io_signature::make(1, 1, sizeof(unsigned char) * vector_length),
-                                 gr::io_signature::make(1, 1, sizeof(unsigned char) * vector_length)) {
-            vec_length = vector_length; //size of the input and output vectors
+                                 gr::io_signature::make(1, 1, sizeof(unsigned char) * vector_length)),
+                  vec_length(vector_length), d_scrambling_vector(scrambling_vector)
+        {
             scrambling_length = scrambling_vector.size(); //size of the scrambling vector
-            set_output_multiple(
-                    scrambling_length); //ensures that scrambling_length vectors are available at input buffer
+            set_output_multiple(scrambling_length); //ensures that scrambling_length vectors are available at input buffer
         }
 
         /*
@@ -65,7 +64,7 @@ namespace gr {
             // produce output vectors
             for (int i = 0; i < noutput_items - scrambling_length-1; i++) { //iteration over produced output vectors
                 for (int j = 0; j < vec_length; j++) { //iteration over elements of vector
-                    *out++ = in[vec_length * (noutput_items - i - scrambling_vector[j % scrambling_length]) + j];
+                    *out++ = in[vec_length * (noutput_items - i - d_scrambling_vector[j % scrambling_length]) + j];
                 }
             }
 
