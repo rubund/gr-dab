@@ -63,14 +63,14 @@ namespace gr {
             unsigned char *out = (unsigned char *) output_items[0];
 
             // produce output vectors
-            for (int i = 0; i < noutput_items - 15; i++) { //iteration over produced output vectors
+            for (int i = 0; i < noutput_items - scrambling_length-1; i++) { //iteration over produced output vectors
                 for (int j = 0; j < vec_length; j++) { //iteration over elements of vector
                     *out++ = in[vec_length * (noutput_items - i - scrambling_vector[j % scrambling_length]) + j];
                 }
             }
 
             // Tell runtime system how many output items we produced.
-            return noutput_items-15;
+            return noutput_items-scrambling_length-1;
         }
 
     } /* namespace dab */

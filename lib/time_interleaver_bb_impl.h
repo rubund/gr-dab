@@ -25,6 +25,12 @@
 
 namespace gr {
   namespace dab {
+/*! applies time interleaving to a vector
+ *
+ * @param vector_length length of input vectors
+ * @param scrambling_vector vector with scrambling parameters (see DAB standard p.138)
+ *
+ */
 
     class time_interleaver_bb_impl : public time_interleaver_bb
     {
