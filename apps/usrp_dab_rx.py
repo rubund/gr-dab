@@ -74,7 +74,7 @@ class usrp_dab_rx(gr.top_block):
 
 		self.demod = dab.ofdm_demod(self.dab_params, self.rx_params, verbose=options.verbose) 
 
-		# self.sink = gr.file_sink(gr.sizeof_char*384, self.filename)
+		# self.sink_frame = gr.file_sink(gr.sizeof_char*384, self.filename)
 		# self.trigsink = gr.null_sink(gr.sizeof_char)
 		# self.connect(self.src, self.demod, self.sink)
 		# self.connect((self.demod,1), self.trigsink)
@@ -82,6 +82,11 @@ class usrp_dab_rx(gr.top_block):
 		self.fic_dec = dab.fic_decode(self.dab_params)
 		self.connect(self.src, self.demod, (self.fic_dec,0))
 		self.connect((self.demod,1), (self.fic_dec,1))
+#debug section
+		self.file_sink_t_frame = blocks.file_sink(gr.sizeof_float * 2*1536, "debug/transmission_frame.dat")
+		self.file_sink_t_frame_trigger = blocks.file_sink(gr.sizeof_char, "debug/transmission_frame_trigger.dat")
+		self.connect((self.demod, 0), self.file_sink_t_frame)
+		self.connect((self.demod, 1), self.file_sink_t_frame_trigger)
 
 		# tune frequency
 		self.frequency = options.freq

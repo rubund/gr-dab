@@ -22,7 +22,7 @@ class qa_select_vectors(gr_unittest.TestCase):
         len = 3
         vlen = 2
         src_data = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
-        trig = (0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0)
+        trig =     (0,    1,    0,    0,    0,     0,      0,      0,     1,    1,    0,    0,    0   )
         expected_data = (6, 7, 8, 9, 10, 11, 6, 7, 8, 9)
         expected_trig = (1, 0, 0, 1, 0)
         src = blocks.vector_source_b(src_data)
@@ -47,7 +47,7 @@ class qa_select_vectors(gr_unittest.TestCase):
         len = 3
         vlen = 2
         src_data = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
-        trig = (0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0)
+        trig =     (0,    1,    0,    0,    0,     0,      0,      0,     1,    1,    0,    0,    0   )
         expected_data = (6, 7, 8, 9, 10, 11, 6, 7, 8, 9)
         expected_trig = (1, 0, 0, 1, 0)
         src = blocks.vector_source_f(src_data)
@@ -67,6 +67,80 @@ class qa_select_vectors(gr_unittest.TestCase):
         self.assertFloatTuplesAlmostEqual(expected_data, result_data)
         self.assertEqual(expected_trig, result_trig)
 
+    def test_003_select_vectors(self):
+        skip = 3
+        len = 2
+        vlen = 3
+        src_data = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+        trig =     (1,       0,       0,       0,          0,          0,       0,       0,       1       )
+        expected_data = (9, 10, 11, 12, 13, 14)
+        expected_trig = (1,          0       )
+        src = blocks.vector_source_f(src_data)
+        trigsrc = blocks.vector_source_b(trig)
+        s2v = blocks.stream_to_vector(gr.sizeof_float, vlen)
+        select_vectors = dab.select_vectors(gr.sizeof_float, vlen, len, skip)
+        v2s = blocks.vector_to_stream(gr.sizeof_float, vlen)
+        dst = blocks.vector_sink_f()
+        trigdst = blocks.vector_sink_b()
+        self.tb.connect(src, s2v, select_vectors, v2s, dst)
+        self.tb.connect(trigsrc, (select_vectors, 1), trigdst)
+        self.tb.run()
+        result_data = dst.data()
+        result_trig = trigdst.data()
+        # print expected_result
+        # print result_data
+        self.assertFloatTuplesAlmostEqual(expected_data, result_data)
+        self.assertEqual(expected_trig, result_trig)
+
+    def test_004_select_vectors(self):
+        skip = 3
+        len = 3
+        vlen = 3
+        src_data = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+        trig =     (1,       1,       0,       0,          0,          0,       1,       0,       1       )
+        expected_data = (12, 13, 14, 15, 0, 1)
+        expected_trig = (1,           0      )
+        src = blocks.vector_source_f(src_data)
+        trigsrc = blocks.vector_source_b(trig)
+        s2v = blocks.stream_to_vector(gr.sizeof_float, vlen)
+        select_vectors = dab.select_vectors(gr.sizeof_float, vlen, len, skip)
+        v2s = blocks.vector_to_stream(gr.sizeof_float, vlen)
+        dst = blocks.vector_sink_f()
+        trigdst = blocks.vector_sink_b()
+        self.tb.connect(src, s2v, select_vectors, v2s, dst)
+        self.tb.connect(trigsrc, (select_vectors, 1), trigdst)
+        self.tb.run()
+        result_data = dst.data()
+        result_trig = trigdst.data()
+        # print expected_result
+        # print result_data
+        self.assertFloatTuplesAlmostEqual(expected_data, result_data)
+        self.assertEqual(expected_trig, result_trig)
+
+    def test_005_select_vectors(self):
+        skip = 3
+        len = 2
+        vlen = 3
+        src_data = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+        trig =     (1,       1,       0,       0,          1,          0,       1,       0,       0       )
+        expected_data = ()
+        expected_trig = ()
+        src = blocks.vector_source_f(src_data)
+        trigsrc = blocks.vector_source_b(trig)
+        s2v = blocks.stream_to_vector(gr.sizeof_float, vlen)
+        select_vectors = dab.select_vectors(gr.sizeof_float, vlen, len, skip)
+        v2s = blocks.vector_to_stream(gr.sizeof_float, vlen)
+        dst = blocks.vector_sink_f()
+        trigdst = blocks.vector_sink_b()
+        self.tb.connect(src, s2v, select_vectors, v2s, dst)
+        self.tb.connect(trigsrc, (select_vectors, 1), trigdst)
+        self.tb.run()
+        result_data = dst.data()
+        result_trig = trigdst.data()
+        # print expected_result
+        # print result_data
+        self.assertFloatTuplesAlmostEqual(expected_data, result_data)
+        self.assertEqual(expected_trig, result_trig)
 
 if __name__ == '__main__':
     gr_unittest.main()

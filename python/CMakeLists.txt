@@ -36,7 +36,8 @@ GR_PYTHON_INSTALL(
     detect_null.py
     ofdm.py
     parameters.py
-    fic.py DESTINATION ${GR_PYTHON_DIR}/dab
+    fic.py
+    msc_decode.py DESTINATION ${GR_PYTHON_DIR}/dab
 )
 
 ########################################################################
