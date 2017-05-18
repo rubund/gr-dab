@@ -222,7 +222,7 @@ class dab_parameters:
         # PI=24 code rate: 8/32
     ]
     puncturing_tail_vector = [1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0]  # V_T
-
+    puncturing_vectors_ones = [0, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]
     # conv coding rate at a protection level, table 7
     conv_code_rate = [1/4, 3/8, 1/2, 3/4]
     subch_size_multiple_n = [12, 8, 6, 4]

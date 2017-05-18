@@ -26,13 +26,13 @@ class msc_decode(gr.hier_block2):
     """
     docstring for block msc_decode
     """
-    def __init__(self, dab_params, adress, size, protection, verbose, debug):
+    def __init__(self, dab_params, address, size, protection, verbose, debug):
         gr.hier_block2.__init__(self,
             "msc_decode",
             gr.io_signature(2, 2, gr.sizeof_float * dab_params.num_carriers * 2, gr.sizeof_char),  # Input signature
             gr.io_signature(1, 1, gr.sizeof_char * 32)) # Output signature
         self.dp = dab_params
-        self.adress = adress
+        self.address = address
         self.size = size
         self.protect = protection
         self.verbose = verbose
@@ -41,15 +41,17 @@ class msc_decode(gr.hier_block2):
         # calculate n factor (multiple of 8kbits etc.)
         self.n = self.size/self.dp.subch_size_multiple_n[self.protect]
 
-        # calculate factors for puncturing
-        self.puncturing_L1 = [6*self.n-3, 2*self.n-3, 6*self.n-3, 4*self.n-3]
-        self.puncturing_L2 = [3, 4*self.n+3, 3, 2*self.n+3]
+        # calculate puncturing factors (EEP, table 33, 34)
+        if (self.n > 1 or self.protect != 1):
+            self.puncturing_L1 = [6*self.n-3, 2*self.n-3, 6*self.n-3, 4*self.n-3]
+            self.puncturing_L2 = [3, 4*self.n+3, 3, 2*self.n+3]
+            self.puncturing_PI1 = [24, 14, 8, 3]
+            self.puncturing_PI2 = [23, 13, 7, 2]
+            # calculate length of punctured codeword (11.3.2)
+            self.msc_punctured_codeword_length = self.puncturing_L1[self.protect] * 4 * self.dp.puncturing_vectors_ones[self.puncturing_PI1[self.protect]] + self.puncturing_L2[self.protect] * 4 * self.dp.puncturing_vectors_ones[self.puncturing_PI2[self.protect]] + 12
         #exception in table
-        if(self.n == 1 and self.protect == 1):
-            self.puncturing_L1 = 5
-            self.puncturing_L2 = 1
-        # calculate length of punctured codeword (11.3.2)
-        self.msc_punctured_codeword_length = 16*self.puncturing_L1[self.protect] + 15*self.puncturing_L2[self.protect] + 12
+        else:
+            self.msc_punctured_codeword_length = 5 * 4 * self.dp.puncturing_vectors_ones[13] + 1 * 4 * self.dp.puncturing_vectors_ones[12] + 12
 
 
 
@@ -57,10 +59,12 @@ class msc_decode(gr.hier_block2):
         # select OFDM carriers with MSC
         self.select_msc_syms = dab.select_vectors(gr.sizeof_float, self.dp.num_carriers * 2, self.dp.num_msc_syms, self.dp.num_fic_syms)
         # repartition MSC data in CIFs
-        self.repartition_msc = dab.repartition_vectors_make(gr.sizeof_float, self.dp.num_carriers * 2, self.dp.cif_bits, self.dp.num_msc_syms, self.dp.num_cifs)
-        # select CUs of one subchannel of every CIF
-        self.select_subch = dab.select_vectors_make(gr.sizeof_char, self.dp.msc_cu_size, self.size, self.adress)
+        self.repartition_msc_to_CIFs = dab.repartition_vectors_make(gr.sizeof_float, self.dp.num_carriers * 2, self.dp.cif_bits, self.dp.num_msc_syms, self.dp.num_cifs)
+        # select CUs of one subchannel of each CIF
+        self.select_subch = dab.select_vectors_make(gr.sizeof_float, self.dp.cif_bits, self.size, self.address)
+        self.nullsink = blocks.null_sink(gr.sizeof_char)
 
 
-            # Define blocks and connect them
-        self.connect(self.select_msc_syms, self.repartition_msc, self.select_subch)
+        # Define blocks and connect them
+        self.connect((self, 0), (self.select_msc_syms, 0), (self.repartition_msc_to_CIFs, 0), (self.select_subch, 0), (self, 1))
+        self.connect((self, 1), (self.select_msc_syms, 1), (self.repartition_msc_to_CIFs, 1), (self.select_subch, 1), self.nullsink)
