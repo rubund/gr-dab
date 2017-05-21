@@ -84,6 +84,5 @@ GR_SWIG_BLOCK_MAGIC2(dab, sum_phasor_trig_vcc);
 GR_SWIG_BLOCK_MAGIC2(dab, ofdm_move_and_insert_zero);
 %include "dab/insert_null_symbol.h"
 GR_SWIG_BLOCK_MAGIC2(dab, insert_null_symbol);
-
 %include "dab/time_interleave_bb.h"
 GR_SWIG_BLOCK_MAGIC2(dab, time_interleave_bb);
