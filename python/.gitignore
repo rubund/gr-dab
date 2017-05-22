@@ -7,3 +7,5 @@
 /*.pyc
 /*.pyo
 /run_tests
+.idea/
+.unittest/
