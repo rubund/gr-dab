@@ -46,5 +46,6 @@ install(FILES
     dab_sum_phasor_trig_vcc.xml
     dab_ofdm_move_and_insert_zero.xml
     dab_insert_null_symbol.xml
-    dab_time_interleave_bb.xml DESTINATION share/gnuradio/grc/blocks
+    dab_time_interleave_bb.xml
+    dab_time_deinterleave_ff.xml DESTINATION share/gnuradio/grc/blocks
 )
