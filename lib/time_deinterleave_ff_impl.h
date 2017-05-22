@@ -24,27 +24,26 @@
 #include <dab/time_deinterleave_ff.h>
 
 namespace gr {
-  namespace dab {
+    namespace dab {
 
-    class time_deinterleave_ff_impl : public time_deinterleave_ff
-    {
-     private:
-      int scrambling_length, vec_length;
-      int scrambling_delay;
-      std::vector<unsigned char> d_scrambling_vector;
+        class time_deinterleave_ff_impl : public time_deinterleave_ff
+        {
+        private:
+            int scrambling_length, vec_length;
+            int scrambling_delay;
+            std::vector<unsigned char> d_scrambling_vector;
 
-     public:
-      time_deinterleave_ff_impl(int vector_length, const std::vector<unsigned char> &scrambling_vector);
-      ~time_deinterleave_ff_impl();
+        public:
+            time_deinterleave_ff_impl(int vector_length, const std::vector<unsigned char> &scrambling_vector);
+            ~time_deinterleave_ff_impl();
 
-      // Where all the action really happens
-      int work(int noutput_items,
-         gr_vector_const_void_star &input_items,
-         gr_vector_void_star &output_items);
-    };
+            // Where all the action really happens
+            int work(int noutput_items,
+                     gr_vector_const_void_star &input_items,
+                     gr_vector_void_star &output_items);
+        };
 
-  } // namespace dab
+    } // namespace dab
 } // namespace gr
 
 #endif /* INCLUDED_DAB_TIME_DEINTERLEAVE_FF_IMPL_H */
-
