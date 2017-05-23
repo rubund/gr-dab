@@ -245,10 +245,13 @@ class dab_parameters:
     __msc_punctured_codeword_length__ = []
 
     # energy dispersal
+
     __energy_dispersal_fic_fibs_per_vector__ = [3, 3, 4, 3]
     __energy_dispersal_fic_vector_length__ = [768, 768, 1024, 768]  # I
     __prbs_bits__ = [0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1,
                      0]  # first 16 PRBS bits are given in the standard - can be used for another assert
+    # time interleaving
+    scrambling_vector = [0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15]
 
     # transport mechanism parameters
     fib_bits = 256
