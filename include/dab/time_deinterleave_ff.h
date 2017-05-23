@@ -28,11 +28,14 @@
 namespace gr {
   namespace dab {
 
-    /*!
-     * \brief <+description of block+>
-     * \ingroup dab
-     *
-     */
+/*! \brief applies time deinterleaving to a vector
+ *
+ * applies time deinterleaving to a vector with its arg_max[scrambling_vector] predecessors, the scrambling_vector describes which vector element comes from which predecessors
+ *
+ * @param vector_length length of input vectors
+ * @param scrambling_vector vector with scrambling parameters (see DAB standard p.138)
+ *
+ */
     class DAB_API time_deinterleave_ff : virtual public gr::sync_block
     {
      public:

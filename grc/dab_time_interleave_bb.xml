@@ -1,38 +1,27 @@
-<?xml version="1.0"?>
 <block>
-  <name>time_interleave_bb</name>
+  <name>Time Interleaver</name>
   <key>dab_time_interleave_bb</key>
-  <category>dab</category>
+  <category>DAB</category>
   <import>import dab</import>
-  <make>dab.time_interleave_bb($vector_length, $&scrambling_vector)</make>
-  <!-- Make one 'param' node for every Parameter you want settable from the GUI.
-       Sub-nodes:
-       * name
-       * key (makes the value accessible as $keyname, e.g. in the make node)
-       * type -->
+  <make>dab.time_interleave_bb($vector_length, $scrambling_vector)</make>
   <param>
-    <name>...</name>
-    <key>...</key>
-    <type>...</type>
+    <name>Vector_length</name>
+    <key>vector_length</key>
+    <type>int</type>
   </param>
-
-  <!-- Make one 'sink' node per input. Sub-nodes:
-       * name (an identifier for the GUI)
-       * type
-       * vlen
-       * optional (set to 1 for optional inputs) -->
+  <param>
+    <name>Scrambling_vector</name>
+    <key>scrambling_vector</key>
+    <type>raw</type>
+  </param>
   <sink>
     <name>in</name>
-    <type><!-- e.g. int, float, complex, byte, short, xxx_vector, ...--></type>
+    <type>byte</type>
+    <vlen>$vector_length</vlen>
   </sink>
-
-  <!-- Make one 'source' node per output. Sub-nodes:
-       * name (an identifier for the GUI)
-       * type
-       * vlen
-       * optional (set to 1 for optional inputs) -->
   <source>
     <name>out</name>
-    <type><!-- e.g. int, float, complex, byte, short, xxx_vector, ...--></type>
+    <type>byte</type>
+    <vlen>$vector_length</vlen>
   </source>
 </block>

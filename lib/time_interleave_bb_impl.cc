@@ -24,7 +24,6 @@
 
 #include <gnuradio/io_signature.h>
 #include "time_interleave_bb_impl.h"
-#include <boost/circular_buffer.hpp>
 
 namespace gr {
     namespace dab {
