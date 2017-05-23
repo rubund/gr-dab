@@ -24,7 +24,6 @@ include(GrPlatform) #define LIB_SUFFIX
 
 include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIRS})
-
 list(APPEND dab_sources
     moving_sum_ff_impl.cc
     ofdm_ffe_all_in_one_impl.cc
@@ -51,7 +50,8 @@ list(APPEND dab_sources
     sum_phasor_trig_vcc_impl.cc
     ofdm_move_and_insert_zero_impl.cc
     insert_null_symbol_impl.cc
-)
+    time_interleave_bb_impl.cc
+    time_deinterleave_ff_impl.cc )
 
 set(dab_sources "${dab_sources}" PARENT_SCOPE)
 if(NOT dab_sources)
