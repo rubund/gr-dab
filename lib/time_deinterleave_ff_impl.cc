@@ -1,23 +1,22 @@
 /* -*- c++ -*- */
-/* 
- * Copyright 2017 <+YOU OR YOUR COMPANY+>.
- * 
+/*
+ * Copyright 2017 by Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
+ *
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3, or (at your option)
  * any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this software; see the file COPYING.  If not, write to
  * the Free Software Foundation, Inc., 51 Franklin Street,
  * Boston, MA 02110-1301, USA.
  */
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -42,10 +41,10 @@ namespace gr {
                 : gr::sync_block("time_deinterleave_ff",
                                  gr::io_signature::make(1, 1, sizeof(float) * vector_length),
                                  gr::io_signature::make(1, 1, sizeof(float) * vector_length)),
-                  vec_length(vector_length), d_scrambling_vector(scrambling_vector) {
-            scrambling_length = scrambling_vector.size(); // size of the scrambling vector
+                  d_vector_length(vector_length), d_scrambling_vector(scrambling_vector) {
+            d_scrambling_length = scrambling_vector.size(); // size of the scrambling vector
             set_output_multiple(
-                    scrambling_length); //ensures that scrambling_length vectors are available at input buffer
+                    d_scrambling_length); //ensures that d_scrambling_length vectors are available at input buffer
         }
 
         /*
@@ -61,26 +60,26 @@ namespace gr {
             const float *in = (const float *) input_items[0];
             float *out = (float *) output_items[0];
 
-            scrambling_delay = scrambling_length - 1;
+            d_scrambling_delay = d_scrambling_length - 1;
 
             for (int i = 0; i < noutput_items; i++) {
 
-                if (nitems_written(0) < scrambling_length - 1 && i < scrambling_length-1) {
-                    scrambling_delay = 0;
+                if (nitems_written(0) < d_scrambling_length - 1 && i < d_scrambling_length-1) {
+                    d_scrambling_delay = 0;
                     //not enough info to write vector, write zeroes
-                    for (int j = 0; j < vec_length; j++) {
+                    for (int j = 0; j < d_vector_length; j++) {
                         *out++ = 0;
                     }
                 } else {
                     // produce output vectors
-                    for (int j = 0; j < vec_length; j++) {
-                        *out++ = in[vec_length * (i+scrambling_delay - d_scrambling_vector[j % scrambling_length]) + j];
+                    for (int j = 0; j < d_vector_length; j++) {
+                        *out++ = in[d_vector_length * (i+d_scrambling_delay - d_scrambling_vector[j % d_scrambling_length]) + j];
                     }
                 }
 
             }
             // Tell runtime system how many output items we produced.
-            return noutput_items - scrambling_length + 1;
+            return noutput_items - d_scrambling_length + 1;
 
 
         }

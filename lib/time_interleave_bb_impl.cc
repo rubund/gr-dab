@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2017 <+YOU OR YOUR COMPANY+>.
+ * Copyright 2017 by Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
  *
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,10 +42,10 @@ namespace gr {
                 : gr::sync_block("time_interleave_bb",
                                  gr::io_signature::make(1, 1, sizeof(unsigned char) * vector_length),
                                  gr::io_signature::make(1, 1, sizeof(unsigned char) * vector_length)),
-                  vec_length(vector_length), d_scrambling_vector(scrambling_vector)
+                  d_vector_length(vector_length), d_scrambling_vector(scrambling_vector)
         {
-            scrambling_length = scrambling_vector.size(); //size of the scrambling vector
-            set_output_multiple(scrambling_length); //ensures that scrambling_length vectors are available at input buffer
+            d_scrambling_length = scrambling_vector.size(); //size of the scrambling vector
+            set_output_multiple(d_scrambling_length); //ensures that d_scrambling_length vectors are available at input buffer
         }
 
         /*
@@ -62,14 +62,14 @@ namespace gr {
             unsigned char *out = (unsigned char *) output_items[0];
 
             // produce output vectors
-            for (int i = 0; i < noutput_items - scrambling_length+1; i++) { //iteration over produced output vectors
-                for (int j = 0; j < vec_length; j++) { //iteration over elements of vector
-                    *out++ = in[vec_length * (i + d_scrambling_vector[j%scrambling_length]) + j];
+            for (int i = 0; i < noutput_items - d_scrambling_length+1; i++) { //iteration over produced output vectors
+                for (int j = 0; j < d_vector_length; j++) { //iteration over elements of vector
+                    *out++ = in[d_vector_length * (i + d_scrambling_vector[j%d_scrambling_length]) + j];
                 }
             }
 
             // Tell runtime system how many output items we produced.
-            return noutput_items - scrambling_length+1;
+            return noutput_items - d_scrambling_length+1;
         }
 
     } /* namespace dab */

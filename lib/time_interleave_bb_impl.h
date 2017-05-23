@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2017 <+YOU OR YOUR COMPANY+>.
+ * Copyright 2017 by Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
  *
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ namespace gr {
         class time_interleave_bb_impl : public time_interleave_bb
         {
         private:
-            int scrambling_length, vec_length;
+            int d_scrambling_length, d_vector_length;
             std::vector<unsigned char> d_scrambling_vector;
 
         public:
