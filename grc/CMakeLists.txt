@@ -47,5 +47,7 @@ install(FILES
     dab_ofdm_move_and_insert_zero.xml
     dab_insert_null_symbol.xml
     dab_time_interleave_bb.xml
-    dab_time_deinterleave_ff.xml DESTINATION share/gnuradio/grc/blocks
+    dab_time_deinterleave_ff.xml
+    dab_crc16_bb.xml
+    dab_fib_source_b.xml DESTINATION share/gnuradio/grc/blocks
 )

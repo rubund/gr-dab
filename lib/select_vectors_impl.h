@@ -26,6 +26,7 @@
 
 namespace gr {
   namespace dab {
+
 /*! \brief select a row of vectors
  *
  * input1: vector of size length*itemsize
@@ -42,27 +43,26 @@ namespace gr {
  * @param num_skip number of vectors to skip before selection of num_select vectors
  *
  */
-class select_vectors_impl : public select_vectors
-{
-  private:
+        class select_vectors_impl : public select_vectors {
+        private:
+            size_t d_itemsize;
+            unsigned int d_length;
+            unsigned int d_num_select;
+            unsigned int d_num_skip;
+            unsigned int d_index;
 
+        public:
+            select_vectors_impl(size_t itemsize, unsigned int length, unsigned int num_select, unsigned int num_skip);
 
-    size_t       d_itemsize;
-    unsigned int d_length;
-    unsigned int d_num_select;
-    unsigned int d_num_skip;
-    unsigned int d_index;
+            void forecast(int noutput_items, gr_vector_int &ninput_items_required);
 
-  public:
-    select_vectors_impl(size_t itemsize, unsigned int length, unsigned int num_select, unsigned int num_skip);
-    void forecast (int noutput_items, gr_vector_int &ninput_items_required);
-    int general_work (int noutput_items,
-                      gr_vector_int &ninput_items,
-                      gr_vector_const_void_star &input_items,
-                      gr_vector_void_star &output_items);
-};
+            int general_work(int noutput_items,
+                             gr_vector_int &ninput_items,
+                             gr_vector_const_void_star &input_items,
+                             gr_vector_void_star &output_items);
+        };
 
-}
+    }
 }
 
 #endif /* INCLUDED_DAB_SELECT_VECTORS_H */

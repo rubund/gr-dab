@@ -30,3 +30,4 @@ cscope.out
 .*.pyc
 *~
 build/
+python/debug/

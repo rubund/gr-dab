@@ -47,5 +47,7 @@ install(FILES
     ofdm_move_and_insert_zero.h
     insert_null_symbol.h
     time_interleave_bb.h
-    time_deinterleave_ff.h DESTINATION include/dab
+    time_deinterleave_ff.h
+    crc16_bb.h
+    fib_source_b.h DESTINATION include/dab
 )
