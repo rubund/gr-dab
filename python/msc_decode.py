@@ -39,9 +39,10 @@ class msc_decode(gr.hier_block2):
     def __init__(self, dab_params, address, size, protection, verbose, debug):
         gr.hier_block2.__init__(self,
                                 "msc_decode",
-                                gr.io_signature(2, 2, gr.sizeof_float * dab_params.num_carriers * 2, gr.sizeof_char),
                                 # Input signature
-                                gr.io_signature(1, 1, gr.sizeof_char * 32))  # Output signature
+                                gr.io_signature2(2, 2, gr.sizeof_float * dab_params.num_carriers * 2, gr.sizeof_char),
+                                # Output signature
+                                gr.io_signature(1, 1, gr.sizeof_float * dab_params.num_carriers * 2))
         self.dp = dab_params
         self.address = address
         self.size = size
@@ -85,9 +86,9 @@ class msc_decode(gr.hier_block2):
         # select CUs of one subchannel of each CIF
         self.select_subch = dab.select_vectors_make(gr.sizeof_float, self.dp.cif_bits, self.size, self.address)
         self.nullsink = blocks.null_sink(gr.sizeof_char)
+
         # time deinterleaving
-        self.time_deinterleaver = dab.time_deinterleave_ff_make(self.msc_punctured_codeword_length,
-                                                                self.dp.scrambling_vector)
+        #self.time_deinterleaver = dab.time_deinterleave_ff_make(self.msc_punctured_codeword_length,self.dp.scrambling_vector)
         # unpuncture
         self.unpuncture = dab.unpuncture_vff_make(self.assembled_msc_puncturing_sequence, 0)
 
@@ -114,10 +115,10 @@ class msc_decode(gr.hier_block2):
         ]
         assert (len(table) / 4 == self.fsm.O())
         table = [(1 - 2 * x) / sqrt(2) for x in table]
-        self.conv_decode = trellis.viterbi_combined_fb(self.fsm, self.msc_I + self.dp.conv_code_add_bits_inputs, 0, 0, 4, table, trellis.TRELLIS_EUCLIDEAN)
-        self.conv_s2v = blocks.stream_to_vector(gr.sizeof_char, self.msc_I + self.dp.conv_code_add_bits_inputs)
-        self.conv_prune = dab.prune_vectors(gr.sizeof_char, self.dp.msc_conv_codeword_length / 4, 0,
-                                            self.dp.conv_code_add_bits_inputs)
+        self.conv_decode = trellis.viterbi_combined_fb(self.fsm, self.msc_I + self.dp.conv_code_add_bits_input, 0, 0, 4, table, trellis.TRELLIS_EUCLIDEAN)
+        self.conv_s2v = blocks.stream_to_vector(gr.sizeof_char, self.msc_I + self.dp.conv_code_add_bits_input)
+        self.conv_prune = dab.prune_vectors(gr.sizeof_char, self.msc_conv_codeword_length / 4, 0,
+                                            self.dp.conv_code_add_bits_input)
 
         #energy descramble
         self.prbs_src = blocks.vector_source_b(self.dp.prbs(self.msc_I), True)
@@ -128,18 +129,21 @@ class msc_decode(gr.hier_block2):
         # Define blocks and connect them
         self.connect((self, 0),
                      (self.select_msc_syms, 0),
-                     (self.repartition_msc_to_CIFs, 0),
-                     (self.select_subch, 0),
-                     self.time_deinterleaver,
-                     self.unpuncture,
-                     self.conv_v2s,
-                     self.conv_decode,
-                     self.conv_s2v,
-                     self.conv_prune,
-                     self.energy_v2s,
-                     self.add_mod_2,
-                     self.energy_s2v, #better output stream or vector??
-                     (self, 1))
-        self.connect((self, 1), (self.select_msc_syms, 1), (self.repartition_msc_to_CIFs, 1), (self.select_subch, 1),
+                     #(self.repartition_msc_to_CIFs, 0),
+                     #(self.select_subch, 0),
+                     #self.time_deinterleaver,
+                     #self.unpuncture,
+                     #self.conv_v2s,
+                     #self.conv_decode,
+                     #self.conv_s2v,
+                     #self.conv_prune,
+                     #self.energy_v2s,
+                     #self.add_mod_2,
+                     #self.energy_s2v, #better output stream or vector??
+                     (self))
+        self.connect((self, 1),
+                     (self.select_msc_syms, 1),
+                     #(self.repartition_msc_to_CIFs, 1),
+                     #(self.select_subch, 1),
                      self.nullsink)
-        self.connect(self.prbs_src, (self.add_mod_2, 1))
+        #self.connect(self.prbs_src, (self.add_mod_2, 1))

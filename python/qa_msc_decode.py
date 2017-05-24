@@ -33,12 +33,15 @@ class qa_msc_decode (gr_unittest.TestCase):
 
 #manual check if data comes threw in transmission mode 1 (default)
     def test_001_t (self):
-        self.src = blocks.file_source_make(gr.sizeof_float * 2*1536)
-        self.dp = dab.parameters.dab_parameters(1 , 208.064e6)
-        self.msc_demod = dab.msc_decode(self.dp, 54, 84, 2, False, False)
-        self.sink = blocks.file_sink_make(gr.sizeof_char * self.dp.msc_cu_size)
+        self.dab_params = dab.parameters.dab_parameters(1 , 208.064e6, True)
+        self.src01 = blocks.file_source_make(gr.sizeof_float * 2*self.dab_params.num_carriers, "debug/transmission_frame.dat")
+        self.src02 = blocks.file_source_make(gr.sizeof_char, "debug/transmission_frame_trigger.dat")
+        self.msc = dab.msc_decode(self.dab_params, 54, 84, 2, 1, 1)
+        #self.sink = blocks.file_sink_make(gr.sizeof_char * self.dab_params.msc_cu_size, "result.dat")
+        self.sink = blocks.file_sink_make(gr.sizeof_float * self.dab_params.num_carriers * 2, "debug/result.dat")
 
-        self.tb.connect(self.src, self.msc_demod, self.sink)
+        self.tb.connect(self.src01, (self.msc, 0), self.sink)
+        self.tb.connect(self.src02, (self.msc, 1))
         self.tb.run ()
         # check data
         pass

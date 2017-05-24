@@ -42,7 +42,7 @@ class fic_decode(gr.hier_block2):
     - get FIC information
     """
 
-    def __init__(self, dab_params, verbose=True, debug=False):
+    def __init__(self, dab_params, verbose=True, debug=True):
         """
         Hierarchical block for FIC decoding
 
@@ -132,6 +132,9 @@ class fic_decode(gr.hier_block2):
                      self.nullsink)
 
         if self.debug:
+            self.connect((self, 0), blocks.file_sink(gr.sizeof_float * self.dp.num_carriers * 2, "debug/transmission_frame.dat"))
+            self.connect((self, 1),
+                         blocks.file_sink(gr.sizeof_char, "debug/transmission_frame_trigger.dat"))
             self.connect(self.select_fic_syms,
                          blocks.file_sink(gr.sizeof_float * self.dp.num_carriers * 2, "debug/fic_select_syms.dat"))
             self.connect(self.repartition_fic, blocks.file_sink(gr.sizeof_float * self.dp.fic_punctured_codeword_length,
