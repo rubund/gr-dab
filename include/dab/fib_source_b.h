@@ -46,7 +46,7 @@ namespace gr {
        * class. dab::fib_source_b::make is the public interface for
        * creating new instances.
        */
-      static sptr make(int transmission_mode, int number_subchannels, std::string ensemble_label, std::string programme_service_label, std::string service_comp_label01, std::string service_comp_label02, std::string service_comp_label03, uint8_t service_comp_lang01, uint8_t service_comp_lang02, uint8_t service_comp_lang03);
+      static sptr make(int transmission_mode, int num_subch, std::string ensemble_label, std::string programme_service_label, std::string service_comp_label, uint8_t service_comp_lang, uint8_t protection_mode, uint8_t data_rate_n);
     };
 
   } // namespace dab

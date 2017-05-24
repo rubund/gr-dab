@@ -35,7 +35,6 @@ namespace gr {
             void bit_adaption(char* out_ptr, int number, int num_bits); //writes an integer value to num_bits bits, beginning at (overwrites default zeros)
 
             //Multiplex Channel Info
-            const static int d_size_subch = 140; //see Table 6, Index 37, important for calculation of startAdress of SubCh in CIF (subchannel_orga)
             int d_num_subch; //number of subchannels
             const static char d_ensemble_info[56]; //CIF counter changes every FIB
             const static int d_size_ensemble_info = 56;
@@ -46,8 +45,9 @@ namespace gr {
             const static int d_size_service_comp_description = 16;
             const static char d_subchannel_orga_header[16]; //const
             const static int d_size_subchannel_orga_header = 16;
-            const static char d_subchannel_orga_field[24]; //*numSubCh
-            const static int d_size_subchannel_orga_field = 24;
+            const static char d_subchannel_orga_field[32]; //*numSubCh
+            const static int d_size_subchannel_orga_field = 32;
+            int d_start_adress, d_protection_mode, d_subch_size, d_data_rate_n;
 
             //Service Information
             static char d_ensemble_label[176]; //21*8+8, ensemble label (FIG 1/0)
@@ -58,15 +58,16 @@ namespace gr {
             const static int d_size_service_comp_label = 184;
             const static char d_service_comp_language[32]; //3*8+8, service component language; short form (FIG 0/5)
             const static int d_size_service_comp_language = 32;
-            const static int d_num_SI_basic = 2; //SI without SI from subchannels
-            const static int d_num_SI_subch = 2; //SI for a specific subchannel
+
+            const static int d_num_SI_basic = 4; //no subchannel specific SI
+            const static int d_num_SI_subch = 0; //SI for a specific subchannel
             const static char* d_SI_pointer[d_num_SI_basic + d_num_SI_subch]; //pointer to iterate the SI data in non-primary FIBs, saves the start adress from each SI_Array
-            const static int d_SI_size[d_num_SI_subch + d_num_SI_subch]; //Saves the lengths of the SI_Arrays
+            const static int d_SI_size[d_num_SI_basic + d_num_SI_subch]; //Saves the lengths of the SI_Arrays
             int d_nSI_written, d_subch_iterate;
             int write_label(char* out_ptr, std::string label, int num_chars = 16);//default for 16 characters (16 byte)
 
         public:
-            fib_source_b_impl(int transmission_mode, int number_subchannels, std::string ensemble_label, std::string programme_service_label, std::string service_comp_label01, std::string service_comp_label02, std::string service_comp_label03, uint8_t service_comp_lang01, uint8_t service_comp_lang02, uint8_t service_comp_lang03);
+            fib_source_b_impl(int transmission_mode, int num_subch, std::string ensemble_label, std::string programme_service_label, std::string service_comp_label, uint8_t service_comp_lang, uint8_t protection_mode, uint8_t data_rate_n);
             ~fib_source_b_impl();
 
             // Where all the action really happens

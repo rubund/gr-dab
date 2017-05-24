@@ -52,10 +52,10 @@ namespace gr {
         const char fib_source_b_impl::d_subchannel_orga_header[16] = {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
         //000 00100 000 00001
 
-        //subchannel orga field (bei mehreren subchannels (int numSubCh > 1) wird dieses Array modifiziert)
-        const char fib_source_b_impl::d_subchannel_orga_field[24] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-                                                                     0, 0, 1, 0, 1};
-        // 000000 0000000000 0 0 100101 short form, protection index 37 (140 CUs, Protection level 1, Bit rate 128 kbit/s)
+        //subchannel orga field (long form) (array has to be modified (subchID, start adress, protection level and subchannel size))
+        const char fib_source_b_impl::d_subchannel_orga_field[32] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
+                                                                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        // 000000 0000000000 0 1 000 00 0000000000 long form (table 7, p. 51)
 
 /*////////////////////////////////////////////
  * SI-FIGs, ready to transmit
@@ -100,39 +100,36 @@ namespace gr {
         //service component language
         const char fib_source_b_impl::d_service_comp_language[32] = {0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0,
                                                                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
-                                                                     0}; //language German
+                                                                     0};
         //"000 00011  000 00101 0 0 000000 00001000"; //language German
 
         //d_SI_pointer array
-        const char* fib_source_b_impl::d_SI_pointer[d_num_SI_subch + d_num_SI_subch] = {d_ensemble_label, d_programme_service_label, d_service_comp_language, d_service_comp_label};
-        const int fib_source_b_impl::d_SI_size[d_num_SI_subch + d_num_SI_subch] = {176, 176, 32, 184};
+        const char* fib_source_b_impl::d_SI_pointer[d_num_SI_basic + d_num_SI_subch] = {d_ensemble_label, d_programme_service_label, d_service_comp_language, d_service_comp_label};
+        const int fib_source_b_impl::d_SI_size[d_num_SI_basic + d_num_SI_subch] = {176, 176, 32, 184};
 
         fib_source_b::sptr
-        fib_source_b::make(int transmission_mode, int number_subchannels, std::string ensemble_label,
-                           std::string programme_service_label, std::string service_comp_label01, std::string service_comp_label02, std::string service_comp_label03, uint8_t service_comp_lang01, uint8_t service_comp_lang02, uint8_t service_comp_lang03) {
+        fib_source_b::make(int transmission_mode, int num_subch, std::string ensemble_label,
+                           std::string programme_service_label, std::string service_comp_label, uint8_t service_comp_lang, uint8_t protection_mode, uint8_t data_rate_n) {
             return gnuradio::get_initial_sptr
-                    (new fib_source_b_impl(transmission_mode, number_subchannels, ensemble_label,
-                                           programme_service_label, service_comp_label01, service_comp_label02, service_comp_label03, service_comp_lang01, service_comp_lang02, service_comp_lang03));
+                    (new fib_source_b_impl(transmission_mode, num_subch, ensemble_label,
+                                           programme_service_label, service_comp_label, service_comp_lang, protection_mode, data_rate_n));
         }
 
         /*
          * The private constructor
          */
-        fib_source_b_impl::fib_source_b_impl(int transmission_mode, int number_subchannels, std::string ensemble_label,
-                                             std::string programme_service_label, std::string service_comp_label01, std::string service_comp_label02, std::string service_comp_label03, uint8_t service_comp_lang01, uint8_t service_comp_lang02, uint8_t service_comp_lang03)
+        fib_source_b_impl::fib_source_b_impl(int transmission_mode, int num_subch, std::string ensemble_label,
+                                             std::string programme_service_label, std::string service_comp_label, uint8_t service_comp_lang, uint8_t protection_mode, uint8_t data_rate_n)
                 : gr::sync_block("fib_source_b",
                                  gr::io_signature::make(0, 0, 0),
-                                 gr::io_signature::make(1, 1, sizeof(char))) {
-            d_transmission_mode = transmission_mode;
-            d_num_subch = number_subchannels;
-            d_nFIBs_written = 0;
-            d_nSI_written = 0;
-            d_subch_iterate = 0;
+                                 gr::io_signature::make(1, 1, sizeof(char))),
+                  d_transmission_mode(transmission_mode), d_num_subch(num_subch), d_nFIBs_written(0), d_nSI_written(0), d_subch_iterate(0), d_protection_mode(protection_mode), d_data_rate_n(data_rate_n)
+        {
             if(d_transmission_mode != 3) set_output_multiple((8*FIB_LENGTH) * 3);
             else set_output_multiple((8*FIB_LENGTH) * 4);
+            //write the labels with input strings once at beginning
             write_label(d_ensemble_label + 32, ensemble_label);
             write_label(d_programme_service_label + 32, programme_service_label);
-            write_label(d_service_comp_label + 40, service_comp_label01);
         }
 
         /*
@@ -142,7 +139,7 @@ namespace gr {
         }
 
         /*
-         * overwrites an integer value to num_bits bits to the num_bits bits before trigger (overwrites default zeros)), e.g. for number of subchannels in ensemble info or
+         * overwrites an integer value to num_bits bits to the num_bits bits before trigger (overwrites default zeros)), e.g. for number of subchannels in ensemble info
          */
         void fib_source_b_impl::bit_adaption(char *out_ptr, int number, int num_bits) {
             for (int i = 0; i < num_bits; i++) {
@@ -192,9 +189,11 @@ namespace gr {
             d_offset = 0;
 
             do {
-                if ((d_nFIBs_written%3 == 0 && d_transmission_mode != 3) || (d_nFIBs_written%3 != 0 && d_transmission_mode == 3)) { //only MCI in this FIB when this FIB ist first in Row (Row are 3 FIBs for d_transmission_mode=1,2,4 or 4 FIBs for d_transmission_mode=3)
+                //only MCI in this FIB when this FIB ist first in Row (Row are 3 FIBs for d_transmission_mode=1,2,4 or 4 FIBs for d_transmission_mode=3)
+                if ((d_nFIBs_written%3 == 0 && d_transmission_mode != 3) || (d_nFIBs_written%4 == 0 && d_transmission_mode == 3))
+                {
 /*///////////////////////////////////////////////
- * add first FIB with only MCI (max numSubCh = 3)
+ * add first FIB with only MCI (max numSubCh = 7)
  *///////////////////////////////////////////////
                     //ensemble info
                     std::memcpy(out + d_offset, d_ensemble_info, d_size_ensemble_info);
@@ -208,7 +207,6 @@ namespace gr {
                     d_offset += d_size_service_orga;
                     //change number of service components in d_service_orga (bit manipulation)
                     bit_adaption(out+d_offset, d_num_subch, 4);
-
                     //service component description (numSubCh times; for every sub_channel different, belongs to d_service_orga)
                     for (int subch_count = 0; subch_count < d_num_subch; subch_count++) {
                         std::memcpy(out + d_offset,
@@ -220,25 +218,6 @@ namespace gr {
                             out[d_offset - 2] = 0; //all additional subchannels are secondary
                             //the SubChannel ID has to increase, to be different (count up from zero)
                             bit_adaption(out + d_offset - 2, subch_count, 6);
-                        }
-                    }
-
-                    //subchannel orga
-                    //subchannel orga header (write only once for all subchannels)
-                    std::memcpy(out + d_offset, d_subchannel_orga_header, d_size_subchannel_orga_header);
-                    d_offset += d_size_subchannel_orga_header;
-                    //change length of FIG header according to number of subchannel orga fields that are added
-                    bit_adaption(out + d_offset - 8, d_num_subch*(d_size_subchannel_orga_field/8) + 1, 5);
-                    //subchannel orga field
-                    for (int subch_count = 0; subch_count < d_num_subch; subch_count++) {//iterate over all subchannels
-                        std::memcpy(out + d_offset + d_size_subchannel_orga_field * subch_count, d_subchannel_orga_field,
-                                    d_size_subchannel_orga_field);
-                        d_offset += d_size_subchannel_orga_field;
-                        if (subch_count >= 1) { //change SubChID and Start Address of SubChannel
-                            //the SubChannel ID has to increase, to be different
-                            bit_adaption(out + d_offset - 18, subch_count, 6);
-                            //the Start Adress of the next subCh is increased about size_subch = 140
-                            bit_adaption(out + d_offset - 8, d_size_subch*subch_count, 10);
                         }
                     }
                     //MCI is set, set EndMarker and padding
@@ -254,26 +233,90 @@ namespace gr {
                     }
                     d_nFIBs_written++;
                 }//first FIB in row (with only MCI) is finished
-                else{
+
+                //second FIB in row reserved for subchannel orga
+                else if((d_nFIBs_written%3 == 1 && d_transmission_mode != 3) || (d_nFIBs_written%4 == 1 && d_transmission_mode == 3)){
+ /*///////////////////////////////////////////////
+ * add second FIB with only subchannel orga (max numSubCh = 7)
+ *///////////////////////////////////////////////
+                    //subchannel orga
+                    d_start_adress = 0;
+                    //subchannel orga header (write only once for all subchannels)
+                    std::memcpy(out + d_offset, d_subchannel_orga_header, d_size_subchannel_orga_header);
+                    d_offset += d_size_subchannel_orga_header;
+                    //change length of FIG header according to number of subchannel orga fields that are added
+                    bit_adaption(out + d_offset - 8, d_num_subch*(d_size_subchannel_orga_field/8) + 1, 5);
+                    //subchannel orga field
+                    for (int subch_count = 0; subch_count < d_num_subch; subch_count++) {//iterate over all subchannels
+                        std::memcpy(out + d_offset + d_size_subchannel_orga_field * subch_count, d_subchannel_orga_field,
+                                    d_size_subchannel_orga_field);
+                        d_offset += d_size_subchannel_orga_field;
+
+                        //change SubChID, start address, protection level and subch size of each sub channel
+                        //the SubChannel ID has to increase, to be different
+                        bit_adaption(out + d_offset - 26, subch_count, 6);
+                        //the start address (in CUs) of the next subch is increased about size of previous subch
+                        bit_adaption(out + d_offset - 16, d_start_adress, 10);
+                        //protection level
+                        bit_adaption(out + d_offset - 10, d_protection_mode, 2);
+                        //calculate size of subchannel in CUs (table 7, p. 51)
+                        switch (d_protection_mode){
+                            case 0:
+                                d_subch_size = 12*d_data_rate_n;
+                                break;
+                            case 1:
+                                d_subch_size = 8*d_data_rate_n;
+                                break;
+                            case 2:
+                                d_subch_size = 6*d_data_rate_n;
+                                break;
+                            case 3:
+                                d_subch_size = 4*d_data_rate_n;
+                                break;
+                            default:
+                                //fehler
+                                break;
+                        }
+                        //write subchannel size
+                        bit_adaption(out + d_offset - 0, d_subch_size, 10);
+                        //shift start address
+                        d_start_adress += d_subch_size;
+                    }
+                    //subchannel orga is set, set EndMarker and padding
+                    if ((8*FIB_DATA_FIELD_LENGTH) - d_offset >= 8) {//add EndMarker (111 11111) if there is minimum one byte left in FIG (FIG without 16 bit crc16)
+                        for (int i = 0; i < 8; i++) { //find:: binde FIC.h ein und verwende die konstaten statt FIB_size
+                            out[i + d_offset] = 1;
+                        }
+                    }
+                    d_offset += 8;
+                    while (d_offset % (8*FIB_LENGTH) != 0) {//padding (fill rest of FIB with zeroes, as well the last 16 crc bits)
+                        out[d_offset] = 0;
+                        d_offset++;
+                    }
+                    d_nFIBs_written++;
+                }//second FIB is finished
+                else
+                {
 /*///////////////////////////////////////////////
  * write a not primary FIB with SI
  *///////////////////////////////////////////////
                     do { //fill FIB with FIGs
                         //write one SI-FIG in FIB
                         std::memcpy(out + d_offset, d_SI_pointer[d_nSI_written], d_SI_size[d_nSI_written]);
+                        //change content if subchannel specific SI
                         d_offset += d_SI_size[d_nSI_written];
 
                         //multiple subchannel labels?
 
                         if(d_nSI_written + 1 >= d_num_SI_basic) //a subchannel specific FIG has to be written d_num_subch times
                         {
-                            if(++d_subch_iterate >= d_num_subch)
+                            if(++d_subch_iterate >= d_num_subch) //all subchannels were written; go on with next SI
                             {
                                 d_nSI_written++;
                                 d_subch_iterate = 0;
                             }
                         }
-                        else
+                        else //basic SI -> just write once
                         {
                             d_nSI_written++;
                         }

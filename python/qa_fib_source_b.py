@@ -33,7 +33,7 @@ class qa_fib_source_b (gr_unittest.TestCase):
 
     # manual check if labels are printed from fibsink properly
     def test_001_t(self):
-        src = dab.fib_source_b_make(1,1,'ensemble label', 'service label', 'component label1', 'label2', 'comp label 3', 1, 2, 3)
+        src = dab.fib_source_b_make(1,1,'ensemble label', 'service label', 'component label1', 1, 2, 3)
         fib_unpacked_to_packed = blocks.unpacked_to_packed_bb(1, gr.GR_MSB_FIRST)
         s2v = blocks.stream_to_vector(gr.sizeof_char, 32)
         crc16 = dab.crc16_bb(32, 0x1021, 0xffff)
@@ -41,7 +41,6 @@ class qa_fib_source_b (gr_unittest.TestCase):
         self.tb.connect(src, fib_unpacked_to_packed, blocks.head(gr.sizeof_char, 500), s2v, crc16, fibsink)
         self.tb.run()
         pass
-
 
 if __name__ == '__main__':
     gr_unittest.run(qa_fib_source_b, "qa_fib_source_b.xml")
