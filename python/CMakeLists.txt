@@ -36,7 +36,8 @@ GR_PYTHON_INSTALL(
     detect_null.py
     ofdm.py
     parameters.py
-    fic.py DESTINATION ${GR_PYTHON_DIR}/dab
+    fic.py
+    msc_decode.py DESTINATION ${GR_PYTHON_DIR}/dab
 )
 
 ########################################################################
@@ -51,4 +52,4 @@ GR_ADD_TEST(qa_time_deinterleave_ff ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_
 GR_ADD_TEST(qa_fib_sink_vb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_fib_sink_vb.py)
 GR_ADD_TEST(qa_crc16_bb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_crc16_bb.py)
 GR_ADD_TEST(qa_fib_source_b ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_fib_source_b.py)
-
+GR_ADD_TEST(qa_select_subch_vfvf ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_select_subch_vfvf.py)

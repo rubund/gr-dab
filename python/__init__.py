@@ -39,4 +39,5 @@ from parameters import receiver_parameters
 from ofdm import ofdm_mod
 from ofdm import ofdm_demod
 from fic import fic_decode
+from msc_decode import msc_decode
 #
