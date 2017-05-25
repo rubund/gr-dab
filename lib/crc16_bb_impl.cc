@@ -71,7 +71,7 @@ namespace gr {
                 //calculate crc16 word
                 d_crc = crc16(in + n*d_length, d_length, d_generator, d_initial_state);
 
-                //check if last 2 bytes are zeros as expected
+                //sanity check (last 2 bytes should be zeros)
                 if(in[30  + n*d_length] != 0 || in[31  + n*d_length] != 0)
                 {
                     GR_LOG_DEBUG(d_logger, "CRC16 overwrites data (zeros expected)");
