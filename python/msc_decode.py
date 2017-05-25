@@ -42,7 +42,7 @@ class msc_decode(gr.hier_block2):
                                 # Input signature
                                 gr.io_signature2(2, 2, gr.sizeof_float * dab_params.num_carriers * 2, gr.sizeof_char),
                                 # Output signature
-                                gr.io_signature(1, 1, gr.sizeof_float * dab_params.msc_cu_size))
+                                gr.io_signature(1, 1, gr.sizeof_float * dab_params.msc_cu_size * size))
         self.dp = dab_params
         self.address = address
         self.size = size
@@ -86,11 +86,8 @@ class msc_decode(gr.hier_block2):
         #repartition MSC to CUs
         self.repartition_msc_to_cus = dab.repartition_vectors_make(gr.sizeof_float, self.dp.num_carriers*2, self.dp.msc_cu_size, self.dp.num_msc_syms, self.dp.num_cus * self.dp.num_cifs)
 
-        # select CUs of one subchannel of each CIF
-        self.select_subch = dab.select_vectors_make(gr.sizeof_float, self.dp.msc_cu_size, self.size, self.address)
-
-        #repartition CUs to logical frame (24ms content of subch)
-        self.repartition_cus_to_logical_frame = dab.repartition_vectors_make(gr.sizeof_float, self.dp.msc_cu_size, self.size * self.dp.msc_cu_size, self.size, 1)
+        # select CUs of one subchannel of each CIF and form logical frame vector
+        self.select_subch = dab.select_subch_vfvf_make(self.dp.msc_cu_size, self.dp.msc_cu_size * self.size, self.address, self.dp.num_cus)
 
         # time deinterleaving
         #self.time_deinterleaver = dab.time_deinterleave_ff_make(self.msc_punctured_codeword_length, self.dp.scrambling_vector)
@@ -168,5 +165,5 @@ class msc_decode(gr.hier_block2):
         self.sink_repartition_msc_to_cus = blocks.file_sink_make(gr.sizeof_float * self.dp.msc_cu_size, "debug/msc_repartitioned_to_cus.dat")
         self.connect((self.repartition_msc_to_cus, 0), self.sink_repartition_msc_to_cus)
 
-        self.sink_msc_select_subch = blocks.file_sink_make(gr.sizeof_float * self.dp.msc_cu_size, "debug/msc_select_subch.dat")
-        self.connect(self.select_subch, self.sink_msc_select_subch)
+        self.sink_select_subch = blocks.file_sink_make(gr.sizeof_float * self.dp.msc_cu_size * self.size, "debug/select_subch.dat")
+        self.connect(self.select_subch, self.sink_select_subch)

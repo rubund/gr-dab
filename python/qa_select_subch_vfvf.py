@@ -70,13 +70,13 @@ class qa_select_subch_vfvf (gr_unittest.TestCase):
     def test_003_select_vectors(self):
         vlen_in = 4
         vlen_out = 4
-        total_size = 2
+        total_size = 1
         address = 0
         src_data = (
             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
-            12, 13, 14, 15, 16, 17, 18, 19, 0)
+            12, 13, 14, 15, 16, 17, 18, 19)
         expected_data = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
-            12, 13, 14, 15, 16, 17, 18, 19, 0)
+            12, 13, 14, 15, 16, 17, 18, 19)
         src = blocks.vector_source_f(src_data)
         s2v = blocks.stream_to_vector(gr.sizeof_float, vlen_in)
         select_subch = dab.select_subch_vfvf_make(vlen_in, vlen_out, address, total_size)
@@ -85,8 +85,6 @@ class qa_select_subch_vfvf (gr_unittest.TestCase):
         self.tb.connect(src, s2v, select_subch, v2s, dst)
         self.tb.run()
         result_data = dst.data()
-        print "test2"
-        print result_data
         self.assertFloatTuplesAlmostEqual2(result_data, expected_data)
 
 if __name__ == '__main__':

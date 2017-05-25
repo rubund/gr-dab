@@ -29,3 +29,4 @@ cscope.out
 .*.swp
 .*.pyc
 *~
+python/debug/
