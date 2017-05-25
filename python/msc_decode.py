@@ -42,7 +42,7 @@ class msc_decode(gr.hier_block2):
                                 # Input signature
                                 gr.io_signature2(2, 2, gr.sizeof_float * dab_params.num_carriers * 2, gr.sizeof_char),
                                 # Output signature
-                                gr.io_signature(1, 1, gr.sizeof_float * dab_params.msc_cu_size * size))
+                                gr.io_signature(1, 1, gr.sizeof_float * 21528))
         self.dp = dab_params
         self.address = address
         self.size = size
@@ -136,7 +136,7 @@ class msc_decode(gr.hier_block2):
                      (self.select_subch, 0),
                      #(self.repartition_cus_to_logical_frame, 0),
                      self.time_deinterleaver,
-                     #self.unpuncture,
+                     self.unpuncture,
                      #self.conv_v2s,
                      #self.conv_decode,
                      #self.conv_s2v,
@@ -172,3 +172,7 @@ class msc_decode(gr.hier_block2):
         #sub channel time_deinterleaved
         self.sink_subch_time_deinterleaved = blocks.file_sink_make(gr.sizeof_float * self.dp.msc_cu_size * self.size, "debug/subch_time_deinterleaved.dat")
         self.connect(self.time_deinterleaver, self.sink_subch_time_deinterleaved)
+
+        #sub channel unpunctured
+        self.sink_subch_unpunctured = blocks.file_sink_make(gr.sizeof_float * self.msc_conv_codeword_length, "debug/subch_unpunctured.dat")
+        self.connect(self.unpuncture, self.sink_subch_unpunctured)
