@@ -42,7 +42,7 @@ class msc_decode(gr.hier_block2):
                                 # Input signature
                                 gr.io_signature2(2, 2, gr.sizeof_float * dab_params.num_carriers * 2, gr.sizeof_char),
                                 # Output signature
-                                gr.io_signature(1, 1, gr.sizeof_float * dab_params.num_carriers*2))
+                                gr.io_signature(1, 1, gr.sizeof_float * dab_params.msc_cu_size))
         self.dp = dab_params
         self.address = address
         self.size = size
@@ -79,12 +79,12 @@ class msc_decode(gr.hier_block2):
         # select OFDM carriers with MSC
         self.select_msc_syms = dab.select_vectors(gr.sizeof_float, self.dp.num_carriers * 2, self.dp.num_msc_syms,
                                                   self.dp.num_fic_syms)
-        # repartition MSC data in CIFs (weggelassen weil scheduler belastung)
+        # repartition MSC data in CIFs (left out due to heavy burden for scheduler and not really necessary)
         #self.repartition_msc_to_CIFs = dab.repartition_vectors_make(gr.sizeof_float, self.dp.num_carriers * 2,
         #                                                            self.dp.cif_bits, self.dp.num_msc_syms,
         #                                                            self.dp.num_cifs)
         #repartition MSC to CUs
-        self.repartition_msc_to_cus = dab.repartition_vectors_make(gr.sizeof_float, self.dp.num_carriers*2, self.dp.msc_cu_size, self.dp.num_msc_syms, self.dp.num_cus)
+        self.repartition_msc_to_cus = dab.repartition_vectors_make(gr.sizeof_float, self.dp.num_carriers*2, self.dp.msc_cu_size, self.dp.num_msc_syms, self.dp.num_cus * self.dp.num_cifs)
 
         # select CUs of one subchannel of each CIF
         self.select_subch = dab.select_vectors_make(gr.sizeof_float, self.dp.msc_cu_size, self.size, self.address)
@@ -135,8 +135,8 @@ class msc_decode(gr.hier_block2):
         self.connect((self, 0),
                      (self.select_msc_syms, 0),
                      #(self.repartition_msc_to_CIFs, 0),
-                     #(self.repartition_msc_to_cus, 0),
-                     #(self.select_subch, 0),
+                     (self.repartition_msc_to_cus, 0),
+                     (self.select_subch, 0),
                      #(self.repartition_cus_to_logical_frame, 0),
                      #self.time_deinterleaver,
                      #self.unpuncture,
@@ -152,7 +152,7 @@ class msc_decode(gr.hier_block2):
         self.connect((self, 1),
                      (self.select_msc_syms, 1),
                      #(self.repartition_msc_to_CIFs, 1),
-                     #(self.repartition_msc_to_cus, 1),
+                     (self.repartition_msc_to_cus, 1),
                      #(self.select_subch, 1),
                      #(self.repartition_CUs_to_logical_frame, 1);
                      blocks.null_sink(gr.sizeof_char))
@@ -165,8 +165,8 @@ class msc_decode(gr.hier_block2):
         self.connect(self.select_msc_syms, self.sink_msc_select_syms)
 
         #msc repartition cus
-        #self.sink_repartition_msc_to_cus = blocks.file_sink_make(gr.sizeof_float * self.dp.msc_cu_size, "debug/msc_repartitioned_to_cus.dat")
-        #self.connect(self.repartition_msc_to_cus, self.sink_repartition_msc_to_cus)
+        self.sink_repartition_msc_to_cus = blocks.file_sink_make(gr.sizeof_float * self.dp.msc_cu_size, "debug/msc_repartitioned_to_cus.dat")
+        self.connect((self.repartition_msc_to_cus, 0), self.sink_repartition_msc_to_cus)
 
-        #self.sink_msc_select_subch = blocks.file_sink_make(gr.sizeof_float * self.dp.msc_cu_size, "debug/msc_select_subch.dat")
-        #self.connect(self.select_subch, self.sink_msc_select_subch)
+        self.sink_msc_select_subch = blocks.file_sink_make(gr.sizeof_float * self.dp.msc_cu_size, "debug/msc_select_subch.dat")
+        self.connect(self.select_subch, self.sink_msc_select_subch)

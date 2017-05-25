@@ -45,5 +45,6 @@ install(FILES
     ofdm_insert_pilot_vcc.h
     sum_phasor_trig_vcc.h
     ofdm_move_and_insert_zero.h
-    insert_null_symbol.h DESTINATION include/dab
+    insert_null_symbol.h
+    select_subch_vfvf.h DESTINATION include/dab
 )
