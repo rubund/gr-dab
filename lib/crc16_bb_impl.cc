@@ -38,12 +38,10 @@ namespace gr {
 
         crc16_bb_impl::crc16_bb_impl(int length, uint16_t generator, uint16_t initial_state)
                 : gr::block("crc16_bb",
-                            gr::io_signature::make(1, 1, length*sizeof(char)), //FIB without CRC (zeros instead)
-                            gr::io_signature::make(1, 1, length*sizeof(char))) //FIB with CRC (+2 byte)
+                            gr::io_signature::make(1, 1, length*sizeof(char)), /*FIB without CRC (zeros instead)*/
+                            gr::io_signature::make(1, 1, length*sizeof(char))), /*FIB with CRC16*/
+        d_length(length), d_generator(generator), d_initial_state(initial_state)
         {
-            len = length;
-            gen = generator;
-            init_state = initial_state;
         }
 
         crc16_bb_impl::~crc16_bb_impl()
@@ -65,22 +63,30 @@ namespace gr {
             const char *in = (const char *) input_items[0];
             char *out = (char *) output_items[0];
 
-            //push bytes through
-            for(int i = 0; i < len; i++) {
-                out[i] = in[i];
-            }
-            //calculate crc16 word
-            crc = crc16(in, len, gen, init_state);
+            for(int n = 0; n < noutput_items; n++) {
+                //push bytes through
+                for (int i = 0; i < d_length; i++) {
+                    out[i + n*d_length] = in[i + n*d_length];
+                }
+                //calculate crc16 word
+                d_crc = crc16(in + n*d_length, d_length, d_generator, d_initial_state);
 
-            //write calculated crc to vector (overwrite last 2 bytes)
-            out[len-2] = (char) (crc>>8);//add MSByte first to FIB
-            out[len-1] = (char)(out[len-2]<<8)^crc; //add LSByte second to FIB
+                //check if last 2 bytes are zeros as expected
+                if(in[30  + n*d_length] != 0 || in[31  + n*d_length] != 0)
+                {
+                    GR_LOG_DEBUG(d_logger, "CRC16 overwrites data (zeros expected)");
+                }
+
+                //write calculated crc to vector (overwrite last 2 bytes)
+                out[d_length - 2 + n*d_length] = (char) (d_crc >> 8);//add MSByte first to FIB
+                out[d_length - 1 + n*d_length] = (char) (out[d_length - 2 + n*d_length] << 8) ^ d_crc; //add LSByte second to FIB
+            }
             // Tell runtime system how many input items we consumed on
             // each input stream.
-            consume_each (1);
+            consume_each (noutput_items);
 
             // Tell runtime system how many output items we produced.
-            return 1;
+            return noutput_items;
         }
 
     } /* namespace dab */

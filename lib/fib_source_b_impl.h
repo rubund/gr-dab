@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2017 by Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
+ * Copyright 2017 Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
  *
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,13 +25,27 @@
 
 namespace gr {
     namespace dab {
-
+/*! \brief source that produces Fast Information Blocks (FIBs) according to the DAB standard
+ *
+ * output: unpacked byte stream with FIBs (each 256 bit) and zeros at last 16 bits for following CRC16
+ *
+ * produces Fast Information Blocks (FIBs) according to the DAB standard and the input parameters
+ *
+ * @param transmission_mode transmission mode
+ * @param num_subch number of subchannels to be transmitted
+ * @param ensemble_label string label of the DAB ensemble (max 16 characters)
+ * @param programme_service_label string label of the DAB service (max 16 characters)
+ * @param service_comp_label string label of the DAB service component (max 16 characters)
+ * @param service_comp_lang language of the service component in hex according to table 9, 10 in ETSI TS 101 756
+ * @param protection_mode protection profile of set A according to table 7
+ * @param data_rate_n n = data_rate/8kbit/s
+ */
         class fib_source_b_impl : public fib_source_b
         {
         private:
             int d_transmission_mode; //transmission mode
-            int d_offset; //offset for writing info to FIBs
-            uint16_t d_nFIBs_written; //FIBs totally written
+            int d_offset;
+            uint16_t d_nFIBs_written; //counts totally written FIBs
             void bit_adaption(char* out_ptr, int number, int num_bits); //writes an integer value to num_bits bits, beginning at (overwrites default zeros)
 
             //Multiplex Channel Info
@@ -56,7 +70,7 @@ namespace gr {
             const static int d_size_service_label = 176;
             static char d_service_comp_label[184]; //21*8+8, service component label (FIG 1/0)
             const static int d_size_service_comp_label = 184;
-            const static char d_service_comp_language[32]; //3*8+8, service component language; short form (FIG 0/5)
+            static char d_service_comp_language[32]; //3*8+8, service component language; short form (FIG 0/5)
             const static int d_size_service_comp_language = 32;
 
             const static int d_num_SI_basic = 4; //no subchannel specific SI

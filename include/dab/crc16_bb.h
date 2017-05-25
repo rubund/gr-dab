@@ -28,11 +28,18 @@
 namespace gr {
   namespace dab {
 
-    /*!
-     * \brief <+description of block+>
-     * \ingroup dab
-     *
-     */
+/*! \brief crc16 is written in the last 2 bits of input vector
+ *
+ * input:  char vector of length length (packed bytes)
+ *
+ * output: char vector of length length (packed bytes) with crc at last 2 bytes (overwrites last 2 bytes)
+ *
+ * uses the crc16 function to calculate a 2 byte crc word and write it to the FIB (overwrites last 2 bytes)
+ *
+ * @param length Length of input and output vector in bytes. (default is 32 for DAB FIBs)
+ * @param generator Generator polynom for shift register. (default is 0x1021 for DAB)
+ * @param initial_state Initial state of shift register. (default is 0xffff for DAB)
+ */
     class DAB_API crc16_bb : virtual public gr::block
     {
      public:

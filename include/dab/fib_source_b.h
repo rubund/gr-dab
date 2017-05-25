@@ -28,10 +28,7 @@
 namespace gr {
   namespace dab {
 
-    /*!
-     * \brief <+description of block+>
-     * \ingroup dab
-     *
+    /*! \brief source that produces Fast Information Blocks (FIBs) according to the DAB standard
      */
     class DAB_API fib_source_b : virtual public gr::sync_block
     {

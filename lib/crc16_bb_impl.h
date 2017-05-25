@@ -29,9 +29,9 @@ namespace gr {
  *
  * input:  char vector of length length (packed bytes)
  *
- * output: char vector of length length (packed bytes) with crc at last 2 bytes (overwritten, zeros expected)
+ * output: char vector of length length (packed bytes) with crc at last 2 bytes (overwrites last 2 bytes)
  *
- * uses the class crc16 to calculate the crc16 and write it to the FIB (overwrites the last 2 bytes)
+ * uses the crc16 function to calculate a 2 byte crc word and write it to the FIB (overwrites last 2 bytes)
  *
  * @param length Length of input and output vector in bytes. (default is 32 for DAB FIBs)
  * @param generator Generator polynom for shift register. (default is 0x1021 for DAB)
@@ -40,8 +40,8 @@ namespace gr {
         class crc16_bb_impl : public crc16_bb
         {
         private:
-            uint16_t crc;
-            int len, gen, init_state;
+            uint16_t d_crc;
+            int d_length, d_generator, d_initial_state;
 
         public:
             crc16_bb_impl(int length, uint16_t generator, uint16_t initial_state);

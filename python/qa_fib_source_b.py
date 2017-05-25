@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2017 by Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
+# Copyright 2017 Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
 #
 # This is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,14 +31,14 @@ class qa_fib_source_b (gr_unittest.TestCase):
     def tearDown (self):
         self.tb = None
 
-    # manual check if labels are printed from fibsink properly
+    # manual check if transmitted data is interpreted properly
     def test_001_t(self):
-        src = dab.fib_source_b_make(1,1,'ensemble label', 'service label', 'component label1', 1, 2, 3)
+        src = dab.fib_source_b_make(1,1,'Galaxy_News', 'Wasteland_Radio', 'Country_Mix', 0x09, 0, 8)
         fib_unpacked_to_packed = blocks.unpacked_to_packed_bb(1, gr.GR_MSB_FIRST)
         s2v = blocks.stream_to_vector(gr.sizeof_char, 32)
         crc16 = dab.crc16_bb(32, 0x1021, 0xffff)
         fibsink = dab.fib_sink_vb()
-        self.tb.connect(src, fib_unpacked_to_packed, blocks.head(gr.sizeof_char, 500), s2v, crc16, fibsink)
+        self.tb.connect(src, fib_unpacked_to_packed, blocks.head(gr.sizeof_char, 300), s2v, crc16, fibsink)
         self.tb.run()
         pass
 

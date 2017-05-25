@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2017 by Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
+ * Copyright 2017 Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
  *
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,9 +29,9 @@
 namespace gr {
     namespace dab {
 
-/*///////////////////////////////////////
- * MCI-FIGs, ready to transmit
- *///////////////////////////////////////
+////////////////////////////////////////
+/// MCI-FIGs, ready to transmit
+////////////////////////////////////////
 
         //ensemble info, CIF counter has to increase with each CIF
         const char fib_source_b_impl::d_ensemble_info[56] = {0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
@@ -57,10 +57,10 @@ namespace gr {
                                                                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         // 000000 0000000000 0 1 000 00 0000000000 long form (table 7, p. 51)
 
-/*////////////////////////////////////////////
- * SI-FIGs, ready to transmit
-*/////////////////////////////////////////////
-        //Ensemble label (bit 17 changed to 0)
+/////////////////////////////////////////////
+/// SI-FIGs, ready to transmit
+/////////////////////////////////////////////
+        //Ensemble label
         char fib_source_b_impl::d_ensemble_label[176] = {0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
                                                          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1,
                                                          0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0,
@@ -70,7 +70,7 @@ namespace gr {
                                                          0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1,
                                                          1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1,
                                                          0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0,
-                                                         0}; // Ensemble label: "__Galaxy_News___"
+                                                         0};
         //"001 10101  0000 0 000 0100 000000000000 01011111 01011111 01000111 01100001 01101100 01100001 01111000 01111001 01011111 01001110 01100101 01110111 01110011 01011111 01011111 01011111 0011100011111000"; // Ensemble label: "__Galaxy_News___"
 
         //Programme Service label
@@ -98,13 +98,14 @@ namespace gr {
         //001 10110 0000 0 100 0 000 0000 0100000000000000 01000001 01110111 01100101 01110011 01101111 01101101 01100101 01011111 01001101 01101001 01111000 01011111 01010110 01101111 01101100 00110001 0000000011111111
 
         //service component language
-        const char fib_source_b_impl::d_service_comp_language[32] = {0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0,
+        char fib_source_b_impl::d_service_comp_language[32] = {0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0,
                                                                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
                                                                      0};
-        //"000 00011  000 00101 0 0 000000 00001000"; //language German
+        //"000 00011  000 00101 0 0 000000 00001000";
 
-        //d_SI_pointer array
+        /// d_SI_pointer array contains all SI for transmission.
         const char* fib_source_b_impl::d_SI_pointer[d_num_SI_basic + d_num_SI_subch] = {d_ensemble_label, d_programme_service_label, d_service_comp_language, d_service_comp_label};
+        /// contains the lengths of the SI FIGs for transmission
         const int fib_source_b_impl::d_SI_size[d_num_SI_basic + d_num_SI_subch] = {176, 176, 32, 184};
 
         fib_source_b::sptr
@@ -130,6 +131,9 @@ namespace gr {
             //write the labels with input strings once at beginning
             write_label(d_ensemble_label + 32, ensemble_label);
             write_label(d_programme_service_label + 32, programme_service_label);
+            write_label(d_service_comp_label + 40, service_comp_label);
+            //change service comp language
+            bit_adaption(d_service_comp_language + d_size_service_comp_language, service_comp_lang, 8);
         }
 
         /*
@@ -192,9 +196,9 @@ namespace gr {
                 //only MCI in this FIB when this FIB ist first in Row (Row are 3 FIBs for d_transmission_mode=1,2,4 or 4 FIBs for d_transmission_mode=3)
                 if ((d_nFIBs_written%3 == 0 && d_transmission_mode != 3) || (d_nFIBs_written%4 == 0 && d_transmission_mode == 3))
                 {
-/*///////////////////////////////////////////////
- * add first FIB with only MCI (max numSubCh = 7)
- *///////////////////////////////////////////////
+////////////////////////////////////////////////
+/// add first FIB with only MCI (max numSubCh = 7)
+////////////////////////////////////////////////
                     //ensemble info
                     std::memcpy(out + d_offset, d_ensemble_info, d_size_ensemble_info);
                     d_offset += d_size_ensemble_info;
@@ -236,9 +240,9 @@ namespace gr {
 
                 //second FIB in row reserved for subchannel orga
                 else if((d_nFIBs_written%3 == 1 && d_transmission_mode != 3) || (d_nFIBs_written%4 == 1 && d_transmission_mode == 3)){
- /*///////////////////////////////////////////////
- * add second FIB with only subchannel orga (max numSubCh = 7)
- *///////////////////////////////////////////////
+ ////////////////////////////////////////////////
+ /// add second FIB with only subchannel orga (max numSubCh = 7)
+ ////////////////////////////////////////////////
                     //subchannel orga
                     d_start_adress = 0;
                     //subchannel orga header (write only once for all subchannels)
@@ -297,17 +301,16 @@ namespace gr {
                 }//second FIB is finished
                 else
                 {
-/*///////////////////////////////////////////////
- * write a not primary FIB with SI
- *///////////////////////////////////////////////
+/////////////////////////////////////////////////
+/// write a not primary FIB with SI
+/////////////////////////////////////////////////
                     do { //fill FIB with FIGs
                         //write one SI-FIG in FIB
                         std::memcpy(out + d_offset, d_SI_pointer[d_nSI_written], d_SI_size[d_nSI_written]);
                         //change content if subchannel specific SI
                         d_offset += d_SI_size[d_nSI_written];
 
-                        //multiple subchannel labels?
-
+                        //SI for each subchannel?
                         if(d_nSI_written + 1 >= d_num_SI_basic) //a subchannel specific FIG has to be written d_num_subch times
                         {
                             if(++d_subch_iterate >= d_num_subch) //all subchannels were written; go on with next SI
