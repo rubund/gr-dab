@@ -131,6 +131,9 @@ class msc_decode(gr.hier_block2):
         self.add_mod_2 = blocks.xor_bb()
         #self.energy_s2v = blocks.stream_to_vector(gr.sizeof_char, self.msc_I)
 
+        #pack bits
+        self.pack_bits = blocks.unpacked_to_packed_bb_make(1, gr.GR_MSB_FIRST)
+
         # connect blocks
         self.connect((self, 0),
                      (self.select_msc_syms, 0),
@@ -146,6 +149,7 @@ class msc_decode(gr.hier_block2):
                      self.conv_prune,
                      self.energy_v2s,
                      self.add_mod_2,
+                     self.pack_bits,
                      #self.energy_s2v, #better output stream or vector??
                      (self))
         #connect trigger chain
@@ -188,6 +192,10 @@ class msc_decode(gr.hier_block2):
         self.sink_subch_pruned = blocks.file_sink_make(gr.sizeof_char * self.msc_I, "debug/subch_pruned.dat")
         self.connect(self.conv_prune, self.sink_subch_pruned)
 
-        # sub channel energy dispersal undone
-        self.sink_subch_energy_disp_undone = blocks.file_sink_make(gr.sizeof_char, "debug/subch_energy_disp_undone.dat")
+        # sub channel energy dispersal undone unpacked
+        self.sink_subch_energy_disp_undone = blocks.file_sink_make(gr.sizeof_char, "debug/subch_energy_disp_undone_unpacked.dat")
         self.connect(self.add_mod_2, self.sink_subch_energy_disp_undone)
+
+        # sub channel energy dispersal undone packed
+        self.sink_subch_energy_disp_undone_packed = blocks.file_sink_make(gr.sizeof_char, "debug/subch_energy_disp_undone_packed.dat")
+        self.connect(self.pack_bits, self.sink_subch_energy_disp_undone_packed)
