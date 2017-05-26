@@ -42,7 +42,7 @@ class msc_decode(gr.hier_block2):
                                 # Input signature
                                 gr.io_signature2(2, 2, gr.sizeof_float * dab_params.num_carriers * 2, gr.sizeof_char),
                                 # Output signature
-                                gr.io_signature(1, 1, gr.sizeof_float * 21528))
+                                gr.io_signature(1, 1, gr.sizeof_char))
         self.dp = dab_params
         self.address = address
         self.size = size
@@ -54,7 +54,7 @@ class msc_decode(gr.hier_block2):
         self.n = self.size / self.dp.subch_size_multiple_n[self.protect]
 
         # calculate puncturing factors (EEP, table 33, 34)
-        self.msc_I = self.size * self.dp.msc_cu_size
+        self.msc_I = self.n * 192
         if (self.n > 1 or self.protect != 1):
             self.puncturing_L1 = [6 * self.n - 3, 2 * self.n - 3, 6 * self.n - 3, 4 * self.n - 3]
             self.puncturing_L2 = [3, 4 * self.n + 3, 3, 2 * self.n + 3]
@@ -74,6 +74,9 @@ class msc_decode(gr.hier_block2):
             self.msc_punctured_codeword_length = 5 * 4 * self.dp.puncturing_vectors_ones[13] + 1 * 4 * \
                                                                                                self.dp.puncturing_vectors_ones[
                                                                                                    12] + 12
+        #sanity check
+        assert(6*self.n == self.puncturing_L1[self.protect] + self.puncturing_L2[self.protect])
+
 
         # MSC selection and block partitioning
         # select OFDM carriers with MSC
@@ -126,7 +129,7 @@ class msc_decode(gr.hier_block2):
         self.prbs_src = blocks.vector_source_b(self.dp.prbs(self.msc_I), True)
         self.energy_v2s = blocks.vector_to_stream(gr.sizeof_char, self.msc_I)
         self.add_mod_2 = blocks.xor_bb()
-        self.energy_s2v = blocks.stream_to_vector(gr.sizeof_char, self.msc_I)
+        #self.energy_s2v = blocks.stream_to_vector(gr.sizeof_char, self.msc_I)
 
         # connect blocks
         self.connect((self, 0),
@@ -137,12 +140,12 @@ class msc_decode(gr.hier_block2):
                      #(self.repartition_cus_to_logical_frame, 0),
                      self.time_deinterleaver,
                      self.unpuncture,
-                     #self.conv_v2s,
-                     #self.conv_decode,
-                     #self.conv_s2v,
-                     #self.conv_prune,
-                     #self.energy_v2s,
-                     #self.add_mod_2,
+                     self.conv_v2s,
+                     self.conv_decode,
+                     self.conv_s2v,
+                     self.conv_prune,
+                     self.energy_v2s,
+                     self.add_mod_2,
                      #self.energy_s2v, #better output stream or vector??
                      (self))
         #connect trigger chain
@@ -153,7 +156,7 @@ class msc_decode(gr.hier_block2):
                      #(self.select_subch, 1),
                      #(self.repartition_CUs_to_logical_frame, 1);
                      blocks.null_sink(gr.sizeof_char))
-        #self.connect(self.prbs_src, (self.add_mod_2, 1))
+        self.connect(self.prbs_src, (self.add_mod_2, 1))
 
 
 #debug
@@ -176,3 +179,15 @@ class msc_decode(gr.hier_block2):
         #sub channel unpunctured
         self.sink_subch_unpunctured = blocks.file_sink_make(gr.sizeof_float * self.msc_conv_codeword_length, "debug/subch_unpunctured.dat")
         self.connect(self.unpuncture, self.sink_subch_unpunctured)
+
+        # sub channel convolutional decoded
+        self.sink_subch_decoded = blocks.file_sink_make(gr.sizeof_char * self.msc_I + self.dp.conv_code_add_bits_input, "debug/subch_decoded.dat")
+        self.connect(self.conv_s2v, self.sink_subch_decoded)
+
+        # sub channel convolutional decoded
+        self.sink_subch_pruned = blocks.file_sink_make(gr.sizeof_char * self.msc_I, "debug/subch_pruned.dat")
+        self.connect(self.conv_prune, self.sink_subch_pruned)
+
+        # sub channel energy dispersal undone
+        self.sink_subch_energy_disp_undone = blocks.file_sink_make(gr.sizeof_char, "debug/subch_energy_disp_undone.dat")
+        self.connect(self.add_mod_2, self.sink_subch_energy_disp_undone)
