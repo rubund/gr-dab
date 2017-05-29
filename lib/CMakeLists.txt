@@ -51,7 +51,10 @@ list(APPEND dab_sources
     ofdm_move_and_insert_zero_impl.cc
     insert_null_symbol_impl.cc
     time_interleave_bb_impl.cc
-    time_deinterleave_ff_impl.cc )
+    time_deinterleave_ff_impl.cc
+    crc16_bb_impl.cc
+    fib_source_b_impl.cc
+)
 
 set(dab_sources "${dab_sources}" PARENT_SCOPE)
 if(NOT dab_sources)

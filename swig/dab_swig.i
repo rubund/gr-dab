@@ -34,6 +34,8 @@
 #include "dab/insert_null_symbol.h"
 #include "dab/time_interleave_bb.h"
 #include "dab/time_deinterleave_ff.h"
+#include "dab/crc16_bb.h"
+#include "dab/fib_source_b.h"
 %}
 
 
@@ -87,6 +89,9 @@ GR_SWIG_BLOCK_MAGIC2(dab, ofdm_move_and_insert_zero);
 GR_SWIG_BLOCK_MAGIC2(dab, insert_null_symbol);
 %include "dab/time_interleave_bb.h"
 GR_SWIG_BLOCK_MAGIC2(dab, time_interleave_bb);
-
 %include "dab/time_deinterleave_ff.h"
 GR_SWIG_BLOCK_MAGIC2(dab, time_deinterleave_ff);
+%include "dab/crc16_bb.h"
+GR_SWIG_BLOCK_MAGIC2(dab, crc16_bb);
+%include "dab/fib_source_b.h"
+GR_SWIG_BLOCK_MAGIC2(dab, fib_source_b);

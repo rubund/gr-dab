@@ -23,7 +23,7 @@ from gnuradio import gr, gr_unittest
 from gnuradio import blocks
 import dab
 
-class qa_fib_sink_vb (gr_unittest.TestCase):
+class qa_fib_source_b (gr_unittest.TestCase):
 
     def setUp (self):
         self.tb = gr.top_block ()
@@ -31,16 +31,16 @@ class qa_fib_sink_vb (gr_unittest.TestCase):
     def tearDown (self):
         self.tb = None
 
-#manual check of print outs with reference data of debug file (SWR radio station)
-    def test_001_t (self):
-        data01 = (0x05, 0x00, 0x10, 0xea, 0x04, 0x24, 0x06, 0x02, 0xd3, 0xa6, 0x01, 0x3f, 0x06, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4c, 0x89)
-        src = blocks.vector_source_b(data01)
-        fibout = blocks.stream_to_vector(1, 32)
+    # manual check if transmitted data is interpreted properly
+    def test_001_t(self):
+        src = dab.fib_source_b_make(1,1,'Galaxy_News', 'Wasteland_Radio', 'Country_Mix', 0x09, 0, 8)
+        fib_unpacked_to_packed = blocks.unpacked_to_packed_bb(1, gr.GR_MSB_FIRST)
+        s2v = blocks.stream_to_vector(gr.sizeof_char, 32)
+        crc16 = dab.crc16_bb(32, 0x1021, 0xffff)
         fibsink = dab.fib_sink_vb()
-        self.tb.connect(src, blocks.head(gr.sizeof_char, 300), fibout, fibsink)
+        self.tb.connect(src, fib_unpacked_to_packed, blocks.head(gr.sizeof_char, 300), s2v, crc16, fibsink)
         self.tb.run()
         pass
 
-
 if __name__ == '__main__':
-    gr_unittest.run(qa_fib_sink_vb, "qa_fib_sink_vb.xml")
+    gr_unittest.run(qa_fib_source_b, "qa_fib_source_b.xml")
