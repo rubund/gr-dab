@@ -25,9 +25,12 @@
 
 namespace gr {
     namespace dab {
-/*! \brief applies time deinterleaving to a vector
+/*! \brief applies time deinterleaving to a vector (convolutional deinterleaving -> descrambling and delay)
  *
- * applies time deinterleaving to a vector with its arg_max[scrambling_vector] predecessors, the scrambling_vector describes which vector element comes from which predecessors
+ * applies convolutional deinterleaving to a vector with its max[vector_length] followers, the scrambling_vector describes which vector element comes from which follower
+ * delays the elements of a max delay of d_scrambling_length-1
+ * more information to the interleaving rules on ETSI EN 300 401 chapter 12
+ * this deinterleaver restores a bitstream interleaved by the block time_interleave_bb
  *
  * @param vector_length length of input vectors
  * @param scrambling_vector vector with scrambling parameters (see DAB standard p.138)
@@ -37,7 +40,6 @@ namespace gr {
         {
         private:
             int d_scrambling_length, d_vector_length;
-            int d_scrambling_delay;
             std::vector<unsigned char> d_scrambling_vector;
 
         public:

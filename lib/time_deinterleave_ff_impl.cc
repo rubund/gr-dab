@@ -28,7 +28,8 @@ namespace gr {
     namespace dab {
 
         time_deinterleave_ff::sptr
-        time_deinterleave_ff::make(int vector_length, const std::vector<unsigned char> &scrambling_vector) {
+        time_deinterleave_ff::make(int vector_length, const std::vector<unsigned char> &scrambling_vector)
+        {
             return gnuradio::get_initial_sptr
                     (new time_deinterleave_ff_impl(vector_length, scrambling_vector));
         }
@@ -41,48 +42,35 @@ namespace gr {
                 : gr::sync_block("time_deinterleave_ff",
                                  gr::io_signature::make(1, 1, sizeof(float) * vector_length),
                                  gr::io_signature::make(1, 1, sizeof(float) * vector_length)),
-                  d_vector_length(vector_length), d_scrambling_vector(scrambling_vector) {
+                  d_vector_length(vector_length), d_scrambling_vector(scrambling_vector)
+        {
             d_scrambling_length = scrambling_vector.size(); // size of the scrambling vector
-            set_output_multiple(
-                    d_scrambling_length); //ensures that d_scrambling_length vectors are available at input buffer
+            set_history(d_scrambling_length); //need for max delay of (scrambling_length-1) * 24ms
         }
 
         /*
          * Our virtual destructor.
          */
-        time_deinterleave_ff_impl::~time_deinterleave_ff_impl() {
+        time_deinterleave_ff_impl::~time_deinterleave_ff_impl()
+        {
         }
 
         int
         time_deinterleave_ff_impl::work(int noutput_items,
                                         gr_vector_const_void_star &input_items,
-                                        gr_vector_void_star &output_items) {
+                                        gr_vector_void_star &output_items)
+        {
             const float *in = (const float *) input_items[0];
             float *out = (float *) output_items[0];
 
-            d_scrambling_delay = d_scrambling_length - 1;
-
             for (int i = 0; i < noutput_items; i++) {
-
-                if (nitems_written(0) < d_scrambling_length - 1 && i < d_scrambling_length-1) {
-                    d_scrambling_delay = 0;
-                    //not enough info to write vector, write zeroes
-                    for (int j = 0; j < d_vector_length; j++) {
-                        *out++ = 0;
-                    }
-                } else {
-                    // produce output vectors
-                    for (int j = 0; j < d_vector_length; j++) {
-                        *out++ = in[d_vector_length * (i+d_scrambling_delay - d_scrambling_vector[j % d_scrambling_length]) + j];
-                    }
+                // produce output vectors
+                for (int j = 0; j < d_vector_length; j++) {
+                    *out++ = in[d_vector_length * (i + (d_scrambling_length-1) - (d_scrambling_length-1 - d_scrambling_vector[j%d_scrambling_length]%d_scrambling_length)) + (j - (j%d_scrambling_length)) + d_scrambling_vector[j%d_scrambling_length]];
                 }
-
             }
             // Tell runtime system how many output items we produced.
-            return noutput_items - d_scrambling_length + 1;
-
-
+            return noutput_items;
         }
-
     } /* namespace dab */
 } /* namespace gr */
