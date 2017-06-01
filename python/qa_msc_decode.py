@@ -36,8 +36,8 @@ class qa_msc_decode (gr_unittest.TestCase):
         self.src01 = blocks.file_source_make(gr.sizeof_float * 2*self.dab_params.num_carriers, "debug/transmission_frame.dat")
         self.src02 = blocks.file_source_make(gr.sizeof_char, "debug/transmission_frame_trigger.dat")
         self.msc = dab.msc_decode(self.dab_params, 54, 90, 2, 1, 1)
-
-        self.tb.connect(self.src01, (self.msc, 0), blocks.null_sink_make(gr.sizeof_char))
+        self.firecode = dab.firecode_check_bb_make(15)
+        self.tb.connect(self.src01, (self.msc, 0), self.firecode, blocks.null_sink_make(gr.sizeof_char))
         self.tb.connect(self.src02, (self.msc, 1))
         self.tb.run ()
         #firecode manually checked

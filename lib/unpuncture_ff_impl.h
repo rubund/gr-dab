@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /* 
- * Copyright 2017 <+YOU OR YOUR COMPANY+>.
+ * Copyright 2017 Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,14 @@
 
 namespace gr {
     namespace dab {
-
+/*! \brief unpuncturing of a stream sequence
+ *
+ * unpuncturing of a stream sequence according to the puncturing_vector (writing a stream element at a '1' and writing the fillval at a '0')
+ *
+ * @param puncturing_vector vector with puncturing sequence, length of puncturing_vector is length of a stream sequence
+ * @param fillval value to fill in for a zero of the puncturing vector
+ *
+ */
         class unpuncture_ff_impl : public unpuncture_ff {
         private:
             unsigned int ones (const std::vector<unsigned char> &puncturing_vector);

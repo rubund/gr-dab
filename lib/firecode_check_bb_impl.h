@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /* 
- * Copyright 2017 <+YOU OR YOUR COMPANY+>.
+ * Copyright 2017 Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,10 +22,18 @@
 #define INCLUDED_DAB_FIRECODE_CHECK_BB_IMPL_H
 
 #include <dab/firecode_check_bb.h>
+#include "dab-constants.h"
+#include "firecode-checker.h"
 
 namespace gr {
   namespace dab {
-
+/*! \brief checks firecode of logical frames
+ *
+ * checks firecode of each logical frame as a qa test for the msc_decoder.
+ * According to ETSI TS 102 563 every fifth logical frame starts with 16 bit firecode
+ *
+ *
+ */
     class firecode_check_bb_impl : public firecode_check_bb
     {
      private:

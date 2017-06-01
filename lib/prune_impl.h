@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /* 
- * Copyright 2017 <+YOU OR YOUR COMPANY+>.
+ * Copyright 2017 Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,14 @@
 
 namespace gr {
   namespace dab {
-
+/*! \brief cuts bits of start and end of a stream sequence
+ *
+ * cuts bits of start and end of a stream sequence like a vector prune, but in stream mode
+ *
+ * @param d_length length of stream sequence
+ * @param d_prune_start number of items to cut from the beginning of sequence
+ * @param d_prune_end number of items to cut from the end of the sequence
+ */
     class prune_impl : public prune
     {
      private:
