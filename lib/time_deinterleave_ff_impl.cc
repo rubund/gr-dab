@@ -66,7 +66,7 @@ namespace gr {
             for (int i = 0; i < noutput_items; i++) {
                 // produce output vectors
                 for (int j = 0; j < d_vector_length; j++) {
-                    *out++ = in[d_vector_length * (i + (d_scrambling_length-1) - (d_scrambling_length-1 - d_scrambling_vector[j%d_scrambling_length]%d_scrambling_length)) + (j - (j%d_scrambling_length)) + d_scrambling_vector[j%d_scrambling_length]];
+                    *out++ = in[d_vector_length * (i + (d_scrambling_length-1) - (d_scrambling_length-1 - d_scrambling_vector[j%d_scrambling_length])) + j];
                 }
             }
             // Tell runtime system how many output items we produced.
