@@ -52,5 +52,6 @@ install(FILES
     dab_fib_source_b.xml
     dab_select_subch_vfvf.xml
     dab_unpuncture_ff.xml
-    dab_prune.xml DESTINATION share/gnuradio/grc/blocks
+    dab_prune.xml
+    dab_firecode_check_bb.xml DESTINATION share/gnuradio/grc/blocks
 )

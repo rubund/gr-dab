@@ -39,6 +39,7 @@
 #include "dab/select_subch_vfvf.h"
 #include "dab/unpuncture_ff.h"
 #include "dab/prune.h"
+#include "dab/firecode_check_bb.h"
 %}
 
 
@@ -105,3 +106,5 @@ GR_SWIG_BLOCK_MAGIC2(dab, select_subch_vfvf);
 GR_SWIG_BLOCK_MAGIC2(dab, unpuncture_ff);
 %include "dab/prune.h"
 GR_SWIG_BLOCK_MAGIC2(dab, prune);
+%include "dab/firecode_check_bb.h"
+GR_SWIG_BLOCK_MAGIC2(dab, firecode_check_bb);

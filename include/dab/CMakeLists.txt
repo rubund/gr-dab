@@ -52,5 +52,6 @@ install(FILES
     fib_source_b.h
     select_subch_vfvf.h
     unpuncture_ff.h
-    prune.h DESTINATION include/dab
+    prune.h
+    firecode_check_bb.h DESTINATION include/dab
 )
