@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
-# Copyright 2017 Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
+# Copyright 2017 <+YOU OR YOUR COMPANY+>.
 # 
 # This is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ from gnuradio import gr, gr_unittest
 from gnuradio import blocks
 import dab
 
-class qa_msc_decode (gr_unittest.TestCase):
+class qa_prune (gr_unittest.TestCase):
 
     def setUp (self):
         self.tb = gr.top_block ()
@@ -31,17 +31,18 @@ class qa_msc_decode (gr_unittest.TestCase):
     def tearDown (self):
         self.tb = None
 
-    def test_001_t (self):
-        self.dab_params = dab.parameters.dab_parameters(1 , 208.064e6, True)
-        self.src01 = blocks.file_source_make(gr.sizeof_float * 2*self.dab_params.num_carriers, "debug/transmission_frame.dat")
-        self.src02 = blocks.file_source_make(gr.sizeof_char, "debug/transmission_frame_trigger.dat")
-        self.msc = dab.msc_decode(self.dab_params, 54, 90, 2, 1, 1)
+    def test_001_prune(self):
+        src_data = [1, 2, 3, 4, 5, 6, 7, 6, 5, 4, 3, 2, 1, 2, 3]
+        expected_result = [3, 4, 6, 5, 1, 2]
+        src = blocks.vector_source_b(src_data)
+        prune = dab.prune(gr.sizeof_char, 5, 2, 1)
+        dst = blocks.vector_sink_b()
+        self.tb.connect(src, prune, dst)
+        self.tb.run()
+        result_data = dst.data()
+        # print result_data
+        self.assertFloatTuplesAlmostEqual(expected_result, result_data, 6)
 
-        self.tb.connect(self.src01, (self.msc, 0), blocks.null_sink_make(gr.sizeof_char))
-        self.tb.connect(self.src02, (self.msc, 1))
-        self.tb.run ()
-        #firecode manually checked
-        pass
 
 if __name__ == '__main__':
-    gr_unittest.run(qa_msc_decode, "qa_msc_decode.xml")
+    gr_unittest.run(qa_prune, "qa_prune.xml")
