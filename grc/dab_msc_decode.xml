@@ -1,38 +1,50 @@
 <?xml version="1.0"?>
 <block>
-  <name>msc_decode</name>
+  <name>MSC Decoder</name>
   <key>dab_msc_decode</key>
   <category>dab</category>
   <import>import dab</import>
   <make>dab.msc_decode($dab_params, $address, $size, $protection, $verbose, $debug)</make>
-  <!-- Make one 'param' node for every Parameter you want settable from the GUI.
-       Sub-nodes:
-       * name
-       * key (makes the value accessible as $keyname, e.g. in the make node)
-       * type -->
   <param>
-    <name>...</name>
-    <key>...</key>
-    <type>...</type>
+    <name>dab_params</name>
+    <key>dab_params</key>
+    <type>raw</type>
   </param>
-
-  <!-- Make one 'sink' node per input. Sub-nodes:
-       * name (an identifier for the GUI)
-       * type
-       * vlen
-       * optional (set to 1 for optional inputs) -->
+  <param>
+    <name>address</name>
+    <key>address</key>
+    <type>int</type>
+  </param>
+  <param>
+    <name>size</name>
+    <key>size</key>
+    <type>int</type>
+  </param>
+  <param>
+    <name>protection</name>
+    <key>protection</key>
+    <type>int</type>
+  </param>
+  <param>
+    <name>verbose</name>
+    <key>verbose</key>
+    <type>bool</type>
+  </param>
+  <param>
+    <name>debug</name>
+    <key>debug</key>
+    <type>bool</type>
+  </param>
   <sink>
-    <name>in</name>
-    <type><!-- e.g. int, float, complex, byte, short, xxx_vector, ...--></type>
+    <name>data</name>
+    <type>float</type>
   </sink>
-
-  <!-- Make one 'source' node per output. Sub-nodes:
-       * name (an identifier for the GUI)
-       * type
-       * vlen
-       * optional (set to 1 for optional inputs) -->
+  <sink>
+    <name>trigger</name>
+    <type>byte</type>
+  </sink>
   <source>
     <name>out</name>
-    <type><!-- e.g. int, float, complex, byte, short, xxx_vector, ...--></type>
+    <type>byte</type>
   </source>
 </block>

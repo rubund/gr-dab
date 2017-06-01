@@ -164,38 +164,39 @@ class msc_decode(gr.hier_block2):
 
 
 #debug
-        #msc_select_syms
-        self.sink_msc_select_syms = blocks.file_sink_make(gr.sizeof_float * self.dp.num_carriers * 2, "debug/msc_select_syms.dat")
-        self.connect(self.select_msc_syms, self.sink_msc_select_syms)
+        if debug is True:
+            #msc_select_syms
+            self.sink_msc_select_syms = blocks.file_sink_make(gr.sizeof_float * self.dp.num_carriers * 2, "debug/msc_select_syms.dat")
+            self.connect(self.select_msc_syms, self.sink_msc_select_syms)
 
-        #msc repartition cus
-        self.sink_repartition_msc_to_cus = blocks.file_sink_make(gr.sizeof_float * self.dp.msc_cu_size, "debug/msc_repartitioned_to_cus.dat")
-        self.connect((self.repartition_msc_to_cus, 0), self.sink_repartition_msc_to_cus)
+            #msc repartition cus
+            self.sink_repartition_msc_to_cus = blocks.file_sink_make(gr.sizeof_float * self.dp.msc_cu_size, "debug/msc_repartitioned_to_cus.dat")
+            self.connect((self.repartition_msc_to_cus, 0), self.sink_repartition_msc_to_cus)
 
-        #data of one sub channel not decoded
-        self.sink_select_subch = blocks.file_sink_make(gr.sizeof_float * self.dp.msc_cu_size * self.size, "debug/select_subch.dat")
-        self.connect(self.select_subch, self.sink_select_subch)
+            #data of one sub channel not decoded
+            self.sink_select_subch = blocks.file_sink_make(gr.sizeof_float * self.dp.msc_cu_size * self.size, "debug/select_subch.dat")
+            self.connect(self.select_subch, self.sink_select_subch)
 
-        #sub channel time_deinterleaved
-        self.sink_subch_time_deinterleaved = blocks.file_sink_make(gr.sizeof_float * self.dp.msc_cu_size * self.size, "debug/subch_time_deinterleaved.dat")
-        self.connect(self.time_deinterleaver, self.sink_subch_time_deinterleaved)
+            #sub channel time_deinterleaved
+            self.sink_subch_time_deinterleaved = blocks.file_sink_make(gr.sizeof_float * self.dp.msc_cu_size * self.size, "debug/subch_time_deinterleaved.dat")
+            self.connect(self.time_deinterleaver, self.sink_subch_time_deinterleaved)
 
-        #sub channel unpunctured
-        self.sink_subch_unpunctured = blocks.file_sink_make(gr.sizeof_float, "debug/subch_unpunctured.dat")
-        self.connect(self.unpuncture, self.sink_subch_unpunctured)
+            #sub channel unpunctured
+            self.sink_subch_unpunctured = blocks.file_sink_make(gr.sizeof_float, "debug/subch_unpunctured.dat")
+            self.connect(self.unpuncture, self.sink_subch_unpunctured)
 
-        # sub channel convolutional decoded
-        self.sink_subch_decoded = blocks.file_sink_make(gr.sizeof_char, "debug/subch_decoded.dat")
-        self.connect(self.conv_decode, self.sink_subch_decoded)
+            # sub channel convolutional decoded
+            self.sink_subch_decoded = blocks.file_sink_make(gr.sizeof_char, "debug/subch_decoded.dat")
+            self.connect(self.conv_decode, self.sink_subch_decoded)
 
-        # sub channel convolutional decoded
-        self.sink_subch_pruned = blocks.file_sink_make(gr.sizeof_char, "debug/subch_pruned.dat")
-        self.connect(self.conv_prune, self.sink_subch_pruned)
+            # sub channel convolutional decoded
+            self.sink_subch_pruned = blocks.file_sink_make(gr.sizeof_char, "debug/subch_pruned.dat")
+            self.connect(self.conv_prune, self.sink_subch_pruned)
 
-        # sub channel energy dispersal undone unpacked
-        self.sink_subch_energy_disp_undone = blocks.file_sink_make(gr.sizeof_char, "debug/subch_energy_disp_undone_unpacked.dat")
-        self.connect(self.add_mod_2, self.sink_subch_energy_disp_undone)
+            # sub channel energy dispersal undone unpacked
+            self.sink_subch_energy_disp_undone = blocks.file_sink_make(gr.sizeof_char, "debug/subch_energy_disp_undone_unpacked.dat")
+            self.connect(self.add_mod_2, self.sink_subch_energy_disp_undone)
 
-        # sub channel energy dispersal undone packed
-        self.sink_subch_energy_disp_undone_packed = blocks.file_sink_make(gr.sizeof_char, "debug/subch_energy_disp_undone_packed.dat")
-        self.connect(self.pack_bits, self.sink_subch_energy_disp_undone_packed)
+            # sub channel energy dispersal undone packed
+            self.sink_subch_energy_disp_undone_packed = blocks.file_sink_make(gr.sizeof_char, "debug/subch_energy_disp_undone_packed.dat")
+            self.connect(self.pack_bits, self.sink_subch_energy_disp_undone_packed)
