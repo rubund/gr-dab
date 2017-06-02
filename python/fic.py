@@ -31,7 +31,6 @@ from math import sqrt
 DAB FIC layer
 """
 
-
 class fic_decode(gr.hier_block2):
     """
     @brief block to decode FIBs (fast information blocks) from the FIC (fast information channel) of a demodulated DAB signal
@@ -42,7 +41,7 @@ class fic_decode(gr.hier_block2):
     - get FIC information
     """
 
-    def __init__(self, dab_params, verbose=True, debug=True):
+    def __init__(self, dab_params, verbose=True, debug=Flase):
         """
         Hierarchical block for FIC decoding
 
@@ -133,14 +132,9 @@ class fic_decode(gr.hier_block2):
 
         if self.debug:
             self.connect((self, 0), blocks.file_sink(gr.sizeof_float * self.dp.num_carriers * 2, "debug/transmission_frame.dat"))
-            self.connect((self, 1),
-                         blocks.file_sink(gr.sizeof_char, "debug/transmission_frame_trigger.dat"))
-            self.connect(self.select_fic_syms,
-                         blocks.file_sink(gr.sizeof_float * self.dp.num_carriers * 2, "debug/fic_select_syms.dat"))
-            self.connect(self.repartition_fic, blocks.file_sink(gr.sizeof_float * self.dp.fic_punctured_codeword_length,
-                                                                "debug/fic_repartitioned.dat"))
-            self.connect(self.unpuncture, blocks.file_sink(gr.sizeof_float * self.dp.fic_conv_codeword_length,
-                                                           "debug/fic_unpunctured.dat"))
+            self.connect((self, 1), blocks.file_sink(gr.sizeof_char, "debug/transmission_frame_trigger.dat"))
+            self.connect(self.select_fic_syms, blocks.file_sink(gr.sizeof_float * self.dp.num_carriers * 2, "debug/fic_select_syms.dat"))
+            self.connect(self.repartition_fic, blocks.file_sink(gr.sizeof_float * self.dp.fic_punctured_codeword_length, "debug/fic_repartitioned.dat"))
+            self.connect(self.unpuncture, blocks.file_sink(gr.sizeof_float * self.dp.fic_conv_codeword_length, "debug/fic_unpunctured.dat"))
             self.connect(self.conv_decode, blocks.file_sink(gr.sizeof_char, "debug/fic_decoded.dat"))
-            self.connect(self.energy_s2v, blocks.file_sink(gr.sizeof_char * self.dp.energy_dispersal_fic_vector_length,
-                                                           "debug/fic_energy_dispersal_undone.dat"))
+            self.connect(self.energy_s2v, blocks.file_sink(gr.sizeof_char * self.dp.energy_dispersal_fic_vector_length, "debug/fic_energy_dispersal_undone.dat"))
