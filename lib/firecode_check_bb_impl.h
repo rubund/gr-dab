@@ -1,6 +1,7 @@
 /* -*- c++ -*- */
 /* 
  * Copyright 2017 Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
+ * The class firecode_checker is adapted from the Qt-DAB software, Copyright Jan van Katwijk (Lazy Chair Computing J.vanKatwijk@gmail.com)
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
