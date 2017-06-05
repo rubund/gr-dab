@@ -40,6 +40,8 @@
 #include "dab/unpuncture_ff.h"
 #include "dab/prune.h"
 #include "dab/firecode_check_bb.h"
+#include "dab/append_bb.h"
+#include "dab/puncture_bb.h"
 %}
 
 
@@ -108,3 +110,7 @@ GR_SWIG_BLOCK_MAGIC2(dab, unpuncture_ff);
 GR_SWIG_BLOCK_MAGIC2(dab, prune);
 %include "dab/firecode_check_bb.h"
 GR_SWIG_BLOCK_MAGIC2(dab, firecode_check_bb);
+%include "dab/append_bb.h"
+GR_SWIG_BLOCK_MAGIC2(dab, append_bb);
+%include "dab/puncture_bb.h"
+GR_SWIG_BLOCK_MAGIC2(dab, puncture_bb);

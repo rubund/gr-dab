@@ -23,7 +23,7 @@ from gnuradio import gr, gr_unittest
 from gnuradio import blocks
 import dab
 
-class qa_unpuncture_ff (gr_unittest.TestCase):
+class qa_puncture_bb (gr_unittest.TestCase):
 
     def setUp (self):
         self.tb = gr.top_block ()
@@ -31,30 +31,30 @@ class qa_unpuncture_ff (gr_unittest.TestCase):
     def tearDown (self):
         self.tb = None
 
-    def test_001_unpuncture_ff(self):
+    def test_001_puncture_ff(self):
         src_data = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
         punc_seq = (1, 0, 0, 0, 1, 0, 1, 1, 1)
-        exp_res = (0, 77, 77, 77, 1, 77, 2, 3, 4, 5, 77, 77, 77, 6, 77, 7, 8, 9)
-        src = blocks.vector_source_f(src_data)
-        unpuncture_ff = dab.unpuncture_ff(punc_seq, 77)
-        dst = blocks.vector_sink_f()
-        self.tb.connect(src, unpuncture_ff, dst)
+        exp_res = (0, 4, 6, 7, 8)
+        src = blocks.vector_source_b(src_data)
+        puncture = dab.puncture_bb_make(punc_seq)
+        dst = blocks.vector_sink_b()
+        self.tb.connect(src, puncture, dst)
         self.tb.run()
         result_data = dst.data()
-        self.assertFloatTuplesAlmostEqual(exp_res, result_data)
+        self.assertEqual(exp_res, result_data)
 
-    def test_002_unpuncture_ff(self):
-        src_data = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
-        punc_seq = (1, 0, 0, 0, 1, 0, 1, 1, 1)
-        exp_res = (0, 0, 0, 0, 1, 0, 2, 3, 4, 5, 0, 0, 0, 6, 0, 7, 8, 9)
-        src = blocks.vector_source_f(src_data)
-        unpuncture_ff = dab.unpuncture_ff(punc_seq, 0)
-        dst = blocks.vector_sink_f()
-        self.tb.connect(src, unpuncture_ff, dst)
+    def test_002_puncture_ff(self):
+        src_data = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+        punc_seq = (1, 0, 0)
+        exp_res = (0, 3, 6, 9, 2, 5)
+        src = blocks.vector_source_b(src_data)
+        puncture = dab.puncture_bb_make(punc_seq)
+        dst = blocks.vector_sink_b()
+        self.tb.connect(src, puncture, dst)
         self.tb.run()
         result_data = dst.data()
-        self.assertFloatTuplesAlmostEqual(exp_res, result_data)
+        self.assertEqual(exp_res, result_data)
 
 
 if __name__ == '__main__':
-    gr_unittest.run(qa_unpuncture_ff, "qa_unpuncture_ff.xml")
+    gr_unittest.run(qa_puncture_bb, "qa_puncture_bb.xml")
