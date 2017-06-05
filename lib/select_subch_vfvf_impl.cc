@@ -45,8 +45,17 @@ namespace gr {
         d_vlen_in(vlen_in), d_vlen_out(vlen_out), d_address(address), d_total_size(total_size)
     {
         //sanity check
-        if(vlen_out%vlen_in != 0) GR_LOG_DEBUG(d_logger, "vlen_out no multiple of vlen_in");
-        if(address*vlen_in + vlen_out > total_size*vlen_in) GR_LOG_DEBUG(d_logger, "vlen_out too long or address wrong");
+        try
+        {
+            if (vlen_out%vlen_in != 0) throw (0);
+            if (address*vlen_in + vlen_out > total_size*vlen_in) throw (1);
+        }
+        catch (int exception_no)
+        {
+            if(exception_no == 0) GR_LOG_WARN(d_logger, "vlen_out no multiple of vlen_in");
+            if(exception_no == 1) GR_LOG_WARN(d_logger, "vlen_out too long or address wrong");
+        }
+        set_relative_rate(1/total_size);
     }
 
     /*
@@ -72,9 +81,7 @@ namespace gr {
       float *out = (float *) output_items[0];
 
       for(int i = 0; i < noutput_items; i++){
-          for(int j = 0; j < d_vlen_out; j++){
-              out[i*d_vlen_out + j] = in[d_vlen_in * (i*d_total_size + d_address) + j];
-          }
+          memcpy(&out[i*d_vlen_out], &in[d_vlen_in * (i*d_total_size + d_address)], d_vlen_out * sizeof(float));
       }
       // Tell runtime system how many input items we consumed on
       // each input stream.

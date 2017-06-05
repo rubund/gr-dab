@@ -1,39 +1,71 @@
 <?xml version="1.0"?>
 <block>
-  <name>MSC Decoder</name>
+  <name>MSC decoder</name>
   <key>dab_msc_decode</key>
   <category>dab</category>
   <import>import dab</import>
   <make>dab.msc_decode($dab_params, $address, $size, $protection, $verbose, $debug)</make>
   <param>
-    <name>dab_params</name>
+    <name>DAB parameter</name>
     <key>dab_params</key>
     <type>raw</type>
   </param>
   <param>
-    <name>address</name>
+    <name>subchannel address</name>
     <key>address</key>
     <type>int</type>
   </param>
   <param>
-    <name>size</name>
+    <name>Subchannel size</name>
     <key>size</key>
     <type>int</type>
   </param>
   <param>
-    <name>protection</name>
+    <name>Protection mode</name>
     <key>protection</key>
     <type>int</type>
+    <option>
+    	<name>A1</name>
+    	<key>0</key>
+    </option>
+    <option>
+    	<name>A2</name>
+    	<key>1</key>
+    </option>
+    <option>
+    	<name>A3</name>
+    	<key>2</key>
+    </option>
+    <option>
+    	<name>A4</name>
+    	<key>3</key>
+    </option>
   </param>
   <param>
-    <name>verbose</name>
+    <name>Verbose</name>
     <key>verbose</key>
     <type>bool</type>
+    <option>
+    	<name>True</name>
+    	<key>True</key>
+    </option>
+    <option>
+    	<name>False</name>
+    	<key>False</key>
+    </option>
   </param>
   <param>
-    <name>debug</name>
+    <name>Debug</name>
     <key>debug</key>
     <type>bool</type>
+    <option>
+    	<name>True</name>
+    	<key>True</key>
+    </option>
+    <option>
+    	<name>False</name>
+    	<key>False</key>
+    </option>
   </param>
   <sink>
     <name>data</name>

@@ -24,6 +24,10 @@
 
 #include <gnuradio/io_signature.h>
 #include "prune_impl.h"
+#include <stdexcept>
+#include <stdio.h>
+#include <sstream>
+#include <boost/format.hpp>
 
 namespace gr {
   namespace dab {
@@ -44,8 +48,17 @@ namespace gr {
               gr::io_signature::make(1, 1, sizeof(char))),
       d_itemsize(itemsize), d_length(length), d_prune_start(prune_start), d_prune_end(prune_end)
     {
-        assert(prune_start+prune_end < length);
+        try
+        {
+            if (prune_start+prune_end > length) throw (prune_start + prune_end - length);
+        }
+        catch (int overprune)
+        {
+            GR_LOG_WARN(d_logger, "want to cut more items than stream is long");
+        }
+
         set_output_multiple(length - prune_start - prune_end);
+        set_relative_rate((length - prune_start - prune_end) / length);
     }
 
     /*

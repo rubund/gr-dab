@@ -45,7 +45,7 @@ namespace gr {
        * class. dab::unpuncture_ff::make is the public interface for
        * creating new instances.
        */
-      static sptr make(const std::vector<unsigned char> &puncturing_vector, float fillval);
+      static sptr make(const std::vector<unsigned char> &puncturing_vector, float fillval=0);
     };
 
   } // namespace dab

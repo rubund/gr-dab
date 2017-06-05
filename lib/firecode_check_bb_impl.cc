@@ -82,12 +82,9 @@ namespace gr {
             }
             else{
                 GR_LOG_DEBUG(d_logger, format("fire code failed at frame %d") %(nitems_written(0)/d_frame_size));
-
             }
         }
-        for (int j = 0; j < noutput_items; j++) {
-            out[j] = in[j];
-        }
+        memcpy(out, in, noutput_items);
 
       // Tell runtime system how many input items we consumed on
       // each input stream.

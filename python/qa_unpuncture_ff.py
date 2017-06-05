@@ -48,7 +48,7 @@ class qa_unpuncture_ff (gr_unittest.TestCase):
         punc_seq = (1, 0, 0, 0, 1, 0, 1, 1, 1)
         exp_res = (0, 0, 0, 0, 1, 0, 2, 3, 4, 5, 0, 0, 0, 6, 0, 7, 8, 9)
         src = blocks.vector_source_f(src_data)
-        unpuncture_ff = dab.unpuncture_ff(punc_seq, 0)
+        unpuncture_ff = dab.unpuncture_ff(punc_seq)
         dst = blocks.vector_sink_f()
         self.tb.connect(src, unpuncture_ff, dst)
         self.tb.run()
