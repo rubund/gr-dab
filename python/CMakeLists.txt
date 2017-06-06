@@ -38,7 +38,8 @@ GR_PYTHON_INSTALL(
     parameters.py
     fic.py
     msc_decode.py
-    fic_encode.py DESTINATION ${GR_PYTHON_DIR}/dab
+    fic_encode.py
+    msc_encode.py DESTINATION ${GR_PYTHON_DIR}/dab
 )
 
 ########################################################################
@@ -59,3 +60,5 @@ GR_ADD_TEST(qa_prune ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_prune.p
 GR_ADD_TEST(qa_fic_encode ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_fic_encode.py)
 GR_ADD_TEST(qa_append_bb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_append_bb.py)
 GR_ADD_TEST(qa_puncture_bb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_puncture_bb.py)
+GR_ADD_TEST(qa_msc_encode ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_msc_encode.py)
+GR_ADD_TEST(qa_transmission_frame_mux_bb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_transmission_frame_mux_bb.py)

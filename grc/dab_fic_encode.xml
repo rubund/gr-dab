@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<block>
+  <name>FIC encode</name>
+  <key>dab_fic_encode</key>
+  <category>dab</category>
+  <import>import dab</import>
+  <make>dab.fic_encode($dab_params)</make>
+  <make>dab.fic_encode(
+          dab.parameters.dab_parameters(
+            mode=$dab_mode,
+            sample_rate=$samp_rate,
+            verbose=False
+          )
+        )
+  </make>
+  <param>
+    <name>DAB Mode</name>
+    <key>dab_mode</key>
+    <value>1</value>
+    <type>int</type>
+  </param>
+  <param>
+    <name>Sampling Rate</name>
+    <key>samp_rate</key>
+    <value>samp_rate</value>
+    <type>int</type>
+  </param>
+  <sink>
+    <name>in</name>
+    <type>byte</type>
+  </sink>
+  <source>
+    <name>out</name>
+    <type>byte</type>
+  </source>
+  <doc>
+    Encodes the FIC.
+  </doc>
+</block>

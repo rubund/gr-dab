@@ -56,5 +56,7 @@ install(FILES
     dab_firecode_check_bb.xml
     dab_fic_encode.xml
     dab_append_bb.xml
-    dab_puncture_bb.xml DESTINATION share/gnuradio/grc/blocks
+    dab_puncture_bb.xml
+    dab_msc_encode.xml
+    dab_transmission_frame_mux_bb.xml DESTINATION share/gnuradio/grc/blocks
 )

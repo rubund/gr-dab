@@ -52,18 +52,33 @@ class fic_encode(gr.hier_block2):
         self.add_mod_2 = blocks.xor_bb()
 
         # convolutional encoder
-        self.conv_encoder_config = fec.cc_encoder_make(self.dp.energy_dispersal_fic_vector_length, 7, 4, [133, 171, 145, 133], 0, fec.CC_STREAMING)
+        self.append_zeros = dab.append_bb_make(768, self.dp.energy_dispersal_fic_vector_length + self.dp.conv_code_add_bits_input)
+        self.conv_encoder_config = fec.cc_encoder_make(self.dp.energy_dispersal_fic_vector_length + self.dp.conv_code_add_bits_input, 7, 4, [91, 121, 101, 91], 0, fec.CC_STREAMING)
         self.conv_encoder = fec.extended_encoder(self.conv_encoder_config, None, '1111')
 
-        self.connect((self),
+        # puncturing
+        self.puncture = dab.puncture_bb_make(self.dp.assembled_fic_puncturing_sequence)
+
+        # pack bits
+        self.unpacked_to_packed_encoded = blocks.unpacked_to_packed_bb_make(1, gr.GR_MSB_FIRST)
+
+        # stream to FIB group vectors
+        self.s2v_decoded = blocks.vector_to_stream_make(gr.sizeof_char, self.dp.fic_punctured_codeword_length/8)
+
+        # connect everything
+        self.connect(self,
                      self.unpacked_to_packed_crc,
                      self.s2v_crc,
                      self.crc16,
                      self.v2s_crc,
                      self.packed_to_unpacked_crc,
                      (self.add_mod_2, 1),
+                     self.append_zeros,
                      self.conv_encoder,
-                     (self))
+                     self.puncture,
+                     self.unpacked_to_packed_encoded,
+                     self.s2v_decoded,
+                     self)
 
         #connect prbs
         self.connect(self.prbs_src, (self.add_mod_2, 1))
