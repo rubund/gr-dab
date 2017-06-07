@@ -24,33 +24,36 @@
 #include <dab/transmission_frame_mux_bb.h>
 
 namespace gr {
-  namespace dab {
+    namespace dab {
 
-    class transmission_frame_mux_bb_impl : public transmission_frame_mux_bb
-    {
-     private:
-      int d_transmission_mode;
-      std::vector<unsigned int> d_subch_size;
+        class transmission_frame_mux_bb_impl : public transmission_frame_mux_bb {
+        private:
+            int d_transmission_mode;
+            std::vector<unsigned int> d_subch_size;
 
-      const unsigned int d_fib_len = 32; // length of a fib in bytes
-      const unsigned int d_cif_len = 6912; // length of a cif in bytes
-      const unsigned int d_cu_len = 8; // length of a capacity unit in bytes
-      unsigned int d_vlen_out, d_num_cifs, d_num_fibs, d_subch_total_len;
+            const static unsigned int d_fib_len = 32; // length of a fib in bytes
+            const static unsigned int d_cif_len = 6912; // length of a cif in bytes
+            const static unsigned int d_cu_len = 8; // length of a capacity unit in bytes
+            unsigned int d_vlen_out, d_num_cifs, d_num_fibs, d_subch_total_len;
 
-     public:
-      transmission_frame_mux_bb_impl(int transmission_mode, const std::vector<unsigned int> &subch_size);
-      ~transmission_frame_mux_bb_impl();
+            static char d_prbs[d_cif_len*8];
+            void generate_prbs(char* out_ptr, int length);
 
-      // Where all the action really happens
-      void forecast (int noutput_items, gr_vector_int &ninput_items_required);
+        public:
+            transmission_frame_mux_bb_impl(int transmission_mode, const std::vector<unsigned int> &subch_size);
 
-      int general_work(int noutput_items,
-           gr_vector_int &ninput_items,
-           gr_vector_const_void_star &input_items,
-           gr_vector_void_star &output_items);
-    };
+            ~transmission_frame_mux_bb_impl();
 
-  } // namespace dab
+            // Where all the action really happens
+            void forecast(int noutput_items, gr_vector_int &ninput_items_required);
+
+            int general_work(int noutput_items,
+                             gr_vector_int &ninput_items,
+                             gr_vector_const_void_star &input_items,
+                             gr_vector_void_star &output_items);
+        };
+
+    } // namespace dab
 } // namespace gr
 
 #endif /* INCLUDED_DAB_TRANSMISSION_FRAME_MUX_BB_IMPL_H */

@@ -21,7 +21,7 @@
 
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
-import dab_swig as dab
+import dab
 
 class qa_transmission_frame_mux_bb (gr_unittest.TestCase):
 
@@ -32,7 +32,7 @@ class qa_transmission_frame_mux_bb (gr_unittest.TestCase):
         self.tb = None
 
     def test_001_t (self):
-        # set up fg
+        #self.mux = dab.transmission_frame_mux_bb_make(1, [1, 1, 1, 1, 1, 1, 1])
         self.tb.run ()
         # check data
 

@@ -41,7 +41,7 @@ namespace gr {
         transmission_frame_mux_bb_impl::transmission_frame_mux_bb_impl(int transmission_mode,
                                                                        const std::vector<unsigned int> &subch_size)
                 : gr::block("transmission_frame_mux_bb",
-                            gr::io_signature::make(2, 9, sizeof(unsigned char)),
+                            gr::io_signature::make(1, 8, sizeof(unsigned char)),
                             gr::io_signature::make(2, 2, sizeof(unsigned char))),
                   d_transmission_mode(transmission_mode), d_subch_size(subch_size)
         {
@@ -75,6 +75,9 @@ namespace gr {
                 throw fprintf(stderr, "subchannels are %d bytes too long for CIF", (d_subch_total_len * d_cu_len - d_cif_len));
             }
             set_output_multiple(d_vlen_out);
+
+            // generate PRBS for padding
+            generate_prbs(d_prbs, sizeof(d_prbs));
         }
 
         /*
@@ -97,6 +100,21 @@ namespace gr {
             }
         }
 
+        void
+        transmission_frame_mux_bb_impl::generate_prbs(char *out_ptr, int length)
+        {
+            char bits[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+            char newbit;
+            for (int i = 0; i < length; ++i) {
+                newbit = bits[8] ^ bits[4];
+                memcpy(bits+1, bits, 8);
+                bits[0] = newbit;
+                out_ptr[i] = newbit;
+                //printf(newbit);
+            }
+
+        }
+
         int
         transmission_frame_mux_bb_impl::general_work(int noutput_items,
                                                      gr_vector_int &ninput_items,
@@ -104,7 +122,14 @@ namespace gr {
                                                      gr_vector_void_star &output_items)
         {
             unsigned char *out = (unsigned char *) output_items[0];
+            unsigned char *triggerout = (unsigned char *) output_items[1];
             const unsigned char *in;
+
+            // create control stream for ofdm with trigger at start of frame and set zero
+            memset(triggerout, 0, noutput_items);
+            for(int i = 0; i < noutput_items/d_vlen_out; ++i) {
+                triggerout[i*d_vlen_out] = 1;
+            }
 
             // write FIBs
            in = (const unsigned char *) input_items[0];
@@ -115,9 +140,9 @@ namespace gr {
             // write sub-channels
             unsigned int cu_index = 4 * d_num_fibs;
             for (int j = 0; j < 7; ++j) {
-                in = (const unsigned char *) input_items[i+2];
+                in = (const unsigned char *) input_items[j+1];
                 for (int i = 0; i < noutput_items/d_vlen_out; ++i) {
-                    memcpy(out + i*d_vlen_out + cu_index*d_cu_len, in, d_subch_size[j]*d_cu_len);
+                    memcpy(out + i*d_vlen_out + d_num_fibs*d_fib_len + cu_index*d_cu_len, in, d_subch_size[j]*d_cu_len);
                     in += d_num_fibs*d_fib_len;
                 }
                 cu_index += d_subch_size[j];
@@ -125,14 +150,21 @@ namespace gr {
             // fill remaining cus with padding
             in = (const unsigned char *) input_items[1];
             for (int i = 0; i < noutput_items/d_vlen_out; ++i) {
-
+                memcpy(out + i*d_vlen_out + d_num_fibs*d_fib_len + d_subch_total_len*d_cu_len, d_prbs + d_subch_total_len*d_cu_len*8, (d_vlen_out - d_num_fibs*d_fib_len - d_subch_total_len*d_cu_len)*8);
+                for (int j = d_subch_total_len*d_cu_len; j < d_subch_total_len; ++j) {
+                    unsigned char temp = 0;
+                    for (int n = 0; n < 8; ++n)
+                        temp = (temp << 1) | (d_prbs[j*8 + n] & 01);
+                    out[i*d_vlen_out + d_num_fibs*d_fib_len + j] = temp;
+                }
             }
-
-
 
             // Tell runtime system how many input items we consumed on
             // each input stream.
-            consume_each(noutput_items);
+            consume(0, noutput_items/d_vlen_out * d_num_fibs*d_fib_len);
+            for (int j = 0; j < 7; ++j) {
+                consume(j+1, noutput_items/d_vlen_out * d_subch_size[j]*d_cu_len);
+            }
 
             // Tell runtime system how many output items we produced.
             return noutput_items;
