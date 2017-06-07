@@ -61,7 +61,7 @@ list(APPEND dab_sources
     firecode_check_bb_impl.cc
     append_bb_impl.cc
     puncture_bb_impl.cc
-    transmission_frame_mux_bb_impl.cc )
+    dab_transmission_frame_mux_bb_impl.cc )
 
 set(dab_sources "${dab_sources}" PARENT_SCOPE)
 if(NOT dab_sources)

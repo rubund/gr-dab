@@ -19,8 +19,8 @@
  */
 
 
-#ifndef INCLUDED_DAB_TRANSMISSION_FRAME_MUX_BB_H
-#define INCLUDED_DAB_TRANSMISSION_FRAME_MUX_BB_H
+#ifndef INCLUDED_DAB_DAB_TRANSMISSION_FRAME_MUX_BB_H
+#define INCLUDED_DAB_DAB_TRANSMISSION_FRAME_MUX_BB_H
 
 #include <dab/api.h>
 #include <gnuradio/block.h>
@@ -33,17 +33,17 @@ namespace gr {
      * \ingroup dab
      *
      */
-    class DAB_API transmission_frame_mux_bb : virtual public gr::block
+    class DAB_API dab_transmission_frame_mux_bb : virtual public gr::block
     {
      public:
-      typedef boost::shared_ptr<transmission_frame_mux_bb> sptr;
+      typedef boost::shared_ptr<dab_transmission_frame_mux_bb> sptr;
 
       /*!
-       * \brief Return a shared_ptr to a new instance of dab::transmission_frame_mux_bb.
+       * \brief Return a shared_ptr to a new instance of dab::dab_transmission_frame_mux_bb.
        *
-       * To avoid accidental use of raw pointers, dab::transmission_frame_mux_bb's
+       * To avoid accidental use of raw pointers, dab::dab_transmission_frame_mux_bb's
        * constructor is in a private implementation
-       * class. dab::transmission_frame_mux_bb::make is the public interface for
+       * class. dab::dab_transmission_frame_mux_bb::make is the public interface for
        * creating new instances.
        */
       static sptr make(int transmission_mode, const std::vector<unsigned int> &subch_size);
@@ -52,5 +52,5 @@ namespace gr {
   } // namespace dab
 } // namespace gr
 
-#endif /* INCLUDED_DAB_TRANSMISSION_FRAME_MUX_BB_H */
+#endif /* INCLUDED_DAB_DAB_TRANSMISSION_FRAME_MUX_BB_H */
 

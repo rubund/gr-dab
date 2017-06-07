@@ -56,5 +56,5 @@ install(FILES
     firecode_check_bb.h
     append_bb.h
     puncture_bb.h
-    transmission_frame_mux_bb.h DESTINATION include/dab
+    dab_transmission_frame_mux_bb.h DESTINATION include/dab
 )

@@ -18,15 +18,15 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef INCLUDED_DAB_TRANSMISSION_FRAME_MUX_BB_IMPL_H
-#define INCLUDED_DAB_TRANSMISSION_FRAME_MUX_BB_IMPL_H
+#ifndef INCLUDED_DAB_DAB_TRANSMISSION_FRAME_MUX_BB_IMPL_H
+#define INCLUDED_DAB_DAB_TRANSMISSION_FRAME_MUX_BB_IMPL_H
 
-#include <dab/transmission_frame_mux_bb.h>
+#include <dab/dab_transmission_frame_mux_bb.h>
 
 namespace gr {
     namespace dab {
 
-        class transmission_frame_mux_bb_impl : public transmission_frame_mux_bb {
+        class dab_transmission_frame_mux_bb_impl : public dab_transmission_frame_mux_bb {
         private:
             int d_transmission_mode;
             std::vector<unsigned int> d_subch_size;
@@ -35,14 +35,15 @@ namespace gr {
             const static unsigned int d_cif_len = 6912; // length of a cif in bytes
             const static unsigned int d_cu_len = 8; // length of a capacity unit in bytes
             unsigned int d_vlen_out, d_num_cifs, d_num_fibs, d_subch_total_len;
+            unsigned int d_fic_len;
 
-            static char d_prbs[d_cif_len*8];
-            void generate_prbs(char* out_ptr, int length);
+            unsigned char d_prbs[d_cif_len];
+            void generate_prbs(unsigned char* out_ptr, int length);
 
         public:
-            transmission_frame_mux_bb_impl(int transmission_mode, const std::vector<unsigned int> &subch_size);
+            dab_transmission_frame_mux_bb_impl(int transmission_mode, const std::vector<unsigned int> &subch_size);
 
-            ~transmission_frame_mux_bb_impl();
+            ~dab_transmission_frame_mux_bb_impl();
 
             // Where all the action really happens
             void forecast(int noutput_items, gr_vector_int &ninput_items_required);
@@ -56,5 +57,5 @@ namespace gr {
     } // namespace dab
 } // namespace gr
 
-#endif /* INCLUDED_DAB_TRANSMISSION_FRAME_MUX_BB_IMPL_H */
+#endif /* INCLUDED_DAB_DAB_TRANSMISSION_FRAME_MUX_BB_IMPL_H */
 

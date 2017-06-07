@@ -1,17 +1,17 @@
 /* -*- c++ -*- */
 /* 
  * Copyright 2017 Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
- * 
+ *
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3, or (at your option)
  * any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this software; see the file COPYING.  If not, write to
  * the Free Software Foundation, Inc., 51 Franklin Street,
@@ -23,24 +23,24 @@
 #endif
 
 #include <gnuradio/io_signature.h>
-#include "transmission_frame_mux_bb_impl.h"
+#include "dab_transmission_frame_mux_bb_impl.h"
 
 namespace gr {
     namespace dab {
 
-        transmission_frame_mux_bb::sptr
-        transmission_frame_mux_bb::make(int transmission_mode, const std::vector<unsigned int> &subch_size)
+        dab_transmission_frame_mux_bb::sptr
+        dab_transmission_frame_mux_bb::make(int transmission_mode, const std::vector<unsigned int> &subch_size)
         {
             return gnuradio::get_initial_sptr
-                    (new transmission_frame_mux_bb_impl(transmission_mode, subch_size));
+                    (new dab_transmission_frame_mux_bb_impl(transmission_mode, subch_size));
         }
 
         /*
          * The private constructor
          */
-        transmission_frame_mux_bb_impl::transmission_frame_mux_bb_impl(int transmission_mode,
+        dab_transmission_frame_mux_bb_impl::dab_transmission_frame_mux_bb_impl(int transmission_mode,
                                                                        const std::vector<unsigned int> &subch_size)
-                : gr::block("transmission_frame_mux_bb",
+                : gr::block("dab_transmission_frame_mux_bb",
                             gr::io_signature::make(1, 8, sizeof(unsigned char)),
                             gr::io_signature::make(2, 2, sizeof(unsigned char))),
                   d_transmission_mode(transmission_mode), d_subch_size(subch_size)
@@ -66,6 +66,7 @@ namespace gr {
                     throw fprintf(stderr, "Transmission mode %d doesn't exist", transmission_mode);
             }
             d_vlen_out = d_num_fibs * d_fib_len + d_num_cifs * d_cif_len;
+            d_fic_len = d_num_fibs * d_fib_len;
             d_subch_total_len = 0;
             for (int i = 0; i < 7; ++i) {
                 d_subch_total_len += subch_size[i];
@@ -76,6 +77,7 @@ namespace gr {
             }
             set_output_multiple(d_vlen_out);
 
+
             // generate PRBS for padding
             generate_prbs(d_prbs, sizeof(d_prbs));
         }
@@ -83,12 +85,12 @@ namespace gr {
         /*
          * Our virtual destructor.
          */
-        transmission_frame_mux_bb_impl::~transmission_frame_mux_bb_impl()
+        dab_transmission_frame_mux_bb_impl::~dab_transmission_frame_mux_bb_impl()
         {
         }
 
         void
-        transmission_frame_mux_bb_impl::forecast(int noutput_items, gr_vector_int &ninput_items_required)
+        dab_transmission_frame_mux_bb_impl::forecast(int noutput_items, gr_vector_int &ninput_items_required)
         {
             // the first input is always the FIC
             ninput_items_required[0] = d_num_fibs * d_fib_len * (noutput_items / d_vlen_out);
@@ -101,22 +103,27 @@ namespace gr {
         }
 
         void
-        transmission_frame_mux_bb_impl::generate_prbs(char *out_ptr, int length)
+        dab_transmission_frame_mux_bb_impl::generate_prbs(unsigned char *out_ptr, int length)
         {
             char bits[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
             char newbit;
-            for (int i = 0; i < length; ++i) {
+            unsigned char temp = 0;
+            for (int i = 0; i < length*8; ++i) {
                 newbit = bits[8] ^ bits[4];
                 memcpy(bits+1, bits, 8);
                 bits[0] = newbit;
-                out_ptr[i] = newbit;
-                //printf(newbit);
+                temp = (temp << 1) | (newbit & 01);
+                if((i+1)%8 == 0)
+                {
+                    out_ptr[(i-7)/8] = temp;
+                    temp = 0;
+                }
             }
 
         }
 
         int
-        transmission_frame_mux_bb_impl::general_work(int noutput_items,
+        dab_transmission_frame_mux_bb_impl::general_work(int noutput_items,
                                                      gr_vector_int &ninput_items,
                                                      gr_vector_const_void_star &input_items,
                                                      gr_vector_void_star &output_items)
@@ -132,30 +139,30 @@ namespace gr {
             }
 
             // write FIBs
-           in = (const unsigned char *) input_items[0];
+            in = (const unsigned char *) input_items[0];
             for (int i = 0; i < noutput_items/d_vlen_out; ++i) {
-                memcpy(out + i * d_vlen_out, in, d_num_fibs*d_fib_len);
+                memcpy(out + i * d_vlen_out, in, d_fic_len);
                 in += d_num_fibs*d_fib_len;
             }
             // write sub-channels
-            unsigned int cu_index = 4 * d_num_fibs;
+            unsigned int cu_index = 0;
             for (int j = 0; j < 7; ++j) {
                 in = (const unsigned char *) input_items[j+1];
                 for (int i = 0; i < noutput_items/d_vlen_out; ++i) {
-                    memcpy(out + i*d_vlen_out + d_num_fibs*d_fib_len + cu_index*d_cu_len, in, d_subch_size[j]*d_cu_len);
-                    in += d_num_fibs*d_fib_len;
+                    for (int k = 0; k < d_num_cifs; ++k) {
+                        memcpy(out + i*d_vlen_out + d_fic_len + k*d_cif_len + cu_index*d_cu_len, in + (i*d_num_cifs + k)*d_subch_size[j]*d_cu_len, d_subch_size[j] * d_cu_len);
+                        //printf("input %d, item %d, cif %d, in_adress %d, in_val %d, out_adress %d\n", j, i, k, (i*d_num_cifs + k)*d_subch_size[j]*d_cu_len, in[(i*d_num_cifs + k)*d_subch_size[j]*d_cu_len], i*d_vlen_out + d_fic_len + k*d_cif_len + cu_index*d_cu_len);
+                    }
                 }
                 cu_index += d_subch_size[j];
             }
             // fill remaining cus with padding
-            in = (const unsigned char *) input_items[1];
             for (int i = 0; i < noutput_items/d_vlen_out; ++i) {
-                memcpy(out + i*d_vlen_out + d_num_fibs*d_fib_len + d_subch_total_len*d_cu_len, d_prbs + d_subch_total_len*d_cu_len*8, (d_vlen_out - d_num_fibs*d_fib_len - d_subch_total_len*d_cu_len)*8);
-                for (int j = d_subch_total_len*d_cu_len; j < d_subch_total_len; ++j) {
-                    unsigned char temp = 0;
-                    for (int n = 0; n < 8; ++n)
-                        temp = (temp << 1) | (d_prbs[j*8 + n] & 01);
-                    out[i*d_vlen_out + d_num_fibs*d_fib_len + j] = temp;
+                //memcpy(out + i*d_vlen_out + d_num_fibs*d_fib_len + d_subch_total_len*d_cu_len, d_prbs + d_subch_total_len*d_cu_len*8, (d_vlen_out - d_num_fibs*d_fib_len - d_subch_total_len*d_cu_len)*8);
+                for (int j = d_subch_total_len*d_cu_len; j < d_cif_len; ++j) {
+                    for (int k = 0; k < d_num_cifs; ++k) {
+                        out[i*d_vlen_out + d_num_fibs*d_fib_len + k*d_cif_len + j] = d_prbs[j];
+                    }
                 }
             }
 
@@ -172,4 +179,3 @@ namespace gr {
 
     } /* namespace dab */
 } /* namespace gr */
-
