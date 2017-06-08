@@ -33,25 +33,25 @@ namespace gr {
  * @param d_prune_start number of items to cut from the beginning of sequence
  * @param d_prune_end number of items to cut from the end of the sequence
  */
-    class prune_impl : public prune
-    {
-     private:
-        size_t       d_itemsize;
-        unsigned int d_length;
-        unsigned int d_prune_start;
-        unsigned int d_prune_end;
+    class prune_impl : public prune {
+    private:
+      size_t d_itemsize;
+      unsigned int d_length;
+      unsigned int d_prune_start;
+      unsigned int d_prune_end;
 
-     public:
+    public:
       prune_impl(size_t itemsize, unsigned int length, unsigned int prune_start, unsigned int prune_end);
+
       ~prune_impl();
 
       // Where all the action really happens
-      void forecast (int noutput_items, gr_vector_int &ninput_items_required);
+      void forecast(int noutput_items, gr_vector_int &ninput_items_required);
 
       int general_work(int noutput_items,
-           gr_vector_int &ninput_items,
-           gr_vector_const_void_star &input_items,
-           gr_vector_void_star &output_items);
+                       gr_vector_int &ninput_items,
+                       gr_vector_const_void_star &input_items,
+                       gr_vector_void_star &output_items);
     };
 
   } // namespace dab

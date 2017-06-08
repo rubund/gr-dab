@@ -25,52 +25,53 @@
 #include "time_deinterleave_ff_impl.h"
 
 namespace gr {
-    namespace dab {
+  namespace dab {
 
-        time_deinterleave_ff::sptr
-        time_deinterleave_ff::make(int vector_length, const std::vector<unsigned char> &scrambling_vector)
-        {
-            return gnuradio::get_initial_sptr
-                    (new time_deinterleave_ff_impl(vector_length, scrambling_vector));
+    time_deinterleave_ff::sptr
+    time_deinterleave_ff::make(int vector_length, const std::vector<unsigned char> &scrambling_vector)
+    {
+      return gnuradio::get_initial_sptr
+              (new time_deinterleave_ff_impl(vector_length, scrambling_vector));
+    }
+
+    /*
+     * The private constructor
+     */
+    time_deinterleave_ff_impl::time_deinterleave_ff_impl(int vector_length,
+                                                         const std::vector<unsigned char> &scrambling_vector)
+            : gr::sync_block("time_deinterleave_ff",
+                             gr::io_signature::make(1, 1, sizeof(float) * vector_length),
+                             gr::io_signature::make(1, 1, sizeof(float) * vector_length)),
+              d_vector_length(vector_length), d_scrambling_vector(scrambling_vector)
+    {
+      d_scrambling_length = scrambling_vector.size(); // size of the scrambling vector
+      set_history(d_scrambling_length); //need for max delay of (scrambling_length-1) * 24ms
+    }
+
+    /*
+     * Our virtual destructor.
+     */
+    time_deinterleave_ff_impl::~time_deinterleave_ff_impl()
+    {
+    }
+
+    int
+    time_deinterleave_ff_impl::work(int noutput_items,
+                                    gr_vector_const_void_star &input_items,
+                                    gr_vector_void_star &output_items)
+    {
+      const float *in = (const float *) input_items[0];
+      float *out = (float *) output_items[0];
+
+      for (int i = 0; i < noutput_items; i++) {
+        // produce output vectors
+        for (int j = 0; j < d_vector_length; j++) {
+          *out++ = in[d_vector_length * (i + (d_scrambling_length - 1) -
+                                         (d_scrambling_length - 1 - d_scrambling_vector[j % d_scrambling_length])) + j];
         }
-
-        /*
-         * The private constructor
-         */
-        time_deinterleave_ff_impl::time_deinterleave_ff_impl(int vector_length,
-                                                             const std::vector<unsigned char> &scrambling_vector)
-                : gr::sync_block("time_deinterleave_ff",
-                                 gr::io_signature::make(1, 1, sizeof(float) * vector_length),
-                                 gr::io_signature::make(1, 1, sizeof(float) * vector_length)),
-                  d_vector_length(vector_length), d_scrambling_vector(scrambling_vector)
-        {
-            d_scrambling_length = scrambling_vector.size(); // size of the scrambling vector
-            set_history(d_scrambling_length); //need for max delay of (scrambling_length-1) * 24ms
-        }
-
-        /*
-         * Our virtual destructor.
-         */
-        time_deinterleave_ff_impl::~time_deinterleave_ff_impl()
-        {
-        }
-
-        int
-        time_deinterleave_ff_impl::work(int noutput_items,
-                                        gr_vector_const_void_star &input_items,
-                                        gr_vector_void_star &output_items)
-        {
-            const float *in = (const float *) input_items[0];
-            float *out = (float *) output_items[0];
-
-            for (int i = 0; i < noutput_items; i++) {
-                // produce output vectors
-                for (int j = 0; j < d_vector_length; j++) {
-                    *out++ = in[d_vector_length * (i + (d_scrambling_length-1) - (d_scrambling_length-1 - d_scrambling_vector[j%d_scrambling_length])) + j];
-                }
-            }
-            // Tell runtime system how many output items we produced.
-            return noutput_items;
-        }
-    } /* namespace dab */
+      }
+      // Tell runtime system how many output items we produced.
+      return noutput_items;
+    }
+  } /* namespace dab */
 } /* namespace gr */

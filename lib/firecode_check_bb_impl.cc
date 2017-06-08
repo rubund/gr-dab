@@ -30,6 +30,7 @@
 #include <stdexcept>
 #include <sstream>
 #include <boost/format.hpp>
+
 using namespace boost;
 
 namespace gr {
@@ -39,19 +40,19 @@ namespace gr {
     firecode_check_bb::make(int bit_rate_n)
     {
       return gnuradio::get_initial_sptr
-        (new firecode_check_bb_impl(bit_rate_n));
+              (new firecode_check_bb_impl(bit_rate_n));
     }
 
     /*
      * The private constructor
      */
     firecode_check_bb_impl::firecode_check_bb_impl(int bit_rate_n)
-      : gr::block("firecode_check_bb",
-              gr::io_signature::make(1, 1, sizeof(unsigned char)),
-              gr::io_signature::make(1, 1, sizeof(unsigned char)))
+            : gr::block("firecode_check_bb",
+                        gr::io_signature::make(1, 1, sizeof(unsigned char)),
+                        gr::io_signature::make(1, 1, sizeof(unsigned char)))
     {
-        d_frame_size = 24 * bit_rate_n;
-        set_output_multiple(d_frame_size); //logical frame
+      d_frame_size = 24 * bit_rate_n;
+      set_output_multiple(d_frame_size); //logical frame
     }
 
     /*
@@ -62,35 +63,34 @@ namespace gr {
     }
 
     void
-    firecode_check_bb_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
+    firecode_check_bb_impl::forecast(int noutput_items, gr_vector_int &ninput_items_required)
     {
-        ninput_items_required[0] = noutput_items; //TODO: error rate???
+      ninput_items_required[0] = noutput_items; //TODO: error rate???
     }
 
     int
-    firecode_check_bb_impl::general_work (int noutput_items,
-                       gr_vector_int &ninput_items,
-                       gr_vector_const_void_star &input_items,
-                       gr_vector_void_star &output_items)
+    firecode_check_bb_impl::general_work(int noutput_items,
+                                         gr_vector_int &ninput_items,
+                                         gr_vector_const_void_star &input_items,
+                                         gr_vector_void_star &output_items)
     {
-        const unsigned char *in = (const unsigned char *) input_items[0];
-        unsigned char *out = (unsigned char *) output_items[0];
+      const unsigned char *in = (const unsigned char *) input_items[0];
+      unsigned char *out = (unsigned char *) output_items[0];
 
-        for(int i = 0; i < noutput_items/d_frame_size; i++){
-            if (fc.check(&in[i * d_frame_size])){
-                GR_LOG_DEBUG(d_logger, format("fire code OK at frame %d") %(nitems_written(0)/d_frame_size));
-            }
-            else{
-                GR_LOG_DEBUG(d_logger, format("fire code failed at frame %d") %(nitems_written(0)/d_frame_size));
-            }
+      for (int i = 0; i < noutput_items / d_frame_size; i++) {
+        if (fc.check(&in[i * d_frame_size])) {
+          GR_LOG_DEBUG(d_logger, format("fire code OK at frame %d") % (nitems_written(0) / d_frame_size));
+        } else {
+          GR_LOG_DEBUG(d_logger, format("fire code failed at frame %d") % (nitems_written(0) / d_frame_size));
         }
-        memcpy(out, in, noutput_items);
+      }
+      memcpy(out, in, noutput_items);
 
       // Tell runtime system how many input items we consumed on
       // each input stream.
-        consume_each (noutput_items);
+      consume_each(noutput_items);
       // Tell runtime system how many output items we produced.
-        return noutput_items;
+      return noutput_items;
     }
 
   } /* namespace dab */

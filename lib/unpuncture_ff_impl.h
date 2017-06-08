@@ -24,7 +24,7 @@
 #include <dab/unpuncture_ff.h>
 
 namespace gr {
-    namespace dab {
+  namespace dab {
 /*! \brief unpuncturing of a stream sequence
  *
  * unpuncturing of a stream sequence according to the puncturing_vector (writing a stream element at a '1' and writing the fillval at a '0')
@@ -33,29 +33,30 @@ namespace gr {
  * @param fillval value to fill in for a zero of the puncturing vector
  *
  */
-        class unpuncture_ff_impl : public unpuncture_ff {
-        private:
-            unsigned int ones (const std::vector<unsigned char> &puncturing_vector);
-            std::vector<unsigned char> d_puncturing_vector;
-            float d_fillval;
-            unsigned int d_vlen_in;
-            unsigned int d_vlen_out;
+    class unpuncture_ff_impl : public unpuncture_ff {
+    private:
+      unsigned int ones(const std::vector<unsigned char> &puncturing_vector);
 
-        public:
-            unpuncture_ff_impl(const std::vector<unsigned char> &puncturing_vector, float fillval);
+      std::vector<unsigned char> d_puncturing_vector;
+      float d_fillval;
+      unsigned int d_vlen_in;
+      unsigned int d_vlen_out;
 
-            ~unpuncture_ff_impl();
+    public:
+      unpuncture_ff_impl(const std::vector<unsigned char> &puncturing_vector, float fillval);
 
-            // Where all the action really happens
-            void forecast(int noutput_items, gr_vector_int &ninput_items_required);
+      ~unpuncture_ff_impl();
 
-            int general_work(int noutput_items,
-                             gr_vector_int &ninput_items,
-                             gr_vector_const_void_star &input_items,
-                             gr_vector_void_star &output_items);
-        };
+      // Where all the action really happens
+      void forecast(int noutput_items, gr_vector_int &ninput_items_required);
 
-    } // namespace dab
+      int general_work(int noutput_items,
+                       gr_vector_int &ninput_items,
+                       gr_vector_const_void_star &input_items,
+                       gr_vector_void_star &output_items);
+    };
+
+  } // namespace dab
 } // namespace gr
 
 #endif /* INCLUDED_DAB_UNPUNCTURE_FF_IMPL_H */

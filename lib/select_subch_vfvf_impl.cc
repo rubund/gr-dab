@@ -26,69 +26,69 @@
 #include "select_subch_vfvf_impl.h"
 
 namespace gr {
-    namespace dab {
+  namespace dab {
 
-        select_subch_vfvf::sptr
-        select_subch_vfvf::make(unsigned int vlen_in, unsigned int vlen_out, unsigned int address,
-                                unsigned int total_size)
-        {
-            return gnuradio::get_initial_sptr
-                    (new select_subch_vfvf_impl(vlen_in, vlen_out, address, total_size));
-        }
+    select_subch_vfvf::sptr
+    select_subch_vfvf::make(unsigned int vlen_in, unsigned int vlen_out, unsigned int address,
+                            unsigned int total_size)
+    {
+      return gnuradio::get_initial_sptr
+              (new select_subch_vfvf_impl(vlen_in, vlen_out, address, total_size));
+    }
 
-        /*
-         * The private constructor
-         */
-        select_subch_vfvf_impl::select_subch_vfvf_impl(unsigned int vlen_in, unsigned int vlen_out,
-                                                       unsigned int address, unsigned int total_size)
-                : gr::block("select_subch_vfvf",
-                            gr::io_signature::make(1, 1, sizeof(float) * vlen_in),
-                            gr::io_signature::make(1, 1, sizeof(float) * vlen_out)),
-                  d_vlen_in(vlen_in), d_vlen_out(vlen_out), d_address(address), d_total_size(total_size)
-        {
-            //sanity check
-            if (vlen_out % vlen_in != 0)
-                throw fprintf(stderr, "vlen_out no multiple of vlen_in");
-            if (address * vlen_in + vlen_out > total_size * vlen_in)
-                throw fprintf(stderr, "vlen_out too long or address wrong");
+    /*
+     * The private constructor
+     */
+    select_subch_vfvf_impl::select_subch_vfvf_impl(unsigned int vlen_in, unsigned int vlen_out,
+                                                   unsigned int address, unsigned int total_size)
+            : gr::block("select_subch_vfvf",
+                        gr::io_signature::make(1, 1, sizeof(float) * vlen_in),
+                        gr::io_signature::make(1, 1, sizeof(float) * vlen_out)),
+              d_vlen_in(vlen_in), d_vlen_out(vlen_out), d_address(address), d_total_size(total_size)
+    {
+      //sanity check
+      if (vlen_out % vlen_in != 0)
+        throw std::runtime_error("vlen_out no multiple of vlen_in");
+      if (address * vlen_in + vlen_out > total_size * vlen_in)
+        throw std::runtime_error("vlen_out too long or address wrong");
 
-            set_relative_rate(1 / total_size);
-        }
+      set_relative_rate(1 / total_size);
+    }
 
-        /*
-         * Our virtual destructor.
-         */
-        select_subch_vfvf_impl::~select_subch_vfvf_impl()
-        {
-        }
+    /*
+     * Our virtual destructor.
+     */
+    select_subch_vfvf_impl::~select_subch_vfvf_impl()
+    {
+    }
 
-        void
-        select_subch_vfvf_impl::forecast(int noutput_items, gr_vector_int &ninput_items_required)
-        {
-            ninput_items_required[0] = noutput_items * d_total_size;
-        }
+    void
+    select_subch_vfvf_impl::forecast(int noutput_items, gr_vector_int &ninput_items_required)
+    {
+      ninput_items_required[0] = noutput_items * d_total_size;
+    }
 
-        int
-        select_subch_vfvf_impl::general_work(int noutput_items,
-                                             gr_vector_int &ninput_items,
-                                             gr_vector_const_void_star &input_items,
-                                             gr_vector_void_star &output_items)
-        {
-            const float *in = (const float *) input_items[0];
-            float *out = (float *) output_items[0];
+    int
+    select_subch_vfvf_impl::general_work(int noutput_items,
+                                         gr_vector_int &ninput_items,
+                                         gr_vector_const_void_star &input_items,
+                                         gr_vector_void_star &output_items)
+    {
+      const float *in = (const float *) input_items[0];
+      float *out = (float *) output_items[0];
 
-            for (int i = 0; i < noutput_items; i++) {
-                memcpy(&out[i * d_vlen_out], &in[d_vlen_in * (i * d_total_size + d_address)],
-                       d_vlen_out * sizeof(float));
-            }
-            // Tell runtime system how many input items we consumed on
-            // each input stream.
-            consume_each(noutput_items * d_total_size);
+      for (int i = 0; i < noutput_items; i++) {
+        memcpy(&out[i * d_vlen_out], &in[d_vlen_in * (i * d_total_size + d_address)],
+               d_vlen_out * sizeof(float));
+      }
+      // Tell runtime system how many input items we consumed on
+      // each input stream.
+      consume_each(noutput_items * d_total_size);
 
-            // Tell runtime system how many output items we produced.
-            return noutput_items;
-        }
+      // Tell runtime system how many output items we produced.
+      return noutput_items;
+    }
 
-    } /* namespace dab */
+  } /* namespace dab */
 } /* namespace gr */
 

@@ -35,24 +35,24 @@ namespace gr {
  *
  *
  */
-    class firecode_check_bb_impl : public firecode_check_bb
-    {
-     private:
-        int d_frame_size;
-        int d_bit_rate_n;
-        firecode_checker fc;
+    class firecode_check_bb_impl : public firecode_check_bb {
+    private:
+      int d_frame_size;
+      int d_bit_rate_n;
+      firecode_checker fc;
 
-     public:
+    public:
       firecode_check_bb_impl(int bit_rate_n);
+
       ~firecode_check_bb_impl();
 
       // Where all the action really happens
-      void forecast (int noutput_items, gr_vector_int &ninput_items_required);
+      void forecast(int noutput_items, gr_vector_int &ninput_items_required);
 
       int general_work(int noutput_items,
-           gr_vector_int &ninput_items,
-           gr_vector_const_void_star &input_items,
-           gr_vector_void_star &output_items);
+                       gr_vector_int &ninput_items,
+                       gr_vector_const_void_star &input_items,
+                       gr_vector_void_star &output_items);
     };
 
   } // namespace dab

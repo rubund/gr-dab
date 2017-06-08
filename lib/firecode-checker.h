@@ -32,18 +32,18 @@
 
 class firecode_checker {
 public:
-    firecode_checker(void);
+  firecode_checker(void);
 
-    ~firecode_checker(void);
+  ~firecode_checker(void);
 
 // error detection. x[0-1] contains parity, x[2-10] contains data
-    bool check(const uint8_t *x); // return true if firecode check is passed
+  bool check(const uint8_t *x); // return true if firecode check is passed
 private:
-    uint16_t tab[256];
+  uint16_t tab[256];
 
-    uint16_t run8(unsigned char regs[]);
+  uint16_t run8(unsigned char regs[]);
 
-    static const uint8_t g[16];
+  static const uint8_t g[16];
 };
 
 #endif
