@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /* 
- * Copyright 2017 <+YOU OR YOUR COMPANY+>.
+ * Copyright 2017 Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,8 +29,7 @@ namespace gr {
   namespace dab {
 
     /*!
-     * \brief <+description of block+>
-     * \ingroup dab
+     * \brief multiplex to DAB transmission frames
      *
      */
     class DAB_API dab_transmission_frame_mux_bb : virtual public gr::block
@@ -46,7 +45,7 @@ namespace gr {
        * class. dab::dab_transmission_frame_mux_bb::make is the public interface for
        * creating new instances.
        */
-      static sptr make(int transmission_mode, const std::vector<unsigned int> &subch_size);
+      static sptr make(int transmission_mode, int num_subch, const std::vector<unsigned int> &subch_size);
     };
 
   } // namespace dab

@@ -29,21 +29,21 @@ namespace gr {
     namespace dab {
 
         dab_transmission_frame_mux_bb::sptr
-        dab_transmission_frame_mux_bb::make(int transmission_mode, const std::vector<unsigned int> &subch_size)
+        dab_transmission_frame_mux_bb::make(int transmission_mode, int num_subch, const std::vector<unsigned int> &subch_size)
         {
             return gnuradio::get_initial_sptr
-                    (new dab_transmission_frame_mux_bb_impl(transmission_mode, subch_size));
+                    (new dab_transmission_frame_mux_bb_impl(transmission_mode, num_subch, subch_size));
         }
 
         /*
          * The private constructor
          */
-        dab_transmission_frame_mux_bb_impl::dab_transmission_frame_mux_bb_impl(int transmission_mode,
+        dab_transmission_frame_mux_bb_impl::dab_transmission_frame_mux_bb_impl(int transmission_mode, int num_subch,
                                                                        const std::vector<unsigned int> &subch_size)
                 : gr::block("dab_transmission_frame_mux_bb",
-                            gr::io_signature::make(1, 8, sizeof(unsigned char)),
+                            gr::io_signature::make(1+num_subch, 1+num_subch, sizeof(unsigned char)),
                             gr::io_signature::make(2, 2, sizeof(unsigned char))),
-                  d_transmission_mode(transmission_mode), d_subch_size(subch_size)
+                  d_transmission_mode(transmission_mode), d_subch_size(subch_size), d_num_subch(num_subch)
         {
             switch (transmission_mode) {
                 case 1:
@@ -65,10 +65,11 @@ namespace gr {
                 default:
                     throw fprintf(stderr, "Transmission mode %d doesn't exist", transmission_mode);
             }
+            if(subch_size.size() != num_subch) GR_LOG_WARN(d_logger, "sizeof vector subch_size does not match with num_subch");
             d_vlen_out = d_num_fibs * d_fib_len + d_num_cifs * d_cif_len;
             d_fic_len = d_num_fibs * d_fib_len;
             d_subch_total_len = 0;
-            for (int i = 0; i < 7; ++i) {
+            for (int i = 0; i <  num_subch; ++i) {
                 d_subch_total_len += subch_size[i];
             }
             if(d_subch_total_len * d_cu_len > d_cif_len)
@@ -96,7 +97,7 @@ namespace gr {
             ninput_items_required[0] = d_num_fibs * d_fib_len * (noutput_items / d_vlen_out);
             // the second input is always the PRBS source
             ninput_items_required[1] = d_cif_len * 8;
-            for (int i = 0; i < 7; ++i) {
+            for (int i = 0; i < d_num_subch; ++i) {
                 // the amount of consumed data of each sub-channel depends on its size
                 ninput_items_required[i+2] = d_subch_size[i]*d_cu_len * (noutput_items / d_vlen_out);
             }
@@ -146,7 +147,7 @@ namespace gr {
             }
             // write sub-channels
             unsigned int cu_index = 0;
-            for (int j = 0; j < 7; ++j) {
+            for (int j = 0; j < d_num_subch; ++j) {
                 in = (const unsigned char *) input_items[j+1];
                 for (int i = 0; i < noutput_items/d_vlen_out; ++i) {
                     for (int k = 0; k < d_num_cifs; ++k) {
@@ -169,7 +170,7 @@ namespace gr {
             // Tell runtime system how many input items we consumed on
             // each input stream.
             consume(0, noutput_items/d_vlen_out * d_num_fibs*d_fib_len);
-            for (int j = 0; j < 7; ++j) {
+            for (int j = 0; j < d_num_subch; ++j) {
                 consume(j+1, noutput_items/d_vlen_out * d_subch_size[j]*d_cu_len);
             }
 

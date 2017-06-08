@@ -25,12 +25,20 @@
 
 namespace gr {
     namespace dab {
-
+/*! \brief multiplex to DAB transmission frames
+ *
+ * block multiplexes the FIBs of the FIC and all subchannels of the MCI to a transmission frame according to ETSI EN 300 401
+ * the number of FIBs per CIF and the number of CIFs per transmission frame depends on the transmission mode
+ * the maximum number of supported sub-channels is 7
+ *
+ * @param transmission_mode transmission mode 1-4 after DAB standard
+ * @param subch_size vector with size of each subchannel
+ */
         class dab_transmission_frame_mux_bb_impl : public dab_transmission_frame_mux_bb {
         private:
             int d_transmission_mode;
+            int d_num_subch;
             std::vector<unsigned int> d_subch_size;
-
             const static unsigned int d_fib_len = 32; // length of a fib in bytes
             const static unsigned int d_cif_len = 6912; // length of a cif in bytes
             const static unsigned int d_cu_len = 8; // length of a capacity unit in bytes
@@ -41,7 +49,7 @@ namespace gr {
             void generate_prbs(unsigned char* out_ptr, int length);
 
         public:
-            dab_transmission_frame_mux_bb_impl(int transmission_mode, const std::vector<unsigned int> &subch_size);
+            dab_transmission_frame_mux_bb_impl(int transmission_mode, int num_subch, const std::vector<unsigned int> &subch_size);
 
             ~dab_transmission_frame_mux_bb_impl();
 
