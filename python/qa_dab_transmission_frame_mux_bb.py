@@ -32,7 +32,7 @@ class qa_dab_transmission_frame_mux_bb (gr_unittest.TestCase):
         self.tb = None
 
     def test_001_t (self):
-        #self.src = dab.fib_source_b_make(1, 1, "dsla", "dlaaa", "fjfdk", 1, 2, 15)
+        # manual check if data is multiplexed properly
         fib = (0xFF, 0xFF)
         data01 = (1, 1)
         data02 = (2, 2)
@@ -50,8 +50,9 @@ class qa_dab_transmission_frame_mux_bb (gr_unittest.TestCase):
         self.tb.connect(self.subch_src01, (self.mux, 1))
         self.tb.connect(self.subch_src02, (self.mux, 2))
         self.tb.connect((self.mux, 0), self.dst)
-        self.tb.connect((self.mux, 1), self.trigger_dst)
+        self.tb.connect((self.mux, 1), blocks.head_make(gr.sizeof_char, 100000), self.trigger_dst)
         self.tb.run ()
+        pass
 
 
 
