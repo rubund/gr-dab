@@ -31,3 +31,7 @@ cscope.out
 *~
 build/
 python/debug/
+/lib/cmake-build-debug/
+lib/latex/
+log_default.conf
+python/.unittests/

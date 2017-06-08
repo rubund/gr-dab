@@ -49,5 +49,9 @@ install(FILES
     time_interleave_bb.h
     time_deinterleave_ff.h
     crc16_bb.h
-    fib_source_b.h DESTINATION include/dab
+    fib_source_b.h
+    select_subch_vfvf.h
+    unpuncture_ff.h
+    prune.h
+    firecode_check_bb.h DESTINATION include/dab
 )

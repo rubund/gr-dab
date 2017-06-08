@@ -36,6 +36,10 @@
 #include "dab/time_deinterleave_ff.h"
 #include "dab/crc16_bb.h"
 #include "dab/fib_source_b.h"
+#include "dab/select_subch_vfvf.h"
+#include "dab/unpuncture_ff.h"
+#include "dab/prune.h"
+#include "dab/firecode_check_bb.h"
 %}
 
 
@@ -95,3 +99,12 @@ GR_SWIG_BLOCK_MAGIC2(dab, time_deinterleave_ff);
 GR_SWIG_BLOCK_MAGIC2(dab, crc16_bb);
 %include "dab/fib_source_b.h"
 GR_SWIG_BLOCK_MAGIC2(dab, fib_source_b);
+%include "dab/select_subch_vfvf.h"
+GR_SWIG_BLOCK_MAGIC2(dab, select_subch_vfvf);
+
+%include "dab/unpuncture_ff.h"
+GR_SWIG_BLOCK_MAGIC2(dab, unpuncture_ff);
+%include "dab/prune.h"
+GR_SWIG_BLOCK_MAGIC2(dab, prune);
+%include "dab/firecode_check_bb.h"
+GR_SWIG_BLOCK_MAGIC2(dab, firecode_check_bb);
