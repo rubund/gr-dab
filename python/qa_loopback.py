@@ -14,6 +14,7 @@ from gnuradio import uhd, blocks
 import dab
 import sys
 
+# transmitting a simple dab signal and receiving it
 class qa_loopback (gr_unittest.TestCase):
 
     def setUp (self):
@@ -23,115 +24,66 @@ class qa_loopback (gr_unittest.TestCase):
         self.tb = None
 
     def test_001_t(self):
-        interp = 64
-        self.sample_rate = 128e6 / interp
+        #interp = 64
+        #self.sample_rate = 128e6 / interp
         self.dp = dab.parameters.dab_parameters(mode=1, sample_rate=2000000, verbose=True)
 
         # build transmission frame
-        self.fic_src = dab.fib_source_b_make(self.mode, 1, "Galaxy News", "Galaxy Radio", "Awesome Mix", 1, 2, 15)
+        # FIC
+        self.fic_src = dab.fib_source_b_make(1, 1, "Galaxy News", "Galaxy Radio", "Awesome Mix", 1, 2, 15)
         self.fic_encoder = dab.fic_encode(self.dp)
-        self.data01 = (1)
+        # MSC
+        self.data01 = (1, 2, 3, 4)
         self.subch_src_01 = blocks.vector_source_b_make(self.data01, True)
-        self.trigsrc = blocks.vector_source_b([1] + [0] * (self.dab_params.symbols_per_frame - 1), True)
+        self.msc_encoder = dab.msc_encode(self.dp, 15, 2)
+        # MUX
+        self.mux = dab.dab_transmission_frame_mux_bb_make(1, 1, [90])
 
-        self.s2v = blocks.stream_to_vector(gr.sizeof_char, 384)
+        # prepare for mod
+        self.s2v_data = blocks.stream_to_vector(gr.sizeof_char, 384)
+        self.trigsrc = blocks.vector_source_b([1] + [0] * (self.dp.symbols_per_frame - 2), True)
 
-        self.mod = dab.ofdm_mod(self.dab_params, verbose=options.verbose)
+        # ofdm modulation
+        self.mod = dab.ofdm_mod(self.dp, verbose=True)
 
-        # self.sink = usrp.sink_c(interp_rate = interp)
-        self.sink = uhd.usrp_sink("", uhd.io_type.COMPLEX_FLOAT32, 1)
-        self.sink.set_samp_rate(self.sample_rate)
-        # self.sink.set_mux(usrp.determine_tx_mux_value(self.sink, options.tx_subdev_spec))
-        # self.subdev = usrp.selected_subdev(self.sink, options.tx_subdev_spec)
-        self.sink.set_antenna(options.antenna)
 
-        print "--> using sample rate: " + str(self.sample_rate)
+        # build reception frame
+        # ofdm demodulation
+        self.rx_params = dab.parameters.receiver_parameters(mode=1, softbits=True,
+                                                            input_fft_filter=True,
+                                                            autocorrect_sample_rate=False,
+                                                            sample_rate_correction_factor=1,
+                                                            verbose=True, correct_ffe=True,
+                                                            equalize_magnitude=True)
+        self.demod = dab.ofdm_demod(self.dp, self.rx_params, verbose=True)
+        # fic sink
+        self.fic_dec = dab.fic_decode(self.dp)
+        # msc sink
+        # file sink
+        self.file_sink = blocks.file_sink_make(gr.sizeof_float*self.dp.num_carriers*2, "debug/loopback_demodulated.dat")
+        self.file_sink_trigger = blocks.file_sink_make(gr.sizeof_char, "debug/loopback_demodulated_trigger.dat")
 
-        self.connect(self.src, self.s2v, self.mod, self.sink)
-        self.connect(self.trigsrc, (self.mod, 1))
+        # debug
+        self.file_sink_mux = blocks.file_sink_make(gr.sizeof_char, "debug/loopback_MUX.dat")
 
-        # tune frequency
-        self.sink.set_center_freq(options.freq)
 
-        # set gain
-        if options.tx_gain is None:
-            # if no gain was specified, use the mid-point in dB
-            g = self.sink.get_gain_range()
-            options.tx_gain = float(g.start() + g.stop()) / 2
-        self.sink.set_gain(options.tx_gain)
+        # connect everything
+        # transmitter
+        self.tb.connect(self.fic_src, self.fic_encoder, (self.mux, 0))
+        self.tb.connect(self.subch_src_01, self.msc_encoder, (self.mux, 1))
+        self.tb.connect((self.mux, 0), self.s2v_data, (self.mod, 0))
+        self.tb.connect(self.trigsrc, (self.mod, 1))
+        # loopback
+        self.tb.connect(self.mod, self.demod)
+        # receiver
+        self.tb.connect(self.demod, (self.fic_dec, 0))
+        self.tb.connect((self.demod, 1), (self.fic_dec, 1))
+        self.tb.connect(self.demod, self.file_sink)
+        self.tb.connect((self.demod, 1), self.file_sink_trigger)
+        # debug
+        self.tb.connect((self.mux, 0), self.file_sink_mux)
+
+        self.tb.run()
 
 if __name__ == '__main__':
     gr_unittest.run(qa_loopback, "qa_loopback.xml")
-
-
-class usrp_dab_tx(gr.top_block):
-    def __init__(self):
-        gr.top_block.__init__(self)
-
-        parser = OptionParser(option_class=eng_option, usage="%prog: [options] input-filename")
-        parser.add_option("-T", "--tx-subdev-spec", type="subdev", default=(0, 0),
-                          help="select USRP Tx side A or B [default=A]")
-        parser.add_option("-f", "--freq", type="eng_float", default=227.36e6,
-                          help="set frequency to FREQ [default=%default]")
-        parser.add_option("-g", "--tx-gain", type="eng_float", default=None,
-                          help="set transmit gain in dB (default is midpoint)")
-        parser.add_option('-v', '--verbose', action="store_true", default=False,
-                          help="verbose output")
-        parser.add_option('-a', '--antenna', type="string", default="TX/RX",
-                          help="select antenna")
-
-        (options, args) = parser.parse_args()
-        if len(args) != 1:
-            parser.print_help()
-            sys.exit(1)
-        else:
-            self.filename = args[0]
-
-        # if gr.enable_realtime_scheduling() != gr.RT_OK:
-        #       print "-> failed to enable realtime scheduling"
-
-        self.mode = 1; #TODO parser option
-
-        interp = 64
-        self.sample_rate = 128e6 / interp
-        self.dab_params = dab.parameters.dab_parameters(mode=self.mode, sample_rate=2000000, verbose=options.verbose)
-
-        # build transmission frame
-        self.fic_src = dab.fib_source_b_make(self.mode, 1, "Galaxy News", "Galaxy Radio", "Awesome Mix", 1, 2, 15)
-        self.data01 = (1)
-        self.subch_src_01 = blocks.vector_source_b_make(data01, True)
-        self.src = blocks.file_source(gr.sizeof_char, self.filename)
-        self.trigsrc = blocks.vector_source_b([1] + [0] * (self.dab_params.symbols_per_frame - 1), True)
-
-        self.s2v = blocks.stream_to_vector(gr.sizeof_char, 384)
-
-        self.mod = dab.ofdm_mod(self.dab_params, verbose=options.verbose)
-
-        # self.sink = usrp.sink_c(interp_rate = interp)
-        self.sink = uhd.usrp_sink("", uhd.io_type.COMPLEX_FLOAT32, 1)
-        self.sink.set_samp_rate(self.sample_rate)
-        # self.sink.set_mux(usrp.determine_tx_mux_value(self.sink, options.tx_subdev_spec))
-        # self.subdev = usrp.selected_subdev(self.sink, options.tx_subdev_spec)
-        self.sink.set_antenna(options.antenna)
-
-        print "--> using sample rate: " + str(self.sample_rate)
-
-        self.connect(self.src, self.s2v, self.mod, self.sink)
-        self.connect(self.trigsrc, (self.mod, 1))
-
-        # tune frequency
-        self.sink.set_center_freq(options.freq)
-
-        # set gain
-        if options.tx_gain is None:
-            # if no gain was specified, use the mid-point in dB
-            g = self.sink.get_gain_range()
-            options.tx_gain = float(g.start() + g.stop()) / 2
-        self.sink.set_gain(options.tx_gain)
-
-
-if __name__ == '__main__':
-    try:
-        usrp_dab_tx().run()
-    except KeyboardInterrupt:
-        pass

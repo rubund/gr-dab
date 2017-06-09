@@ -21,7 +21,7 @@
 
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
-from msc_encode import msc_encode
+import dab
 
 class qa_msc_encode (gr_unittest.TestCase):
 
@@ -32,9 +32,15 @@ class qa_msc_encode (gr_unittest.TestCase):
         self.tb = None
 
     def test_001_t (self):
-        # set up fg
+        self.dab_params = dab.parameters.dab_parameters(1, 208.064e6, True)
+        fib = (0xF1, 0x02)
+        self.fib_src = blocks.vector_source_b(fib, True)
+        self.fib_enc = dab.fic_encode(self.dab_params)
+        self.sink = blocks.file_sink_make(gr.sizeof_char, "debug/generated_fic_encoded.dat")
+
+        self.tb.connect(self.fib_src, self.fib_enc, self.sink)
         self.tb.run ()
-        # check data
+        pass
 
 
 if __name__ == '__main__':

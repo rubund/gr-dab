@@ -26,157 +26,158 @@
 #include "dab_transmission_frame_mux_bb_impl.h"
 
 namespace gr {
-    namespace dab {
+  namespace dab {
 
-        dab_transmission_frame_mux_bb::sptr
-        dab_transmission_frame_mux_bb::make(int transmission_mode, int num_subch, const std::vector<unsigned int> &subch_size)
-        {
-            return gnuradio::get_initial_sptr
-                    (new dab_transmission_frame_mux_bb_impl(transmission_mode, num_subch, subch_size));
+    dab_transmission_frame_mux_bb::sptr
+    dab_transmission_frame_mux_bb::make(int transmission_mode, int num_subch,
+                                        const std::vector<unsigned int> &subch_size)
+    {
+      return gnuradio::get_initial_sptr
+              (new dab_transmission_frame_mux_bb_impl(transmission_mode, num_subch, subch_size));
+    }
+
+    /*
+     * The private constructor
+     */
+    dab_transmission_frame_mux_bb_impl::dab_transmission_frame_mux_bb_impl(int transmission_mode, int num_subch,
+                                                                           const std::vector<unsigned int> &subch_size)
+            : gr::block("dab_transmission_frame_mux_bb",
+                        gr::io_signature::make(1 + num_subch, 1 + num_subch, sizeof(unsigned char)),
+                        gr::io_signature::make(1, 1, sizeof(unsigned char))),
+              d_transmission_mode(transmission_mode), d_subch_size(subch_size), d_num_subch(num_subch)
+    {
+      switch (transmission_mode) {
+        case 1:
+          d_num_fibs = 12;
+          d_num_cifs = 4;
+          break;
+        case 2:
+          d_num_fibs = 3;
+          d_num_cifs = 1;
+          break;
+        case 3:
+          d_num_fibs = 4;
+          d_num_cifs = 1;
+          break;
+        case 4:
+          d_num_fibs = 6;
+          d_num_cifs = 2;
+          break;
+        default:
+          throw std::runtime_error("Transmission mode %d doesn't exist" + transmission_mode);
+      }
+      if (subch_size.size() != num_subch)
+        GR_LOG_WARN(d_logger, "sizeof vector subch_size does not match with num_subch");
+      d_vlen_out = d_num_fibs * d_fib_len + d_num_cifs * d_cif_len;
+      d_fic_len = d_num_fibs * d_fib_len * 3; // fic code rate = 3
+      d_subch_total_len = 0;
+      for (int i = 0; i < num_subch; ++i) {
+        d_subch_total_len += subch_size[i];
+      }
+      if (d_subch_total_len * d_cu_len > d_cif_len) {
+        throw std::runtime_error("subchannels are %d bytes too long for CIF" + (d_subch_total_len * d_cu_len - d_cif_len));
+      }
+      set_output_multiple(d_vlen_out);
+
+
+      // generate PRBS for padding
+      generate_prbs(d_prbs, sizeof(d_prbs));
+    }
+
+    /*
+     * Our virtual destructor.
+     */
+    dab_transmission_frame_mux_bb_impl::~dab_transmission_frame_mux_bb_impl()
+    {
+    }
+
+    void
+    dab_transmission_frame_mux_bb_impl::forecast(int noutput_items, gr_vector_int &ninput_items_required)
+    {
+      // the first input is always the FIC
+      ninput_items_required[0] = d_fic_len * (noutput_items / d_vlen_out);
+      // the second input is always the PRBS source
+      ninput_items_required[1] = d_cif_len * 8;
+      for (int i = 0; i < d_num_subch; ++i) {
+        // the amount of consumed data of each sub-channel depends on its size
+        ninput_items_required[i + 2] = d_subch_size[i] * d_cu_len * (noutput_items / d_vlen_out);
+      }
+    }
+
+    void
+    dab_transmission_frame_mux_bb_impl::generate_prbs(unsigned char *out_ptr, int length)
+    {
+      char bits[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+      char newbit;
+      unsigned char temp = 0;
+      for (int i = 0; i < length * 8; ++i) {
+        newbit = bits[8] ^ bits[4];
+        memcpy(bits + 1, bits, 8);
+        bits[0] = newbit;
+        temp = (temp << 1) | (newbit & 01);
+        if ((i + 1) % 8 == 0) {
+          out_ptr[(i - 7) / 8] = temp;
+          temp = 0;
         }
+      }
 
-        /*
-         * The private constructor
-         */
-        dab_transmission_frame_mux_bb_impl::dab_transmission_frame_mux_bb_impl(int transmission_mode, int num_subch,
-                                                                       const std::vector<unsigned int> &subch_size)
-                : gr::block("dab_transmission_frame_mux_bb",
-                            gr::io_signature::make(1+num_subch, 1+num_subch, sizeof(unsigned char)),
-                            gr::io_signature::make(2, 2, sizeof(unsigned char))),
-                  d_transmission_mode(transmission_mode), d_subch_size(subch_size), d_num_subch(num_subch)
-        {
-            switch (transmission_mode) {
-                case 1:
-                    d_num_fibs = 12;
-                    d_num_cifs = 4;
-                    break;
-                case 2:
-                    d_num_fibs = 3;
-                    d_num_cifs = 1;
-                    break;
-                case 3:
-                    d_num_fibs = 4;
-                    d_num_cifs = 1;
-                    break;
-                case 4:
-                    d_num_fibs = 6;
-                    d_num_cifs = 2;
-                    break;
-                default:
-                    throw fprintf(stderr, "Transmission mode %d doesn't exist", transmission_mode);
-            }
-            if(subch_size.size() != num_subch) GR_LOG_WARN(d_logger, "sizeof vector subch_size does not match with num_subch");
-            d_vlen_out = d_num_fibs * d_fib_len + d_num_cifs * d_cif_len;
-            d_fic_len = d_num_fibs * d_fib_len;
-            d_subch_total_len = 0;
-            for (int i = 0; i <  num_subch; ++i) {
-                d_subch_total_len += subch_size[i];
-            }
-            if(d_subch_total_len * d_cu_len > d_cif_len)
-            {
-                throw fprintf(stderr, "subchannels are %d bytes too long for CIF", (d_subch_total_len * d_cu_len - d_cif_len));
-            }
-            set_output_multiple(d_vlen_out);
+    }
 
-
-            // generate PRBS for padding
-            generate_prbs(d_prbs, sizeof(d_prbs));
-        }
-
-        /*
-         * Our virtual destructor.
-         */
-        dab_transmission_frame_mux_bb_impl::~dab_transmission_frame_mux_bb_impl()
-        {
-        }
-
-        void
-        dab_transmission_frame_mux_bb_impl::forecast(int noutput_items, gr_vector_int &ninput_items_required)
-        {
-            // the first input is always the FIC
-            ninput_items_required[0] = d_num_fibs * d_fib_len * (noutput_items / d_vlen_out);
-            // the second input is always the PRBS source
-            ninput_items_required[1] = d_cif_len * 8;
-            for (int i = 0; i < d_num_subch; ++i) {
-                // the amount of consumed data of each sub-channel depends on its size
-                ninput_items_required[i+2] = d_subch_size[i]*d_cu_len * (noutput_items / d_vlen_out);
-            }
-        }
-
-        void
-        dab_transmission_frame_mux_bb_impl::generate_prbs(unsigned char *out_ptr, int length)
-        {
-            char bits[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
-            char newbit;
-            unsigned char temp = 0;
-            for (int i = 0; i < length*8; ++i) {
-                newbit = bits[8] ^ bits[4];
-                memcpy(bits+1, bits, 8);
-                bits[0] = newbit;
-                temp = (temp << 1) | (newbit & 01);
-                if((i+1)%8 == 0)
-                {
-                    out_ptr[(i-7)/8] = temp;
-                    temp = 0;
-                }
-            }
-
-        }
-
-        int
-        dab_transmission_frame_mux_bb_impl::general_work(int noutput_items,
+    int
+    dab_transmission_frame_mux_bb_impl::general_work(int noutput_items,
                                                      gr_vector_int &ninput_items,
                                                      gr_vector_const_void_star &input_items,
                                                      gr_vector_void_star &output_items)
-        {
-            unsigned char *out = (unsigned char *) output_items[0];
-            unsigned char *triggerout = (unsigned char *) output_items[1];
-            const unsigned char *in;
+    {
+      unsigned char *out = (unsigned char *) output_items[0];
+      unsigned char *triggerout = (unsigned char *) output_items[1];
+      const unsigned char *in;
 
-            // create control stream for ofdm with trigger at start of frame and set zero
-            memset(triggerout, 0, noutput_items);
-            for(int i = 0; i < noutput_items/d_vlen_out; ++i) {
-                triggerout[i*d_vlen_out] = 1;
-            }
+      // create control stream for ofdm with trigger at start of frame and set zero
+      /*memset(triggerout, 0, noutput_items);
+      for (int i = 0; i < noutput_items / d_vlen_out; ++i) {
+        triggerout[i * d_vlen_out] = 1;
+      }*/
 
-            // write FIBs
-            in = (const unsigned char *) input_items[0];
-            for (int i = 0; i < noutput_items/d_vlen_out; ++i) {
-                memcpy(out + i * d_vlen_out, in, d_fic_len);
-                in += d_num_fibs*d_fib_len;
-            }
-            // write sub-channels
-            unsigned int cu_index = 0;
-            for (int j = 0; j < d_num_subch; ++j) {
-                in = (const unsigned char *) input_items[j+1];
-                for (int i = 0; i < noutput_items/d_vlen_out; ++i) {
-                    for (int k = 0; k < d_num_cifs; ++k) {
-                        memcpy(out + i*d_vlen_out + d_fic_len + k*d_cif_len + cu_index*d_cu_len, in + (i*d_num_cifs + k)*d_subch_size[j]*d_cu_len, d_subch_size[j] * d_cu_len);
-                        //printf("input %d, item %d, cif %d, in_adress %d, in_val %d, out_adress %d\n", j, i, k, (i*d_num_cifs + k)*d_subch_size[j]*d_cu_len, in[(i*d_num_cifs + k)*d_subch_size[j]*d_cu_len], i*d_vlen_out + d_fic_len + k*d_cif_len + cu_index*d_cu_len);
-                    }
-                }
-                cu_index += d_subch_size[j];
-            }
-            // fill remaining cus with padding
-            for (int i = 0; i < noutput_items/d_vlen_out; ++i) {
-                //memcpy(out + i*d_vlen_out + d_num_fibs*d_fib_len + d_subch_total_len*d_cu_len, d_prbs + d_subch_total_len*d_cu_len*8, (d_vlen_out - d_num_fibs*d_fib_len - d_subch_total_len*d_cu_len)*8);
-                for (int j = d_subch_total_len*d_cu_len; j < d_cif_len; ++j) {
-                    for (int k = 0; k < d_num_cifs; ++k) {
-                        out[i*d_vlen_out + d_num_fibs*d_fib_len + k*d_cif_len + j] = d_prbs[j];
-                    }
-                }
-            }
-
-            // Tell runtime system how many input items we consumed on
-            // each input stream.
-            consume(0, noutput_items/d_vlen_out * d_num_fibs*d_fib_len);
-            for (int j = 0; j < d_num_subch; ++j) {
-                consume(j+1, noutput_items/d_vlen_out * d_subch_size[j]*d_cu_len);
-            }
-
-            // Tell runtime system how many output items we produced.
-            return noutput_items;
+      // write FIBs
+      in = (const unsigned char *) input_items[0];
+      for (int i = 0; i < noutput_items / d_vlen_out; ++i) {
+        memcpy(out + i * d_vlen_out, in + d_fic_len, d_fic_len);
+        in += d_fic_len;
+      }
+      // write sub-channels
+      unsigned int cu_index = 0;
+      for (int j = 0; j < d_num_subch; ++j) {
+        in = (const unsigned char *) input_items[j + 1];
+        for (int i = 0; i < noutput_items / d_vlen_out; ++i) {
+          for (int k = 0; k < d_num_cifs; ++k) {
+            memcpy(out + i * d_vlen_out + d_fic_len + k * d_cif_len + cu_index * d_cu_len,
+                   in + (i * d_num_cifs + k) * d_subch_size[j] * d_cu_len, d_subch_size[j] * d_cu_len);
+            //printf("input %d, item %d, cif %d, in_adress %d, in_val %d, out_adress %d\n", j, i, k, (i*d_num_cifs + k)*d_subch_size[j]*d_cu_len, in[(i*d_num_cifs + k)*d_subch_size[j]*d_cu_len], i*d_vlen_out + d_fic_len + k*d_cif_len + cu_index*d_cu_len);
+          }
         }
+        cu_index += d_subch_size[j];
+      }
+      // fill remaining cus with padding
+      for (int i = 0; i < noutput_items / d_vlen_out; ++i) {
+        //memcpy(out + i*d_vlen_out + d_num_fibs*d_fib_len + d_subch_total_len*d_cu_len, d_prbs + d_subch_total_len*d_cu_len*8, (d_vlen_out - d_num_fibs*d_fib_len - d_subch_total_len*d_cu_len)*8);
+        for (int j = d_subch_total_len * d_cu_len; j < d_cif_len; ++j) {
+          for (int k = 0; k < d_num_cifs; ++k) {
+            out[i * d_vlen_out + d_fic_len + k * d_cif_len + j] = d_prbs[j];
+          }
+        }
+      }
 
-    } /* namespace dab */
+      // Tell runtime system how many input items we consumed on
+      // each input stream.
+      consume(0, noutput_items / d_vlen_out * d_fic_len);
+      for (int j = 0; j < d_num_subch; ++j) {
+        consume(j + 1, noutput_items / d_vlen_out * d_subch_size[j] * d_cu_len);
+      }
+
+      // Tell runtime system how many output items we produced.
+      return noutput_items;
+    }
+
+  } /* namespace dab */
 } /* namespace gr */

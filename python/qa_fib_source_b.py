@@ -38,7 +38,7 @@ class qa_fib_source_b (gr_unittest.TestCase):
         s2v = blocks.stream_to_vector(gr.sizeof_char, 32)
         crc16 = dab.crc16_bb(32, 0x1021, 0xffff)
         fibsink = dab.fib_sink_vb()
-        self.tb.connect(src, fib_unpacked_to_packed, blocks.head(gr.sizeof_char, 300), s2v, crc16, fibsink)
+        self.tb.connect(src, fib_unpacked_to_packed, blocks.head(gr.sizeof_char, 3000), s2v, crc16, fibsink)
         self.tb.run()
         pass
 

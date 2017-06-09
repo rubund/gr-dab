@@ -43,7 +43,7 @@ class msc_encode(gr.hier_block2):
 
         # convolutional encoder
         self.append_zeros = dab.append_bb_make(self.msc_I, self.msc_I + self.dp.conv_code_add_bits_input)
-        self.conv_encoder_config = fec.cc_encoder_make(self.msc_I, self.msc_I + self.dp.conv_code_add_bits_input, 7, 4, [91, 121, 101, 91], 0, fec.CC_STREAMING)
+        self.conv_encoder_config = fec.cc_encoder_make(self.msc_I + self.dp.conv_code_add_bits_input, 7, 4, [91, 121, 101, 91], 0, fec.CC_STREAMING)
         self.conv_encoder = fec.extended_encoder(self.conv_encoder_config, None, '1111')
 
         # calculate puncturing factors (EEP, table 33, 34)
@@ -73,7 +73,9 @@ class msc_encode(gr.hier_block2):
         self.puncture = dab.puncture_bb_make(self.assembled_msc_puncturing_sequence)
 
         # time interleaving
+        self.s2v_time_interleave = blocks.stream_to_vector_make(gr.sizeof_char, self.msc_punctured_codeword_length)
         self.time_interleaver = dab.time_interleave_bb_make(self.msc_punctured_codeword_length, self.dp.scrambling_vector)
+        self.v2s_time_interleave = blocks.vector_to_stream_make(gr.sizeof_char, self.msc_punctured_codeword_length)
 
         # pack bits
         self.unpacked_to_packed_encoded = blocks.unpacked_to_packed_bb_make(1, gr.GR_MSB_FIRST)
@@ -84,7 +86,9 @@ class msc_encode(gr.hier_block2):
                      self.append_zeros,
                      self.conv_encoder,
                      self.puncture,
+                     self.s2v_time_interleave,
                      self.time_interleaver,
+                     self.v2s_time_interleave,
                      self.unpacked_to_packed_encoded,
                      self)
 

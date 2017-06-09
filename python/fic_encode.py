@@ -27,17 +27,19 @@ class fic_encode(gr.hier_block2):
     """
     @brief block to encode the FIBs produced by FIB_source
 
-    -get bytes from FIB_source
+    -get unpacked bytes from FIB_source
     -crc16
     -energy dispersal
     -convolutional encoding
     -puncturing
+    -output packed bytes
     """
     def __init__(self, dab_params):
-        gr.hier_block2.__init__(self,
-            "fic_encode",
-            gr.io_signature(1, 1, gr.sizeof_char),  # Input signature
-            gr.io_signature(1, 1, gr.sizeof_char)) # Output signature
+        gr.hier_block2.__init__(self, "fic_encode",
+                                gr.io_signature(1, 1, gr.sizeof_char),
+                                # Input signature
+                                gr.io_signature(1, 1, gr.sizeof_char))
+                                # Output signature
         self.dp = dab_params
 
         # crc
@@ -53,7 +55,7 @@ class fic_encode(gr.hier_block2):
 
         # convolutional encoder
         self.append_zeros = dab.append_bb_make(768, self.dp.energy_dispersal_fic_vector_length + self.dp.conv_code_add_bits_input)
-        self.conv_encoder_config = fec.cc_encoder_make(self.dp.energy_dispersal_fic_vector_length + self.dp.conv_code_add_bits_input, 7, 4, [91, 121, 101, 91], 0, fec.CC_STREAMING)
+        self.conv_encoder_config = fec.cc_encoder_make(self.dp.energy_dispersal_fic_vector_length + self.dp.conv_code_add_bits_input, 7, 4, [0133, 0171, 0145, 0133], 0, fec.CC_STREAMING)
         self.conv_encoder = fec.extended_encoder(self.conv_encoder_config, None, '1111')
 
         # puncturing
@@ -66,19 +68,19 @@ class fic_encode(gr.hier_block2):
         self.s2v_decoded = blocks.vector_to_stream_make(gr.sizeof_char, self.dp.fic_punctured_codeword_length/8)
 
         # connect everything
-        self.connect(self,
+        self.connect((self, 0),
                      self.unpacked_to_packed_crc,
                      self.s2v_crc,
                      self.crc16,
                      self.v2s_crc,
                      self.packed_to_unpacked_crc,
-                     (self.add_mod_2, 1),
+                     (self.add_mod_2, 0),
                      self.append_zeros,
                      self.conv_encoder,
                      self.puncture,
-                     self.unpacked_to_packed_encoded,
-                     self.s2v_decoded,
-                     self)
+                     self.unpacked_to_packed_encoded)
+                     #self.s2v_decoded,
+        self.connect(self.unpacked_to_packed_encoded, self)
 
         #connect prbs
         self.connect(self.prbs_src, (self.add_mod_2, 1))
