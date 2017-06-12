@@ -58,7 +58,9 @@ list(APPEND dab_sources
     unpuncture_ff_impl.cc
     prune_impl.cc
     firecode-checker.cpp
-    firecode_check_bb_impl.cc )
+    firecode_check_bb_impl.cc
+    mp4_decode_bb_impl.cc
+    reed_solomon_bb_impl.cc )
 
 set(dab_sources "${dab_sources}" PARENT_SCOPE)
 if(NOT dab_sources)

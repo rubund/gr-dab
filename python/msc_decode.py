@@ -33,7 +33,7 @@ class msc_decode(gr.hier_block2):
     - do time deinterleaving
     - do convolutional decoding
     - undo energy dispersal
-    - output data stream of one subchannel
+    - output data stream of one subchannel (packed bytes)
     """
 
     def __init__(self, dab_params, address, size, protection, verbose=False, debug=True):

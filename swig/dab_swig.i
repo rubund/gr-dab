@@ -40,6 +40,8 @@
 #include "dab/unpuncture_ff.h"
 #include "dab/prune.h"
 #include "dab/firecode_check_bb.h"
+#include "dab/mp4_decode_bb.h"
+#include "dab/reed_solomon_bb.h"
 %}
 
 
@@ -108,3 +110,7 @@ GR_SWIG_BLOCK_MAGIC2(dab, unpuncture_ff);
 GR_SWIG_BLOCK_MAGIC2(dab, prune);
 %include "dab/firecode_check_bb.h"
 GR_SWIG_BLOCK_MAGIC2(dab, firecode_check_bb);
+%include "dab/mp4_decode_bb.h"
+GR_SWIG_BLOCK_MAGIC2(dab, mp4_decode_bb);
+%include "dab/reed_solomon_bb.h"
+GR_SWIG_BLOCK_MAGIC2(dab, reed_solomon_bb);
