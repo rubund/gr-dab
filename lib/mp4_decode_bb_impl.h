@@ -22,8 +22,9 @@
 #define INCLUDED_DAB_MP4_DECODE_BB_IMPL_H
 
 #include <dab/mp4_decode_bb.h>
-#include	"dab-constants.h"
-#include	"faad-decoder.h"
+#include "dab-constants.h"
+#include "faad-decoder.h"
+#include "neaacdec.h"
 
 namespace gr {
   namespace dab {

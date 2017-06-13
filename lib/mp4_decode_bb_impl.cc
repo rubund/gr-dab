@@ -120,12 +120,79 @@ namespace gr {
                                            &channels);
       if (init_result != 0) {
 /*      If some error initializing occured, skip the file */
-        printf("Error initializing decoder library: %s\n",
-               NeAACDecGetErrorMessage(-init_result));
+        GR_LOG_ERROR(d_logger, "Error initializing decoding library");
         NeAACDecClose(aacHandle);
         return false;
       }
       return true;
+    }
+
+
+    int16_t mp4_decode_bb_impl::MP42PCM (uint8_t   dacRate,
+                                  uint8_t   sbrFlag,
+                                  int16_t   mpegSurround,
+                                  uint8_t   aacChannelMode,
+                                  uint8_t   buffer [],
+                                  int16_t   bufferLength) {
+      int16_t samples;
+      long unsigned int       sampleRate;
+      int16_t *outBuffer;
+      NeAACDecFrameInfo       hInfo;
+      uint8_t dummy   [10000];
+      uint8_t channels;
+
+      if (!aacInitialized) {
+        if (!initialize (dacRate, sbrFlag, mpegSurround, aacChannelMode))
+          return 0;
+        aacInitialized = true;
+      }
+
+      outBuffer = (int16_t *)NeAACDecDecode (aacHandle,
+                                             &hInfo, buffer, bufferLength);
+      sampleRate      = hInfo. samplerate;
+
+      sampleRate      = hInfo. samplerate;
+      samples         = hInfo. samples;
+      if ((sampleRate == 24000) ||
+          (sampleRate == 32000) ||
+          (sampleRate == 48000) ||
+          (sampleRate !=  (long unsigned)baudRate))
+        baudRate = sampleRate;
+
+//      fprintf (stderr, "bytes consumed %d\n", (int)(hInfo. bytesconsumed));
+//      fprintf (stderr, "samplerate = %d, samples = %d, channels = %d, error = %d, sbr = %d\n", sampleRate, samples,
+//               hInfo. channels,
+//               hInfo. error,
+//               hInfo. sbr);
+//      fprintf (stderr, "header = %d\n", hInfo. header_type);
+      channels        = hInfo. channels;
+      if (hInfo. error != 0) {
+        fprintf (stderr, "Warning: %s\n",
+                 faacDecGetErrorMessage (hInfo. error));
+        return 0;
+      }
+
+      if (channels == 2) {
+        audioBuffer  -> putDataIntoBuffer (outBuffer, samples);
+        if (audioBuffer -> GetRingBufferReadAvailable () > sampleRate / 8)
+          newAudio (sampleRate);
+      }
+      else
+      if (channels == 1) {
+        int16_t *buffer = (int16_t *)alloca (2 * samples);
+        int16_t i;
+        for (i = 0; i < samples; i ++) {
+          buffer [2 * i]    = ((int16_t *)outBuffer) [i];
+          buffer [2 * i + 1] = buffer [2 * i];
+        }
+        audioBuffer  -> putDataIntoBuffer (buffer, samples);
+        if (audioBuffer -> GetRingBufferReadAvailable () > sampleRate / 8)
+          newAudio (sampleRate);
+      }
+      else
+        GR_LOG_ERROR(d_logger, "Cannot handle these channels");
+
+      return samples / 2;
     }
 
     void mp4_decode_bb_impl::handle_aac_frame(uint8_t *v,
@@ -149,7 +216,7 @@ namespace gr {
         //my_padhandler. processPAD (buffer, count - 3, L1, L0);
       }
 
-      int tmp = aacDecoder.MP42PCM(dacRate,
+      int tmp = MP42PCM(dacRate,
                                    sbrFlag,
                                    mpegSurround,
                                    aacChannelMode,
