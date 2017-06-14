@@ -59,5 +59,6 @@ install(FILES
     dab_append_bb.xml
     dab_puncture_bb.xml
     dab_msc_encode.xml
-    dab_dab_transmission_frame_mux_bb.xml DESTINATION share/gnuradio/grc/blocks
+    dab_dab_transmission_frame_mux_bb.xml
+    dab_transmitter_c.xml DESTINATION share/gnuradio/grc/blocks
 )

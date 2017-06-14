@@ -25,7 +25,14 @@ import dab
 
 class msc_encode(gr.hier_block2):
     """
-    docstring for block msc_encode
+    @brief block to encode the logical frames of a sub-channel produced by an MPEG source
+
+    -get unpacked bytes from source
+    -energy dispersal
+    -convolutional encoding
+    -puncturing
+    -time interleaving
+    -output packed bytes
     """
     def __init__(self, dab_params, data_rate_n, protection):
         gr.hier_block2.__init__(self,
@@ -42,8 +49,8 @@ class msc_encode(gr.hier_block2):
         self.add_mod_2 = blocks.xor_bb()
 
         # convolutional encoder
-        self.append_zeros = dab.append_bb_make(self.msc_I, self.msc_I + self.dp.conv_code_add_bits_input)
-        self.conv_encoder_config = fec.cc_encoder_make(self.msc_I + self.dp.conv_code_add_bits_input, 7, 4, [91, 121, 101, 91], 0, fec.CC_STREAMING)
+        #self.append_zeros = dab.append_bb_make(self.msc_I, self.msc_I + self.dp.conv_code_add_bits_input)
+        self.conv_encoder_config = fec.cc_encoder_make(self.msc_I + self.dp.conv_code_add_bits_input, 7, 4, [91, 121, 101, 91], 0, fec.CC_TERMINATED)
         self.conv_encoder = fec.extended_encoder(self.conv_encoder_config, None, '1111')
 
         # calculate puncturing factors (EEP, table 33, 34)
@@ -83,7 +90,7 @@ class msc_encode(gr.hier_block2):
         # connect everything
         self.connect(self,
                      self.add_mod_2,
-                     self.append_zeros,
+                     #self.append_zeros,
                      self.conv_encoder,
                      self.puncture,
                      self.s2v_time_interleave,

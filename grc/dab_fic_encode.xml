@@ -4,12 +4,28 @@
   <key>dab_fic_encode</key>
   <category>dab</category>
   <import>import dab</import>
-  <make>dab.fic_encode($dab_params)</make>
+  <make>dab.msc_encode(dab.parameters.dab_parameters(mode=$dab_mode, sample_rate=$samp_rate, verbose=False))</make>
   <param>
     <name>DAB Mode</name>
     <key>dab_mode</key>
     <value>1</value>
     <type>int</type>
+    <option>
+    	<name>Mode 1</name>
+    	<key>1</key>
+    </option>
+    <option>
+    	<name>Mode 2</name>
+    	<key>2</key>
+    </option>
+    <option>
+    	<name>Mode 3</name>
+    	<key>3</key>
+    </option>
+    <option>
+    	<name>Mode 4</name>
+    	<key>4</key>
+    </option>
   </param>
   <param>
     <name>Sampling Rate</name>

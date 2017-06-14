@@ -43,10 +43,10 @@ class fic_encode(gr.hier_block2):
         self.dp = dab_params
 
         # crc
-        #self.unpacked_to_packed_crc = blocks.unpacked_to_packed_bb_make(1, gr.GR_MSB_FIRST)
-        #self.s2v_crc = blocks.stream_to_vector(gr.sizeof_char, 32)
-        #self.crc16 = dab.crc16_bb(32, 0x1021, 0xffff)
-        #self.v2s_crc = blocks.vector_to_stream(gr.sizeof_char, 32)
+        self.unpacked_to_packed_crc = blocks.unpacked_to_packed_bb_make(1, gr.GR_MSB_FIRST)
+        self.s2v_crc = blocks.stream_to_vector(gr.sizeof_char, 32)
+        self.crc16 = dab.crc16_bb(32, 0x1021, 0xffff)
+        self.v2s_crc = blocks.vector_to_stream(gr.sizeof_char, 32)
         self.packed_to_unpacked_crc = blocks.packed_to_unpacked_bb_make(1, gr.GR_MSB_FIRST)
 
         # energy dispersal
@@ -64,22 +64,19 @@ class fic_encode(gr.hier_block2):
         # pack bits
         self.unpacked_to_packed_encoded = blocks.unpacked_to_packed_bb_make(1, gr.GR_MSB_FIRST)
 
-        # stream to FIB group vectors
-        #self.s2v_decoded = blocks.vector_to_stream_make(gr.sizeof_char, self.dp.fic_punctured_codeword_length/8)
 
         # connect everything
         self.connect((self, 0),
-                     #self.unpacked_to_packed_crc,
-                     #self.s2v_crc,
-                     #self.crc16,
-                     #self.v2s_crc,
-                     #self.packed_to_unpacked_crc,
+                     self.unpacked_to_packed_crc,
+                     self.s2v_crc,
+                     self.crc16,
+                     self.v2s_crc,
+                     self.packed_to_unpacked_crc,
                      (self.add_mod_2, 0),
                      #self.append_zeros,
                      self.conv_encoder,
                      self.puncture,
                      self.unpacked_to_packed_encoded,
-                     #self.s2v_decoded,
                      self)
 
         #connect prbs

@@ -39,7 +39,8 @@ GR_PYTHON_INSTALL(
     fic.py
     msc_decode.py
     fic_encode.py
-    msc_encode.py DESTINATION ${GR_PYTHON_DIR}/dab
+    msc_encode.py
+    transmitter_c.py DESTINATION ${GR_PYTHON_DIR}/dab
 )
 
 ########################################################################
