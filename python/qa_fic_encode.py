@@ -38,7 +38,8 @@ class qa_fic_encode (gr_unittest.TestCase):
 
         # source
         self.dp = dab.parameters.dab_parameters(1, 208.064e6, True)
-        self.source = blocks.file_source_make(gr.sizeof_gr_complex, "debug/170524/ofdm_deinterleaved.dat")
+        self.fib_src = dab.fib_source_b_make(1, 1, "ensemble1", "service1", "bla", 4, 2, 15)
+        #self.source = blocks.file_source_make(gr.sizeof_gr_complex, "debug/170524/ofdm_deinterleaved.dat")
 
         # encoder
         self.fib_enc = dab.fic_encode(self.dab_params)
@@ -46,7 +47,7 @@ class qa_fic_encode (gr_unittest.TestCase):
         # mapper
         self.s2v_map = blocks.stream_to_vector_make(gr.sizeof_char, self.dp.fic_punctured_codeword_length)
         self.map = dab.qpsk_mapper_vbc_make(self.dp.fic_punctured_codeword_length*4)
-        self.v2s_map = blocks.vector_to_stream_make(gr.sizeof_gr_complex, self.dp.fic_punctured_codeword_length*4)
+        #self.v2s_map = blocks.vector_to_stream_make(gr.sizeof_gr_complex, self.dp.fic_punctured_codeword_length*4)
 
         # demapper
         self.soft_interleaver = dab.complex_to_interleaved_float_vcf_make(self.dp.fic_punctured_codeword_length*4)
@@ -54,10 +55,10 @@ class qa_fic_encode (gr_unittest.TestCase):
 
         # decode
         self.s2v_fic_dec = blocks.stream_to_vector_make(gr.sizeof_float, 3072)
-        #self.fic_decoder = dab.fic_decode(self.dab_params)
+        self.fic_decoder = dab.fic_decode(self.dab_params)
 
         # control stream
-        #self.trigger_src = blocks.vector_source_b([1] + [0]*(74), True)
+        self.trigger_src = blocks.vector_source_b([1] + [0]*(74), True)
 
 
 
@@ -67,19 +68,17 @@ class qa_fic_encode (gr_unittest.TestCase):
         #self.file_sink = blocks.file_sink_make(gr.sizeof_gr_complex, "debug/170524/.dat")
         self.sink = blocks.vector_sink_c()
 
-        self.tb.connect(self.source,
-                        blocks.head_make(gr.sizeof_gr_complex, 31310),
-                        #self.fib_src_unpack,
-                        #self.fib_enc,
-                        #self.s2v_map,
-                        #self.map,
+        self.tb.connect(self.fib_src,
+                        blocks.head_make(gr.sizeof_char, 10000000),
+                        self.fib_enc,
+                        self.s2v_map,
+                        self.map,
                         #self.v2s_map,
-                        #self.soft_interleaver,
-                        #self.v2s_interleave,
-                        #self.s2v_fic_dec,
-                        #self.fic_decoder
-                        self.sink)
-        #self.tb.connect(self.trigger_src, (self.fic_decoder, 1))
+                        self.soft_interleaver,
+                        self.v2s_interleave,
+                        self.s2v_fic_dec,
+                        self.fic_decoder)
+        self.tb.connect(self.trigger_src, (self.fic_decoder, 1))
 
 
         self.tb.run ()
