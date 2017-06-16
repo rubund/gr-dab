@@ -46,7 +46,7 @@ namespace gr {
        * class. dab::mp4_decode_bb::make is the public interface for
        * creating new instances.
        */
-      static sptr make();
+      static sptr make(int bit_rate_n);
     };
 
   } // namespace dab

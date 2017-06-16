@@ -23,37 +23,56 @@
 
 #include <dab/mp4_decode_bb.h>
 #include "dab-constants.h"
-#include "faad-decoder.h"
 #include "neaacdec.h"
 
 namespace gr {
   namespace dab {
 
-    class mp4_decode_bb_impl : public mp4_decode_bb
-    {
-     private:
+    class mp4_decode_bb_impl : public mp4_decode_bb {
+    private:
+      int offset;
       int d_bit_rate_n;
       int d_superframe_size;
+      bool aacInitialized;
       uint8_t d_dac_rate, d_sbr_flag, d_aac_channel_mode, d_ps_flag, d_mpeg_surround, d_num_aus;
       uint8_t d_au_start[7];
+      int32_t baudRate;
+      NeAACDecHandle aacHandle;
+
+      int get_aac_channel_configuration(int16_t m_mpeg_surround_config, uint8_t aacChannelMode);
+      bool initialize(uint8_t dacRate,
+                      uint8_t sbrFlag,
+                      int16_t mpegSurround,
+                      uint8_t aacChannelMode);
+
       void handle_aac_frame(uint8_t *v,
                             int16_t frame_length,
-                            uint8_t	dacRate,
-                            uint8_t	sbrFlag,
-                            uint8_t	mpegSurround,
-                            uint8_t	aacChannelMode);
+                            uint8_t dacRate,
+                            uint8_t sbrFlag,
+                            uint8_t mpegSurround,
+                            uint8_t aacChannelMode,
+                            int* out_sample);
 
-     public:
-      mp4_decode_bb_impl();
+      int16_t MP42PCM(uint8_t dacRate,
+                      uint8_t sbrFlag,
+                      int16_t mpegSurround,
+                      uint8_t aacChannelMode,
+                      uint8_t buffer[],
+                      int16_t bufferLength,
+                      int* out_sample);
+
+    public:
+      mp4_decode_bb_impl(int bit_rate_n);
+
       ~mp4_decode_bb_impl();
 
       // Where all the action really happens
-      void forecast (int noutput_items, gr_vector_int &ninput_items_required);
+      void forecast(int noutput_items, gr_vector_int &ninput_items_required);
 
       int general_work(int noutput_items,
-           gr_vector_int &ninput_items,
-           gr_vector_const_void_star &input_items,
-           gr_vector_void_star &output_items);
+                       gr_vector_int &ninput_items,
+                       gr_vector_const_void_star &input_items,
+                       gr_vector_void_star &output_items);
     };
 
   } // namespace dab

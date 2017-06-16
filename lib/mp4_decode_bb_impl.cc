@@ -38,14 +38,17 @@ namespace gr {
     /*
      * The private constructor
      */
-    mp4_decode_bb_impl::mp4_decode_bb_impl()
+    mp4_decode_bb_impl::mp4_decode_bb_impl(int bit_rate_n)
             : gr::block("mp4_decode_bb",
                         gr::io_signature::make(1, 1, sizeof(unsigned char)),
-                        gr::io_signature::make(1, 1, sizeof(unsigned char))),
-              d_bit_rate_n(d_bit_rate_n)
+                        gr::io_signature::make(1, 1, sizeof(int))),
+              d_bit_rate_n(bit_rate_n)
     {
-      set_output_multiple(); //TODO: set PCM output_multiple
+      set_output_multiple(bit_rate_n * 110);
       d_superframe_size = bit_rate_n * 110;
+      aacInitialized = false;
+      baudRate = 48000;
+      aacHandle = NeAACDecOpen ();
     }
 
     /*
@@ -58,12 +61,11 @@ namespace gr {
     void
     mp4_decode_bb_impl::forecast(int noutput_items, gr_vector_int &ninput_items_required)
     {
-      /* <+forecast+> e.g. ninput_items_required[0] = noutput_items */
+      ninput_items_required[0] = noutput_items;
     }
 
 
-    int mp4_decode_bb_impl::get_aac_channel_configuration(int16_t m_mpeg_surround_config,
-                                                          uint8_t aacChannelMode)
+    int mp4_decode_bb_impl::get_aac_channel_configuration(int16_t m_mpeg_surround_config, uint8_t aacChannelMode)
     {
       switch (m_mpeg_surround_config) {
         case 0:     // no surround
@@ -78,9 +80,9 @@ namespace gr {
     }
 
     bool mp4_decode_bb_impl::initialize(uint8_t dacRate,
-                                 uint8_t sbrFlag,
-                                 int16_t mpegSurround,
-                                 uint8_t aacChannelMode)
+                                        uint8_t sbrFlag,
+                                        int16_t mpegSurround,
+                                        uint8_t aacChannelMode)
     {
       long unsigned int sample_rate;
       uint8_t channels;
@@ -128,35 +130,37 @@ namespace gr {
     }
 
 
-    int16_t mp4_decode_bb_impl::MP42PCM (uint8_t   dacRate,
-                                  uint8_t   sbrFlag,
-                                  int16_t   mpegSurround,
-                                  uint8_t   aacChannelMode,
-                                  uint8_t   buffer [],
-                                  int16_t   bufferLength) {
+    int16_t mp4_decode_bb_impl::MP42PCM(uint8_t dacRate,
+                                        uint8_t sbrFlag,
+                                        int16_t mpegSurround,
+                                        uint8_t aacChannelMode,
+                                        uint8_t buffer[],
+                                        int16_t bufferLength,
+                                        int *out_sample)
+    {
       int16_t samples;
-      long unsigned int       sampleRate;
+      long unsigned int sampleRate;
       int16_t *outBuffer;
-      NeAACDecFrameInfo       hInfo;
-      uint8_t dummy   [10000];
+      NeAACDecFrameInfo hInfo;
+      uint8_t dummy[10000];
       uint8_t channels;
 
       if (!aacInitialized) {
-        if (!initialize (dacRate, sbrFlag, mpegSurround, aacChannelMode))
+        if (!initialize(dacRate, sbrFlag, mpegSurround, aacChannelMode))
           return 0;
         aacInitialized = true;
       }
 
-      outBuffer = (int16_t *)NeAACDecDecode (aacHandle,
+      outBuffer = (int16_t *) NeAACDecDecode(aacHandle,
                                              &hInfo, buffer, bufferLength);
-      sampleRate      = hInfo. samplerate;
+      sampleRate = hInfo.samplerate;
 
-      sampleRate      = hInfo. samplerate;
-      samples         = hInfo. samples;
+      sampleRate = hInfo.samplerate;
+      samples = hInfo.samples;
       if ((sampleRate == 24000) ||
           (sampleRate == 32000) ||
           (sampleRate == 48000) ||
-          (sampleRate !=  (long unsigned)baudRate))
+          (sampleRate != (long unsigned) baudRate))
         baudRate = sampleRate;
 
 //      fprintf (stderr, "bytes consumed %d\n", (int)(hInfo. bytesconsumed));
@@ -165,33 +169,37 @@ namespace gr {
 //               hInfo. error,
 //               hInfo. sbr);
 //      fprintf (stderr, "header = %d\n", hInfo. header_type);
-      channels        = hInfo. channels;
-      if (hInfo. error != 0) {
-        fprintf (stderr, "Warning: %s\n",
-                 faacDecGetErrorMessage (hInfo. error));
+      channels = hInfo.channels;
+      if (hInfo.error != 0) {
+        fprintf(stderr, "Warning: %s\n",
+                faacDecGetErrorMessage(hInfo.error));
         return 0;
       }
 
       if (channels == 2) {
-        audioBuffer  -> putDataIntoBuffer (outBuffer, samples);
-        if (audioBuffer -> GetRingBufferReadAvailable () > sampleRate / 8)
-          newAudio (sampleRate);
-      }
-      else
-      if (channels == 1) {
-        int16_t *buffer = (int16_t *)alloca (2 * samples);
-        int16_t i;
-        for (i = 0; i < samples; i ++) {
-          buffer [2 * i]    = ((int16_t *)outBuffer) [i];
-          buffer [2 * i + 1] = buffer [2 * i];
+        //audioBuffer  -> putDataIntoBuffer (outBuffer, samples);
+        for (int n = 0; n < samples; n++) {
+          out_sample[n + offset] = (int) outBuffer[n];
         }
-        audioBuffer  -> putDataIntoBuffer (buffer, samples);
-        if (audioBuffer -> GetRingBufferReadAvailable () > sampleRate / 8)
-          newAudio (sampleRate);
-      }
-      else
+        /*if (audioBuffer -> GetRingBufferReadAvailable () > sampleRate / 8)
+          newAudio (sampleRate);*/
+      } else if (channels == 1) {
+        int16_t *buffer = (int16_t *) alloca(2 * samples);
+        int16_t i;
+        for (i = 0; i < samples; i++) {
+          buffer[2 * i] = ((int16_t *) outBuffer)[i];
+          buffer[2 * i + 1] = buffer[2 * i];
+        }
+        //audioBuffer  -> putDataIntoBuffer (buffer, samples);
+        for (int n = 0; n < samples; n++) {
+          out_sample[n + offset] = (int) buffer[n];
+        }
+        /*if (audioBuffer -> GetRingBufferReadAvailable () > sampleRate / 8)
+          newAudio (sampleRate);*/
+      } else
         GR_LOG_ERROR(d_logger, "Cannot handle these channels");
 
+      offset += samples / 2;
       return samples / 2;
     }
 
@@ -200,7 +208,8 @@ namespace gr {
                                               uint8_t dacRate,
                                               uint8_t sbrFlag,
                                               uint8_t mpegSurround,
-                                              uint8_t aacChannelMode)
+                                              uint8_t aacChannelMode,
+                                              int *out_sample)
     {
       uint8_t theAudioUnit[2 * 960 + 10];  // sure, large enough
 
@@ -217,11 +226,12 @@ namespace gr {
       }
 
       int tmp = MP42PCM(dacRate,
-                                   sbrFlag,
-                                   mpegSurround,
-                                   aacChannelMode,
-                                   theAudioUnit,
-                                   frame_length);
+                        sbrFlag,
+                        mpegSurround,
+                        aacChannelMode,
+                        theAudioUnit,
+                        frame_length,
+                        out_sample);
       //*error	= tmp == 0;
     }
 
@@ -234,8 +244,9 @@ namespace gr {
     {
       const unsigned char *in = (const unsigned char *) input_items[0];
       unsigned char *out = (unsigned char *) output_items[0];
+      offset = 0;
 
-      for (int n = 0; n < noutput_items / (bit_rate_n * 110), n++) {
+      for (int n = 0; n < noutput_items / (d_bit_rate_n * 110); n++) {
         //process superframe header
         //	bits 0 .. 15 is firecode
         //	bit 16 is unused
@@ -282,44 +293,45 @@ namespace gr {
             d_au_start[3] = d_superframe_size;
             break;
         }
-      }
+
 
 /**
   *	OK, the result is N * 110 * 8 bits (still single bit per byte!!!)
   *	extract the AU's, and prepare a buffer,  with the sufficient
   *	lengthy for conversion to PCM samples
   */
-      for (int i = 0; i < d_num_aus; i++) {
-        int16_t aac_frame_length;
+        for (int i = 0; i < d_num_aus; i++) {
+          int16_t aac_frame_length;
 
-        // sanity check 1
-        if (d_au_start[i + 1] < d_au_start[i]) {
-          GR_LOG_ERROR(d_logger, "au start address wrong");
-          // should not happen, all errors were corrected
+          // sanity check 1
+          if (d_au_start[i + 1] < d_au_start[i]) {
+            GR_LOG_ERROR(d_logger, "au start address wrong");
+            // should not happen, all errors were corrected
+          }
+
+          aac_frame_length = d_au_start[i + 1] - d_au_start[i] - 2;
+          // just a sanity check
+          if ((aac_frame_length >= 960) || (aac_frame_length < 0)) {
+            GR_LOG_WARN(d_logger, "aac frame length not in range");
+          }
+
+          // first the crc check
+          if (check_crc_bytes(&in[d_au_start[i]],
+                              aac_frame_length)) {
+            handle_aac_frame(&in[n * d_superframe_size + d_au_start[i]],
+                             aac_frame_length,
+                             d_dac_rate,
+                             d_sbr_flag,
+                             d_mpeg_surround,
+                             d_aac_channel_mode,
+                             out);
+
+          } else {
+            GR_LOG_DEBUG(d_logger, "CRC failure with dab+ frame");
+          }
         }
 
-        aac_frame_length = d_au_start[i + 1] - d_au_start[i] - 2;
-        // just a sanity check
-        if ((aac_frame_length >= 960) || (aac_frame_length < 0)) {
-          GR_LOG_WARN(d_logger, "aac frame length not in range");
-        }
-
-        // first the crc check
-        if (check_crc_bytes(&in[au_start[i]],
-                            aac_frame_length)) {
-          handle_aacFrame(&in[n * d_superframe_size + au_start[i]],
-                          aac_frame_length,
-                          d_dac_rate,
-                          d_sbr_flag,
-                          d_mpeg_surround,
-                          d_aac_channel_mode);
-
-        } else {
-          GR_LOG_DEBUG(d_logger, "CRC failure with dab+ frame");
-        }
       }
-
-
 
 
       // Tell runtime system how many input items we consumed on
@@ -327,7 +339,7 @@ namespace gr {
       consume_each(noutput_items);
 
       // Tell runtime system how many output items we produced.
-      return noutput_items;
+      return offset;
     }
 
   } /* namespace dab */
