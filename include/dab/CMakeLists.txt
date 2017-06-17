@@ -54,6 +54,5 @@ install(FILES
     unpuncture_ff.h
     prune.h
     firecode_check_bb.h
-    mp4_decode_bb.h
     reed_solomon_bb.h DESTINATION include/dab
 )

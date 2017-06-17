@@ -23,7 +23,7 @@ from gnuradio import gr, gr_unittest
 from gnuradio import blocks
 import dab_swig as dab
 
-class qa_mp4_decode_bb (gr_unittest.TestCase):
+class qa_reed_solomon_bb (gr_unittest.TestCase):
 
     def setUp (self):
         self.tb = gr.top_block ()
@@ -38,4 +38,4 @@ class qa_mp4_decode_bb (gr_unittest.TestCase):
 
 
 if __name__ == '__main__':
-    gr_unittest.run(qa_mp4_decode_bb, "qa_mp4_decode_bb.xml")
+    gr_unittest.run(qa_reed_solomon_bb, "qa_reed_solomon_bb.xml")

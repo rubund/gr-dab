@@ -22,7 +22,8 @@
 #define INCLUDED_DAB_REED_SOLOMON_BB_IMPL_H
 
 #include <dab/reed_solomon_bb.h>
-#include	"reed-solomon.h"
+#include "reed-solomon.h"
+#include "firecode-checker.h"
 
 namespace gr {
   namespace dab {
@@ -34,14 +35,14 @@ namespace gr {
  */
     class reed_solomon_bb_impl : public reed_solomon_bb
     {
-     private:
+    private:
       int d_bit_rate_n;
       reedSolomon	my_rs_decoder;
       int d_nproduced;
       uint8_t d_rs_in [120];
       uint8_t d_rs_out [110];
 
-     public:
+    public:
       reed_solomon_bb_impl(int bit_rate_n);
       ~reed_solomon_bb_impl();
 
@@ -49,9 +50,9 @@ namespace gr {
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
 
       int general_work(int noutput_items,
-           gr_vector_int &ninput_items,
-           gr_vector_const_void_star &input_items,
-           gr_vector_void_star &output_items);
+                       gr_vector_int &ninput_items,
+                       gr_vector_const_void_star &input_items,
+                       gr_vector_void_star &output_items);
     };
 
   } // namespace dab
