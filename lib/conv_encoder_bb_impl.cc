@@ -1,6 +1,10 @@
 /* -*- c++ -*- */
-/* 
- * Copyright 2017 <+YOU OR YOUR COMPANY+>.
+/*
+   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 Her Majesty
+   the Queen in Right of Canada (Communications Research Center Canada)
+ */
+/*
+ * This file is adopted from ODR-DabMod.
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

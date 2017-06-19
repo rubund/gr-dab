@@ -35,7 +35,11 @@ class data_printer (gr_unittest.TestCase):
     def test_001_t (self):
         self.dp = dab.parameters.dab_parameters(1, 208.064e6, True)
         self.source = blocks.file_source_make(gr.sizeof_gr_complex, "debug/170531/single_vectors/complex_symbols.dat")
-
+        data02 = (
+        0x05, 0x00, 0x10, 0xEA, 0x04, 0x24, 0x06, 0x02, 0xD3, 0xA6, 0x01, 0x3F, 0x06, 0xFF, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4C, 0x89)
+        src = blocks.vector_source_b(data02, True)
+        
         # encoder
         self.conv_encoder_config = fec.cc_encoder_make(self.dp.energy_dispersal_fic_vector_length, 7, 4, [91, 121, 101, 91], 0, fec.CC_TERMINATED)
         self.conv_encoder = fec.extended_encoder(self.conv_encoder_config, None, "1")
