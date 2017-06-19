@@ -4,7 +4,7 @@
    the Queen in Right of Canada (Communications Research Center Canada)
  */
 /*
- * This file is adopted from ODR-DabMod.
+ * The content of this class is mostly adopted from ODR-DabMod.
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
