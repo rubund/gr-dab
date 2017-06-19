@@ -55,8 +55,11 @@ class fic_encode(gr.hier_block2):
 
         # convolutional encoder
         #self.append_zeros = dab.append_bb_make(768, self.dp.energy_dispersal_fic_vector_length + self.dp.conv_code_add_bits_input)
-        self.conv_encoder_config = fec.cc_encoder_make(self.dp.energy_dispersal_fic_vector_length, 7, 4, [91, 121, 101, 91], 0, fec.CC_TERMINATED)
-        self.conv_encoder = fec.extended_encoder(self.conv_encoder_config, None, "1")
+        #self.conv_encoder_config = fec.cc_encoder_make(self.dp.energy_dispersal_fic_vector_length, 7, 4, [91, 121, 101, 91], 0, fec.CC_TERMINATED)
+        #self.conv_encoder = fec.extended_encoder(self.conv_encoder_config, None, "1")
+        self.conv_pack = blocks.unpacked_to_packed_bb_make(1, gr.GR_MSB_FIRST)
+        self.conv_encoder = dab.conv_encoder_bb_make(self.dp.energy_dispersal_fic_vector_length/8)
+        self.conv_unpack = blocks.packed_to_unpacked_bb_make(1, gr.GR_MSB_FIRST)
 
         # puncturing
         self.puncture = dab.puncture_bb_make(self.dp.assembled_fic_puncturing_sequence)
@@ -74,7 +77,9 @@ class fic_encode(gr.hier_block2):
                      self.packed_to_unpacked_crc,
                      (self.add_mod_2, 0),
                      #self.append_zeros,
+                     self.conv_pack,
                      self.conv_encoder,
+                     self.conv_unpack,
                      self.puncture,
                      self.unpacked_to_packed_encoded,
                      self)

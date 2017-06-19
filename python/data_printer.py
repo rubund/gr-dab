@@ -34,7 +34,11 @@ class data_printer (gr_unittest.TestCase):
 
     def test_001_t (self):
         self.dp = dab.parameters.dab_parameters(1, 208.064e6, True)
-        self.source = blocks.file_source_make(gr.sizeof_char, "debug/170524/.dat")
+        self.source = blocks.file_source_make(gr.sizeof_gr_complex, "debug/170531/single_vectors/complex_symbols.dat")
+
+        # encoder
+        self.conv_encoder_config = fec.cc_encoder_make(self.dp.energy_dispersal_fic_vector_length, 7, 4, [91, 121, 101, 91], 0, fec.CC_TERMINATED)
+        self.conv_encoder = fec.extended_encoder(self.conv_encoder_config, None, "1")
 
         # hard bit demapper
         self.s2v = blocks.stream_to_vector_make(gr.sizeof_gr_complex, self.dp.num_carriers)
@@ -46,11 +50,14 @@ class data_printer (gr_unittest.TestCase):
         self.unpuncture = dab.unpuncture_ff_make(self.dp.assembled_fic_puncturing_sequence)
         self.f2b = blocks.float_to_char_make()
 
+        # pack / unpack
+        self.packed2unpacked = blocks.packed_to_unpacked_bb_make(1, gr.GR_MSB_FIRST)
 
 
-        self.file_sink = blocks.file_sink_make(gr.sizeof_char, "debug/170524/hardbits_unpunctured.dat")
+        #self.sink = blocks.vector_sink_b()
+        self.file_sink = blocks.file_sink_make(gr.sizeof_char, "debug/170531/single_vectors/hardbits_unpacked.dat")
 
-        self.tb.connect(self.source, self.b2f, self.unpuncture, self.f2b, self.file_sink)
+        self.tb.connect(self.source, self.s2v, self.demap, self.v2s, self.packed2unpacked, self.file_sink)
         #self.tb.connect(self.prbs_src, (self.mod2, 1))
         self.tb.run()
         #result = self.sink.data()

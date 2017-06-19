@@ -43,6 +43,7 @@
 #include "dab/append_bb.h"
 #include "dab/puncture_bb.h"
 #include "dab/dab_transmission_frame_mux_bb.h"
+#include "dab/conv_encoder_bb.h"
 %}
 
 
@@ -118,3 +119,5 @@ GR_SWIG_BLOCK_MAGIC2(dab, puncture_bb);
 
 %include "dab/dab_transmission_frame_mux_bb.h"
 GR_SWIG_BLOCK_MAGIC2(dab, dab_transmission_frame_mux_bb);
+%include "dab/conv_encoder_bb.h"
+GR_SWIG_BLOCK_MAGIC2(dab, conv_encoder_bb);

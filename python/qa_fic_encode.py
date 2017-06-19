@@ -45,16 +45,14 @@ class qa_fic_encode (gr_unittest.TestCase):
         self.fib_enc = dab.fic_encode(self.dab_params)
 
         # mapper
-        self.s2v_map = blocks.stream_to_vector_make(gr.sizeof_char, self.dp.fic_punctured_codeword_length)
-        self.map = dab.qpsk_mapper_vbc_make(self.dp.fic_punctured_codeword_length*4)
+        self.s2v_map = blocks.stream_to_vector_make(gr.sizeof_char, self.dp.num_carriers/4)
+        self.map = dab.qpsk_mapper_vbc_make(self.dp.num_carriers)
         #self.v2s_map = blocks.vector_to_stream_make(gr.sizeof_gr_complex, self.dp.fic_punctured_codeword_length*4)
 
         # demapper
-        self.soft_interleaver = dab.complex_to_interleaved_float_vcf_make(self.dp.fic_punctured_codeword_length*4)
-        self.v2s_interleave = blocks.vector_to_stream_make(gr.sizeof_float, self.dp.fic_punctured_codeword_length*8)
+        self.soft_interleaver = dab.complex_to_interleaved_float_vcf_make(self.dp.num_carriers)
 
         # decode
-        self.s2v_fic_dec = blocks.stream_to_vector_make(gr.sizeof_float, 3072)
         self.fic_decoder = dab.fic_decode(self.dab_params)
 
         # control stream
@@ -75,8 +73,6 @@ class qa_fic_encode (gr_unittest.TestCase):
                         self.map,
                         #self.v2s_map,
                         self.soft_interleaver,
-                        self.v2s_interleave,
-                        self.s2v_fic_dec,
                         self.fic_decoder)
         self.tb.connect(self.trigger_src, (self.fic_decoder, 1))
 

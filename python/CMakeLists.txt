@@ -63,3 +63,4 @@ GR_ADD_TEST(qa_append_bb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_app
 GR_ADD_TEST(qa_puncture_bb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_puncture_bb.py)
 GR_ADD_TEST(qa_msc_encode ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_msc_encode.py)
 GR_ADD_TEST(qa_dab_transmission_frame_mux_bb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_dab_transmission_frame_mux_bb.py)
+GR_ADD_TEST(qa_conv_encoder_bb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_conv_encoder_bb.py)
