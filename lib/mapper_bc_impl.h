@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /* 
- * Copyright 2017 <+YOU OR YOUR COMPANY+>.
+ * Copyright 2017 by Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,23 +27,30 @@
 
 namespace gr {
   namespace dab {
-
-    class mapper_bc_impl : public mapper_bc
-    {
-     private:
+/*! \brief QPSK mapper according to the DAB standard ETSI EN 300 401 V1.4.1, clause 14.5
+ *
+ * uses two unpacked bit frames of respectively length symbol_length to form a complex frame of length symbol_length
+ * two bits define a complex symbol, the first bit is taken from the the first bit frame at index i, the second bit from the second bit frame at index i, they form the complex symbol at index i
+ *
+ * @param symbol_length length of output frame
+ *
+ */
+    class mapper_bc_impl : public mapper_bc {
+    private:
       int d_symbol_length;
 
-     public:
+    public:
       mapper_bc_impl(int symbol_length);
+
       ~mapper_bc_impl();
 
       // Where all the action really happens
-      void forecast (int noutput_items, gr_vector_int &ninput_items_required);
+      void forecast(int noutput_items, gr_vector_int &ninput_items_required);
 
       int general_work(int noutput_items,
-           gr_vector_int &ninput_items,
-           gr_vector_const_void_star &input_items,
-           gr_vector_void_star &output_items);
+                       gr_vector_int &ninput_items,
+                       gr_vector_const_void_star &input_items,
+                       gr_vector_void_star &output_items);
     };
 
   } // namespace dab

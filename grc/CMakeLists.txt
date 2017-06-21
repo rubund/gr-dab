@@ -61,5 +61,6 @@ install(FILES
     dab_msc_encode.xml
     dab_dab_transmission_frame_mux_bb.xml
     dab_transmitter_c.xml
-    dab_conv_encoder_bb.xml DESTINATION share/gnuradio/grc/blocks
+    dab_conv_encoder_bb.xml
+    dab_mapper_bc.xml DESTINATION share/gnuradio/grc/blocks
 )

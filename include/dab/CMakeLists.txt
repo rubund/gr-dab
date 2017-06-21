@@ -57,5 +57,6 @@ install(FILES
     append_bb.h
     puncture_bb.h
     dab_transmission_frame_mux_bb.h
-    conv_encoder_bb.h DESTINATION include/dab
+    conv_encoder_bb.h
+    mapper_bc.h DESTINATION include/dab
 )
