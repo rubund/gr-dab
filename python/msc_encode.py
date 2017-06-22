@@ -27,7 +27,8 @@ class msc_encode(gr.hier_block2):
     """
     @brief block to encode the logical frames of a sub-channel produced by an MPEG source
 
-    -get unpacked bytes from source
+    -get packed bytes from source
+    -unpack bytes
     -energy dispersal
     -convolutional encoding
     -puncturing
@@ -44,14 +45,18 @@ class msc_encode(gr.hier_block2):
         self.msc_I = self.n * 192
         self.protect = protection
 
+        # unpack
+        self.unpack = blocks.packed_to_unpacked_bb_make(1, gr.GR_MSB_FIRST)
+
         # energy dispersal
         self.prbs_src = blocks.vector_source_b(self.dp.prbs(self.msc_I), True)
         self.add_mod_2 = blocks.xor_bb()
 
         # convolutional encoder
-        #self.append_zeros = dab.append_bb_make(self.msc_I, self.msc_I + self.dp.conv_code_add_bits_input)
-        self.conv_encoder_config = fec.cc_encoder_make(self.msc_I + self.dp.conv_code_add_bits_input, 7, 4, [91, 121, 101, 91], 0, fec.CC_TERMINATED)
-        self.conv_encoder = fec.extended_encoder(self.conv_encoder_config, None, '1111')
+        self.conv_pack = blocks.unpacked_to_packed_bb_make(1, gr.GR_MSB_FIRST)
+        self.conv_encoder = dab.conv_encoder_bb_make(self.msc_I / 8)
+        self.conv_unpack = blocks.packed_to_unpacked_bb_make(1, gr.GR_MSB_FIRST)
+
 
         # calculate puncturing factors (EEP, table 33, 34)
         if (self.n > 1 or self.protect != 1):
@@ -89,8 +94,8 @@ class msc_encode(gr.hier_block2):
 
         # connect everything
         self.connect(self,
+                     self.unpack,
                      self.add_mod_2,
-                     #self.append_zeros,
                      self.conv_encoder,
                      self.puncture,
                      self.s2v_time_interleave,

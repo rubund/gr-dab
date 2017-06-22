@@ -1,11 +1,13 @@
 /* -*- c++ -*- */
 /*
+ * 2017 Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
+ * The content of this class is adopted from ODR-DabMod and written into a GNU Radio OutOfTree block.
+ *
    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 Her Majesty
    the Queen in Right of Canada (Communications Research Center Canada)
+   See https://github.com/Opendigitalradio/ODR-DabMod for licensing information of ODR-DabMod.
  */
 /*
- * The content of this class is mostly adopted from ODR-DabMod.
- * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3, or (at your option)
@@ -98,12 +100,13 @@ namespace gr {
       uint8_t data;
 
       for(int n = 0; n < (noutput_items / (d_framesize*4 + 3)); n++){
+        // for each input byte
         for(int in_count = 0; in_count < d_framesize; ++in_count){
           data = in[d_in_offset];
           // For next 4 output bytes
           for(unsigned out_count = 0; out_count < 4; ++out_count){
             out[d_out_offset] = 0;
-            // For each 4-bit output word
+            // For each 4-bit output word (2 4-bit output words in 1 byte)
             for(unsigned j = 0; j < 2; ++j){
               d_memory >>= 1;
               d_memory |= (data >> 7) << 6;
@@ -124,6 +127,8 @@ namespace gr {
           }
           ++d_in_offset;
         }
+        if(d_in_offset%d_framesize != 0)
+          GR_LOG_DEBUG(d_logger, "processing wrong input frame size");
         for (unsigned pad_count = 0; pad_count < 3; ++pad_count) {
           out[d_out_offset] = 0;
           // For each 4-bit output word
