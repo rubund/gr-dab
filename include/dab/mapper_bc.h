@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /* 
- * Copyright 2017 <+YOU OR YOUR COMPANY+>.
+ * Copyright 2017 by Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,8 @@ namespace gr {
   namespace dab {
 
     /*!
-     * \brief <+description of block+>
+     * \brief QPSK mapper according to the DAB standard ETSI EN 300 401 V1.4.1, clause 14.5
+
      * \ingroup dab
      *
      */

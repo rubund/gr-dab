@@ -31,7 +31,15 @@
 
 namespace gr {
   namespace dab {
-
+/*! \brief convolutional encoding for DAB without puncturing
+ *
+ * convolutional encoder according to DAB standard ETSI EN 300 401 V1.4.1
+ * code rate R=1/4, polyonoms in octal form: [133, 171, 145, 133], appends 3*8 tailbits to mother codeword (flush out of state register)
+ * input and output are packed bytes
+ *
+ * @param framesize size of packed bytes in one frame; output framelenght is 4*framesize+3 in packed bytes
+ *
+ */
     class conv_encoder_bb_impl : public conv_encoder_bb
     {
      private:
