@@ -38,7 +38,7 @@ class qa_msc_encode(gr_unittest.TestCase):
         if os.path.exists("debug/transmission_frame_generated_blaba.dat"):
             self.dp = dab.parameters.dab_parameters(1, 208.064e6, True)
 
-            self.src = blocks.file_source_make(gr.sizeof_char, "debug/transmission_frame_generated_blaba.dat")
+            self.src = blocks.file_source_make(gr.sizeof_char, "debug/transmission_frame_generated.dat")
             self.unpack = blocks.packed_to_unpacked_bb_make(1, gr.GR_MSB_FIRST)
 
             # mapper

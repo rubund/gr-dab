@@ -28,8 +28,7 @@
 namespace gr {
   namespace dab {
 
-    /*!
-     * \brief QPSK mapper according to the DAB standard ETSI EN 300 401 V1.4.1, clause 14.5
+    /*! \brief QPSK mapper according to the DAB standard ETSI EN 300 401 V1.4.1, clause 14.5
 
      * \ingroup dab
      *

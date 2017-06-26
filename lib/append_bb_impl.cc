@@ -21,6 +21,7 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+
 #include <stdexcept>
 #include <stdio.h>
 #include <sstream>
@@ -34,29 +35,27 @@ namespace gr {
     append_bb::make(unsigned int vlen_in, unsigned int vlen_out, uint8_t fillval)
     {
       return gnuradio::get_initial_sptr
-        (new append_bb_impl(vlen_in, vlen_out, fillval));
+              (new append_bb_impl(vlen_in, vlen_out, fillval));
     }
 
     /*
      * The private constructor
      */
     append_bb_impl::append_bb_impl(unsigned int vlen_in, unsigned int vlen_out, uint8_t fillval)
-      : gr::block("append_bb",
-              gr::io_signature::make(1, 1, sizeof(unsigned char)),
-              gr::io_signature::make(1, 1, sizeof(unsigned char))),
-        d_vlen_in(vlen_in), d_vlen_out(vlen_out), d_fillval(fillval)
+            : gr::block("append_bb",
+                        gr::io_signature::make(1, 1, sizeof(unsigned char)),
+                        gr::io_signature::make(1, 1, sizeof(unsigned char))),
+              d_vlen_in(vlen_in), d_vlen_out(vlen_out), d_fillval(fillval)
     {
-        try
-        {
-            if (vlen_in > vlen_out) throw (vlen_in - vlen_out);
-        }
-        catch (int difference)
-        {
-            GR_LOG_WARN(d_logger, "out vector shorter than in vector; prune instead of append");
-        }
+      try {
+        if (vlen_in > vlen_out) throw (vlen_in - vlen_out);
+      }
+      catch (int difference) {
+        GR_LOG_WARN(d_logger, "out vector shorter than in vector; prune instead of append");
+      }
 
-        set_output_multiple(vlen_out);
-        set_relative_rate(vlen_out/vlen_in);
+      set_output_multiple(vlen_out);
+      set_relative_rate(vlen_out / vlen_in);
     }
 
     /*
@@ -67,27 +66,27 @@ namespace gr {
     }
 
     void
-    append_bb_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
+    append_bb_impl::forecast(int noutput_items, gr_vector_int &ninput_items_required)
     {
       ninput_items_required[0] = noutput_items - (d_vlen_out - d_vlen_in);
     }
 
     int
-    append_bb_impl::general_work (int noutput_items,
-                       gr_vector_int &ninput_items,
-                       gr_vector_const_void_star &input_items,
-                       gr_vector_void_star &output_items)
+    append_bb_impl::general_work(int noutput_items,
+                                 gr_vector_int &ninput_items,
+                                 gr_vector_const_void_star &input_items,
+                                 gr_vector_void_star &output_items)
     {
       const unsigned char *in = (const unsigned char *) input_items[0];
-        unsigned char *out = (unsigned char *) output_items[0];
+      unsigned char *out = (unsigned char *) output_items[0];
 
-      for(int i = 0; i < noutput_items/d_vlen_out; i++){
-          memcpy(&out[i*d_vlen_out], &in[i*d_vlen_in], d_vlen_in); //copy in vector
-          memset(&out[i*d_vlen_out + d_vlen_in], d_fillval, d_vlen_out - d_vlen_in); //append fillval
+      for (int i = 0; i < noutput_items / d_vlen_out; i++) {
+        memcpy(&out[i * d_vlen_out], &in[i * d_vlen_in], d_vlen_in); //copy in vector
+        memset(&out[i * d_vlen_out + d_vlen_in], d_fillval, d_vlen_out - d_vlen_in); //append fillval
       }
       // Tell runtime system how many input items we consumed on
       // each input stream.
-      consume_each (noutput_items/d_vlen_out * d_vlen_in);
+      consume_each(noutput_items / d_vlen_out * d_vlen_in);
 
       // Tell runtime system how many output items we produced.
       return noutput_items;

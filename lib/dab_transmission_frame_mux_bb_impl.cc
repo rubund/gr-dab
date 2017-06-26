@@ -75,7 +75,8 @@ namespace gr {
         d_subch_total_len += subch_size[i];
       }
       if (d_subch_total_len * d_cu_len > d_cif_len) {
-        throw std::runtime_error("subchannels are %d bytes too long for CIF" + (d_subch_total_len * d_cu_len - d_cif_len));
+        throw std::runtime_error(
+                "subchannels are %d bytes too long for CIF" + (d_subch_total_len * d_cu_len - d_cif_len));
       }
       set_output_multiple(d_vlen_out);
 

@@ -64,7 +64,7 @@ class fic_decode(gr.hier_block2):
         # unpuncturing
         self.unpuncture = dab.unpuncture_vff(self.dp.assembled_fic_puncturing_sequence, 0)
 
-        # convolutional coconnectding
+        # convolutional coding
         # self.fsm = trellis.fsm(self.dp.conv_code_in_bits, self.dp.conv_code_out_bits, self.dp.conv_code_generator_polynomials)
         self.fsm = trellis.fsm(1, 4, [0133, 0171, 0145, 0133])  # OK (dumped to text and verified partially)
         self.conv_v2s = blocks.vector_to_stream(gr.sizeof_float, self.dp.fic_conv_codeword_length)

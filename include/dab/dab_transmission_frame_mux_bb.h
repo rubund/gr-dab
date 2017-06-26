@@ -28,8 +28,7 @@
 namespace gr {
   namespace dab {
 
-    /*!
-     * \brief multiplex to DAB transmission frames
+    /*! \brief multiplex to DAB transmission frames
      *
      */
     class DAB_API dab_transmission_frame_mux_bb : virtual public gr::block

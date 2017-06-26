@@ -24,7 +24,7 @@
 #include <dab/append_bb.h>
 
 namespace gr {
-    namespace dab {
+  namespace dab {
 /*! @brief appends fillval to stream sequence
  *
  * produces an output stream sequence of lenght vlen_out by copying the input sequence and appending fillval vlen_out-vlen_in times
@@ -33,27 +33,27 @@ namespace gr {
  * @param vlen_out length of output sequence
  * @param fillval value of appended elements (default = 0)
  */
-        class append_bb_impl : public append_bb {
-        private:
-            unsigned int d_vlen_in;
-            unsigned int d_vlen_out;
-            int d_fillval;
+    class append_bb_impl : public append_bb {
+    private:
+      unsigned int d_vlen_in;
+      unsigned int d_vlen_out;
+      int d_fillval;
 
-        public:
-            append_bb_impl(unsigned int vlen_in, unsigned int vlen_out, uint8_t fillval);
+    public:
+      append_bb_impl(unsigned int vlen_in, unsigned int vlen_out, uint8_t fillval);
 
-            ~append_bb_impl();
+      ~append_bb_impl();
 
-            // Where all the action really happens
-            void forecast(int noutput_items, gr_vector_int &ninput_items_required);
+      // Where all the action really happens
+      void forecast(int noutput_items, gr_vector_int &ninput_items_required);
 
-            int general_work(int noutput_items,
-                             gr_vector_int &ninput_items,
-                             gr_vector_const_void_star &input_items,
-                             gr_vector_void_star &output_items);
-        };
+      int general_work(int noutput_items,
+                       gr_vector_int &ninput_items,
+                       gr_vector_const_void_star &input_items,
+                       gr_vector_void_star &output_items);
+    };
 
-    } // namespace dab
+  } // namespace dab
 } // namespace gr
 
 #endif /* INCLUDED_DAB_APPEND_BB_IMPL_H */

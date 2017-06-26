@@ -38,7 +38,7 @@ namespace gr {
     conv_encoder_bb::make(int framesize)
     {
       return gnuradio::get_initial_sptr
-        (new conv_encoder_bb_impl(framesize));
+              (new conv_encoder_bb_impl(framesize));
     }
 
     const static uint8_t PARITY[] = {
@@ -64,13 +64,13 @@ namespace gr {
      * The private constructor
      */
     conv_encoder_bb_impl::conv_encoder_bb_impl(int framesize)
-      : gr::block("conv_encoder_bb",
-              gr::io_signature::make(1, 1, sizeof(unsigned char)),
-              gr::io_signature::make(1, 1, sizeof(unsigned char))),
-        d_framesize(framesize)
+            : gr::block("conv_encoder_bb",
+                        gr::io_signature::make(1, 1, sizeof(unsigned char)),
+                        gr::io_signature::make(1, 1, sizeof(unsigned char))),
+              d_framesize(framesize)
     {
-      d_outsize = (d_framesize *4) + 3;
-      set_output_multiple(framesize*4 + 3);
+      d_outsize = (d_framesize * 4) + 3;
+      set_output_multiple(framesize * 4 + 3);
     }
 
     /*
@@ -81,16 +81,16 @@ namespace gr {
     }
 
     void
-    conv_encoder_bb_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
+    conv_encoder_bb_impl::forecast(int noutput_items, gr_vector_int &ninput_items_required)
     {
-      ninput_items_required[0] = (noutput_items / (d_framesize*4 + 3)) * d_framesize;
+      ninput_items_required[0] = (noutput_items / (d_framesize * 4 + 3)) * d_framesize;
     }
 
     int
-    conv_encoder_bb_impl::general_work (int noutput_items,
-                       gr_vector_int &ninput_items,
-                       gr_vector_const_void_star &input_items,
-                       gr_vector_void_star &output_items)
+    conv_encoder_bb_impl::general_work(int noutput_items,
+                                       gr_vector_int &ninput_items,
+                                       gr_vector_const_void_star &input_items,
+                                       gr_vector_void_star &output_items)
     {
       const unsigned char *in = (const unsigned char *) input_items[0];
       unsigned char *out = (unsigned char *) output_items[0];
@@ -99,15 +99,15 @@ namespace gr {
       d_out_offset = 0;
       uint8_t data;
 
-      for(int n = 0; n < (noutput_items / (d_framesize*4 + 3)); n++){
+      for (int n = 0; n < (noutput_items / (d_framesize * 4 + 3)); n++) {
         // for each input byte
-        for(int in_count = 0; in_count < d_framesize; ++in_count){
+        for (int in_count = 0; in_count < d_framesize; ++in_count) {
           data = in[d_in_offset];
           // For next 4 output bytes
-          for(unsigned out_count = 0; out_count < 4; ++out_count){
+          for (unsigned out_count = 0; out_count < 4; ++out_count) {
             out[d_out_offset] = 0;
             // For each 4-bit output word (2 4-bit output words in 1 byte)
-            for(unsigned j = 0; j < 2; ++j){
+            for (unsigned j = 0; j < 2; ++j) {
               d_memory >>= 1;
               d_memory |= (data >> 7) << 6;
               data <<= 1;
@@ -127,7 +127,7 @@ namespace gr {
           }
           ++d_in_offset;
         }
-        if(d_in_offset%d_framesize != 0)
+        if (d_in_offset % d_framesize != 0)
           GR_LOG_DEBUG(d_logger, "processing wrong input frame size");
         for (unsigned pad_count = 0; pad_count < 3; ++pad_count) {
           out[d_out_offset] = 0;
@@ -153,7 +153,7 @@ namespace gr {
       }
       // Tell runtime system how many input items we consumed on
       // each input stream.
-      consume_each ((noutput_items / (d_framesize*4 + 3)) * d_framesize);
+      consume_each((noutput_items / (d_framesize * 4 + 3)) * d_framesize);
 
       // Tell runtime system how many output items we produced.
       return noutput_items;

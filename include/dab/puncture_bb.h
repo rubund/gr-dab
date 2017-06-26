@@ -28,8 +28,7 @@
 namespace gr {
   namespace dab {
 
-    /*!
-     * \brief puncturing of a stream sequence
+    /*! \brief puncturing of a stream sequence
      *
      */
     class DAB_API puncture_bb : virtual public gr::block

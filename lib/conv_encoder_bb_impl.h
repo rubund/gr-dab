@@ -40,26 +40,26 @@ namespace gr {
  * @param framesize size of packed bytes in one frame; output framelenght is 4*framesize+3 in packed bytes
  *
  */
-    class conv_encoder_bb_impl : public conv_encoder_bb
-    {
-     private:
+    class conv_encoder_bb_impl : public conv_encoder_bb {
+    private:
       int d_framesize;
       int d_outsize;
       unsigned int d_in_offset, d_out_offset;
       uint16_t d_memory;
 
 
-     public:
+    public:
       conv_encoder_bb_impl(int framesize);
+
       ~conv_encoder_bb_impl();
 
       // Where all the action really happens
-      void forecast (int noutput_items, gr_vector_int &ninput_items_required);
+      void forecast(int noutput_items, gr_vector_int &ninput_items_required);
 
       int general_work(int noutput_items,
-           gr_vector_int &ninput_items,
-           gr_vector_const_void_star &input_items,
-           gr_vector_void_star &output_items);
+                       gr_vector_int &ninput_items,
+                       gr_vector_const_void_star &input_items,
+                       gr_vector_void_star &output_items);
     };
 
   } // namespace dab

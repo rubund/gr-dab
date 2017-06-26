@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /* 
- * Copyright 2017 <+YOU OR YOUR COMPANY+>.
+ * Copyright 2017 Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,25 +32,26 @@ namespace gr {
  * @param puncturing_vector vector with puncturing sequence, length of puncturing_vector is length of a input stream sequence
  *
  */
-    class puncture_bb_impl : public puncture_bb
-    {
-     private:
-        unsigned int ones (const std::vector<unsigned char> &puncturing_vector);
-        std::vector<unsigned char> d_puncturing_vector;
-        unsigned int d_vlen_in;
-        unsigned int d_vlen_out;
+    class puncture_bb_impl : public puncture_bb {
+    private:
+      unsigned int ones(const std::vector<unsigned char> &puncturing_vector);
 
-     public:
+      std::vector<unsigned char> d_puncturing_vector;
+      unsigned int d_vlen_in;
+      unsigned int d_vlen_out;
+
+    public:
       puncture_bb_impl(const std::vector<unsigned char> &puncturing_vector);
+
       ~puncture_bb_impl();
 
       // Where all the action really happens
-      void forecast (int noutput_items, gr_vector_int &ninput_items_required);
+      void forecast(int noutput_items, gr_vector_int &ninput_items_required);
 
       int general_work(int noutput_items,
-           gr_vector_int &ninput_items,
-           gr_vector_const_void_star &input_items,
-           gr_vector_void_star &output_items);
+                       gr_vector_int &ninput_items,
+                       gr_vector_const_void_star &input_items,
+                       gr_vector_void_star &output_items);
     };
 
   } // namespace dab

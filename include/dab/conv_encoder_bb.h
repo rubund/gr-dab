@@ -33,8 +33,7 @@
 namespace gr {
   namespace dab {
 
-    /*!
-     * \brief convolutional encoding for DAB without puncturing
+    /*! \brief convolutional encoding for DAB without puncturing
      * \ingroup dab
      *
      */

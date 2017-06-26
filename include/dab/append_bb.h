@@ -28,8 +28,7 @@
 namespace gr {
   namespace dab {
 
-    /*!
-     * appends fillval to stream sequence
+    /*! \brief appends fillval to stream sequence
      *
      */
     class DAB_API append_bb : virtual public gr::block
