@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
-# Copyright 2017 <+YOU OR YOUR COMPANY+>.
+# Copyright 2017 Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
 # 
 # This is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,25 +21,46 @@
 
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
+import os
 import dab
 
-class qa_msc_encode (gr_unittest.TestCase):
 
-    def setUp (self):
-        self.tb = gr.top_block ()
+class qa_msc_encode(gr_unittest.TestCase):
+    def setUp(self):
+        self.tb = gr.top_block()
 
-    def tearDown (self):
+    def tearDown(self):
         self.tb = None
 
-    def test_001_t (self):
-        self.dab_params = dab.parameters.dab_parameters(1, 208.064e6, True)
-        fib = (0xF1, 0x02)
-        self.fib_src = blocks.vector_source_b(fib, True)
-        self.fib_enc = dab.fic_encode(self.dab_params)
-        self.sink = blocks.file_sink_make(gr.sizeof_char, "debug/generated_fic_encoded.dat")
+# manual check
+# debug data has to be produced with python script "/../apps/usrp_dab_rx.py"
+    def test_001_t(self):
+        if os.path.exists("debug/transmission_frame_generated_blaba.dat"):
+            self.dp = dab.parameters.dab_parameters(1, 208.064e6, True)
 
-        self.tb.connect(self.fib_src, self.fib_enc, self.sink)
-        self.tb.run ()
+            self.src = blocks.file_source_make(gr.sizeof_char, "debug/transmission_frame_generated_blaba.dat")
+            self.unpack = blocks.packed_to_unpacked_bb_make(1, gr.GR_MSB_FIRST)
+
+            # mapper
+            self.map = dab.mapper_bc_make(self.dp.num_carriers)
+
+            # demapper
+            self.s2v = blocks.stream_to_vector_make(gr.sizeof_gr_complex, self.dp.num_carriers)
+            self.soft_interleaver = dab.complex_to_interleaved_float_vcf_make(self.dp.num_carriers)
+
+            # decode
+            self.fic_decoder = dab.fic_decode(self.dp)
+            self.msc_decoder = dab.msc_decode(self.dp, 90, 90, 2)
+
+            # sink
+            self.file_sink = blocks.file_sink_make(gr.sizeof_char, "debug/encoder_subch_decoded.dat")
+
+            # control stream
+            self.trigger_src = blocks.vector_source_b([1] + [0] * 74, True)
+
+            self.tb.connect(self.src, self.unpack, self.map, self.s2v, self.soft_interleaver, self.msc_decoder)
+            self.tb.connect(self.trigger_src, (self.msc_decoder, 1))
+            self.tb.run()
         pass
 
 

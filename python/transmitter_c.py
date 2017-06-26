@@ -25,7 +25,11 @@ import dab
 
 class transmitter_c(gr.hier_block2):
     """
-    docstring for block transmitter_c
+    DAB transmitter hierarchical block, including:
+    -FIB source + FIC_encoder
+    -MSC_encoder
+    -DAB multiplex
+    -DAB Modulator
     """
     def __init__(self, dab_params, sampling_rate, num_subch, ensemble_lable, service_label, service_comp_label, service_language, protection_mode, data_rate_n):
         gr.hier_block2.__init__(self,
@@ -49,13 +53,14 @@ class transmitter_c(gr.hier_block2):
         self.mux = dab.dab_transmission_frame_mux_bb_make(self.dp.mode, num_subch, self.subch_size)
 
         # OFDM Modulator
+        self.s2v = blocks.stream_to_vector(gr.sizeof_char, 384)
         self.mod = dab.ofdm_mod(self.dp)
 
         # connect everything
         self.connect(self.fic_source, self.fic_encode, (self.mux, 0))
         for i in range(0, num_subch):
             self.connect((self, i), self.msc_encoder[i], (self.mux, i+1))
-        self.connect((self.mux, 0), (self.mod, 0))
+        self.connect((self.mux, 0), self.s2v, (self.mod, 0))
         self.connect((self.mux, 1), (self.mod, 1))
         self.connect(self.mod, self)
 
