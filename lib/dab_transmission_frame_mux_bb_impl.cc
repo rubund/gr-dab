@@ -68,7 +68,7 @@ namespace gr {
       }
       if (subch_size.size() != num_subch)
         GR_LOG_WARN(d_logger, "sizeof vector subch_size does not match with num_subch");
-      d_vlen_out = d_num_fibs * d_fib_len + d_num_cifs * d_cif_len;
+      d_vlen_out = d_num_fibs * d_fib_len * 3 + d_num_cifs * d_cif_len;
       d_fic_len = d_num_fibs * d_fib_len * 3; // fic code rate = 3
       d_subch_total_len = 0;
       for (int i = 0; i < num_subch; ++i) {
