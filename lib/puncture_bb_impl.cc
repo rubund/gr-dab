@@ -23,19 +23,19 @@
 #endif
 
 #include <gnuradio/io_signature.h>
-#include "unpuncture_ff_impl.h"
+#include "puncture_bb_impl.h"
 
 namespace gr {
   namespace dab {
 
-    unpuncture_ff::sptr
-    unpuncture_ff::make(const std::vector<unsigned char> &puncturing_vector, float fillval)
+    puncture_bb::sptr
+    puncture_bb::make(const std::vector<unsigned char> &puncturing_vector)
     {
       return gnuradio::get_initial_sptr
-              (new unpuncture_ff_impl(puncturing_vector, fillval));
+              (new puncture_bb_impl(puncturing_vector));
     }
 
-    unsigned int unpuncture_ff_impl::ones(const std::vector<unsigned char> &puncturing_vector)
+    unsigned int puncture_bb_impl::ones(const std::vector<unsigned char> &puncturing_vector)
     {
       unsigned int onescount = 0;
       for (unsigned int i = 0; i < puncturing_vector.size(); i++) {
@@ -48,14 +48,14 @@ namespace gr {
     /*
      * The private constructor
      */
-    unpuncture_ff_impl::unpuncture_ff_impl(const std::vector<unsigned char> &puncturing_vector, float fillval)
-            : gr::block("unpuncture_ff",
-                        gr::io_signature::make(1, 1, sizeof(float)),
-                        gr::io_signature::make(1, 1, sizeof(float))),
-              d_puncturing_vector(puncturing_vector), d_fillval(fillval)
+    puncture_bb_impl::puncture_bb_impl(const std::vector<unsigned char> &puncturing_vector)
+            : gr::block("puncture_bb",
+                        gr::io_signature::make(1, 1, sizeof(unsigned char)),
+                        gr::io_signature::make(1, 1, sizeof(unsigned char))),
+              d_puncturing_vector(puncturing_vector)
     {
-      d_vlen_in = ones(puncturing_vector);
-      d_vlen_out = puncturing_vector.size();
+      d_vlen_in = puncturing_vector.size();
+      d_vlen_out = ones(puncturing_vector);
       set_output_multiple(d_vlen_out);
       set_relative_rate(d_vlen_out / d_vlen_in);
     }
@@ -63,33 +63,30 @@ namespace gr {
     /*
      * Our virtual destructor.
      */
-    unpuncture_ff_impl::~unpuncture_ff_impl()
+    puncture_bb_impl::~puncture_bb_impl()
     {
     }
 
     void
-    unpuncture_ff_impl::forecast(int noutput_items, gr_vector_int &ninput_items_required)
+    puncture_bb_impl::forecast(int noutput_items, gr_vector_int &ninput_items_required)
     {
       ninput_items_required[0] = noutput_items * d_vlen_in / d_vlen_out;
     }
 
     int
-    unpuncture_ff_impl::general_work(int noutput_items,
-                                     gr_vector_int &ninput_items,
-                                     gr_vector_const_void_star &input_items,
-                                     gr_vector_void_star &output_items)
+    puncture_bb_impl::general_work(int noutput_items,
+                                   gr_vector_int &ninput_items,
+                                   gr_vector_const_void_star &input_items,
+                                   gr_vector_void_star &output_items)
     {
-      int i;
-      unsigned int j;
+      const unsigned char *in = (const unsigned char *) input_items[0];
+      unsigned char *out = (unsigned char *) output_items[0];
 
-      const float *in = (const float *) input_items[0];
-      float *out = (float *) output_items[0];
-
-      for (i = 0; i < noutput_items; i++) {
-        if (d_puncturing_vector[i % d_vlen_out] == 1)
+      for (int i = 0; i < noutput_items * d_vlen_in / d_vlen_out; i++) {
+        if (d_puncturing_vector[i % d_vlen_in] == 1)
           *out++ = *in++;
         else
-          *out++ = d_fillval;
+          in++;
       }
       // Tell runtime system how many input items we consumed on
       // each input stream.

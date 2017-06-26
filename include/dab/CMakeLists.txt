@@ -53,5 +53,10 @@ install(FILES
     select_subch_vfvf.h
     unpuncture_ff.h
     prune.h
-    firecode_check_bb.h DESTINATION include/dab
+    firecode_check_bb.h
+    append_bb.h
+    puncture_bb.h
+    dab_transmission_frame_mux_bb.h
+    conv_encoder_bb.h
+    mapper_bc.h DESTINATION include/dab
 )

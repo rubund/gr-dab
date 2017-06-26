@@ -1,5 +1,5 @@
 <block>
-  <name>c2f interleaved</name>
+  <name>Complex to interleaved float vcf</name>
   <key>dab_complex_to_interleaved_float_vcf</key>
   <category>DAB</category>
   <import>import dab</import>

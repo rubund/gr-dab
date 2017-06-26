@@ -21,10 +21,9 @@
 
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
-import os
 import dab
 
-class qa_msc_decode (gr_unittest.TestCase):
+class qa_puncture_bb (gr_unittest.TestCase):
 
     def setUp (self):
         self.tb = gr.top_block ()
@@ -32,19 +31,30 @@ class qa_msc_decode (gr_unittest.TestCase):
     def tearDown (self):
         self.tb = None
 
-# manual check of firecode: firecode should be OK at every fifth frame (each superframe)
-# debug data has to be produced with python script "/../apps/usrp_dab_rx.py"
-    def test_001_t (self):
-        if os.path.exists("debug/transmission_frame.dat") and os.path.exists("debug/transmission_frame_trigger.dat"):
-            self.dab_params = dab.parameters.dab_parameters(1 , 208.064e6, True)
-            self.src01 = blocks.file_source_make(gr.sizeof_float * 2*self.dab_params.num_carriers, "debug/transmission_frame.dat")
-            self.src02 = blocks.file_source_make(gr.sizeof_char, "debug/transmission_frame_trigger.dat")
-            self.msc = dab.msc_decode(self.dab_params, 54, 90, 2, 1, 1)
-            self.firecode = dab.firecode_check_bb_make(15)
-            self.tb.connect(self.src01, (self.msc, 0), self.firecode, blocks.null_sink_make(gr.sizeof_char))
-            self.tb.connect(self.src02, (self.msc, 1))
-            self.tb.run ()
-        pass
+    def test_001_puncture_ff(self):
+        src_data = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+        punc_seq = (1, 0, 0, 0, 1, 0, 1, 1, 1)
+        exp_res = (0, 4, 6, 7, 8)
+        src = blocks.vector_source_b(src_data)
+        puncture = dab.puncture_bb_make(punc_seq)
+        dst = blocks.vector_sink_b()
+        self.tb.connect(src, puncture, dst)
+        self.tb.run()
+        result_data = dst.data()
+        self.assertEqual(exp_res, result_data)
+
+    def test_002_puncture_ff(self):
+        src_data = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+        punc_seq = (1, 0, 0)
+        exp_res = (0, 3, 6, 9, 2, 5)
+        src = blocks.vector_source_b(src_data)
+        puncture = dab.puncture_bb_make(punc_seq)
+        dst = blocks.vector_sink_b()
+        self.tb.connect(src, puncture, dst)
+        self.tb.run()
+        result_data = dst.data()
+        self.assertEqual(exp_res, result_data)
+
 
 if __name__ == '__main__':
-    gr_unittest.run(qa_msc_decode, "qa_msc_decode.xml")
+    gr_unittest.run(qa_puncture_bb, "qa_puncture_bb.xml")
