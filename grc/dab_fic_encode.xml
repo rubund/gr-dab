@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <block>
-  <name>FIC encode</name>
+  <name>DAB: FIC encode</name>
   <key>dab_fic_encode</key>
-  <category>dab</category>
+  <category>DAB</category>
   <import>import dab</import>
   <make>dab.msc_encode(dab.parameters.dab_parameters(mode=$dab_mode, sample_rate=$samp_rate, verbose=False))</make>
   <param>
