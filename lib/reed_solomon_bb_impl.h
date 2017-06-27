@@ -23,7 +23,6 @@
 
 #include <dab/reed_solomon_bb.h>
 #include "reed-solomon.h"
-#include "firecode-checker.h"
 
 namespace gr {
   namespace dab {
@@ -37,7 +36,7 @@ namespace gr {
     {
     private:
       int d_bit_rate_n;
-      reedSolomon	my_rs_decoder;
+      reedSolomon	d_rs_decoder;
       int d_nproduced;
       uint8_t d_rs_in [120];
       uint8_t d_rs_out [110];

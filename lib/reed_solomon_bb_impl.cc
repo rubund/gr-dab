@@ -41,9 +41,10 @@ namespace gr {
     reed_solomon_bb_impl::reed_solomon_bb_impl(int bit_rate_n)
             : gr::block("reed_solomon_bb",
                         gr::io_signature::make(1, 1, sizeof(unsigned char)),
-                        gr::io_signature::make(1, 1, sizeof(unsigned char)))
-             // my_rs_decoder(8, 0435, 0, 1, 10), d_bit_rate_n(bit_rate_n)
+                        gr::io_signature::make(1, 1, sizeof(unsigned char))),
+              d_bit_rate_n(bit_rate_n)
     {
+      reedSolomon *d_rs_decoder = new reedSolomon(8, 0435, 0, 1, 10);
       set_output_multiple(d_bit_rate_n * 110);
       d_nproduced = 0;
     }
@@ -71,30 +72,27 @@ namespace gr {
       unsigned char *out = (unsigned char *) output_items[0];
 
 
-      /*for (int j = 0; j < d_bit_rate_n; j++) {
+      for (int j = 0; j < d_bit_rate_n; j++) {
         int16_t ler = 0;
-        for (int k = 0; k < 120; k++)
+        for (int k = 0; k < 120; k++) {
           d_rs_in[k] = in[j + k * d_bit_rate_n];
-        ler = my_rs_decoder.dec(d_rs_in, d_rs_out, 135);
-        if (ler < 0) {
-          continue; //TODO: continue proper coding style?
         }
-        for (int k = 0; k < 110; k++)
+        ler = d_rs_decoder.dec(d_rs_in, d_rs_out, 135);
+        if (ler < 0) {
+          continue; // cannot correct error -> dump frame
+        }
+        for (int k = 0; k < 110; k++) {
           out[j + k * d_bit_rate_n] = d_rs_out[k];
+        }
         d_nproduced++;
-      }*/
-      for(int i = 0; i < noutput_items; i++)
-        out[i] = in[i];
-
-
+      }
 
       // Tell runtime system how many input items we consumed on
       // each input stream.
       consume_each(noutput_items * (120 / 110));
 
       // Tell runtime system how many output items we produced.
-      //return d_nproduced * 110;
-      return noutput_items;
+      return d_nproduced * 110;
     }
 
   } /* namespace dab */

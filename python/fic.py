@@ -53,7 +53,7 @@ class fic_decode(gr.hier_block2):
 
         self.dp = dab_params
         self.verbose = verbose
-        self.debug = debug
+        self.debug = True
 
         # FIB selection and block partitioning
         self.select_fic_syms = dab.select_vectors(gr.sizeof_float, self.dp.num_carriers * 2, self.dp.num_fic_syms, 0)

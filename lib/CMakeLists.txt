@@ -59,7 +59,9 @@ list(APPEND dab_sources
     prune_impl.cc
     firecode-checker.cpp
     firecode_check_bb_impl.cc
-    reed_solomon_bb_impl.cc )
+    reed_solomon_bb_impl.cc 
+    reed-solomon.cpp
+    galois.cpp)
 
 set(dab_sources "${dab_sources}" PARENT_SCOPE)
 if(NOT dab_sources)
