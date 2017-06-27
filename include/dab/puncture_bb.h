@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /* 
- * Copyright 2017Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
+ * Copyright 2017 <+YOU OR YOUR COMPANY+>.
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,35 +19,36 @@
  */
 
 
-#ifndef INCLUDED_DAB_FIB_SOURCE_B_H
-#define INCLUDED_DAB_FIB_SOURCE_B_H
+#ifndef INCLUDED_DAB_PUNCTURE_BB_H
+#define INCLUDED_DAB_PUNCTURE_BB_H
 
 #include <dab/api.h>
-#include <gnuradio/sync_block.h>
+#include <gnuradio/block.h>
 
 namespace gr {
   namespace dab {
 
-    /*! \brief source that produces Fast Information Blocks (FIBs) according to the DAB standard
+    /*! \brief puncturing of a stream sequence
+     *
      */
-    class DAB_API fib_source_b : virtual public gr::sync_block
+    class DAB_API puncture_bb : virtual public gr::block
     {
      public:
-      typedef boost::shared_ptr<fib_source_b> sptr;
+      typedef boost::shared_ptr<puncture_bb> sptr;
 
       /*!
-       * \brief Return a shared_ptr to a new instance of dab::fib_source_b.
+       * \brief Return a shared_ptr to a new instance of dab::puncture_bb.
        *
-       * To avoid accidental use of raw pointers, dab::fib_source_b's
+       * To avoid accidental use of raw pointers, dab::puncture_bb's
        * constructor is in a private implementation
-       * class. dab::fib_source_b::make is the public interface for
+       * class. dab::puncture_bb::make is the public interface for
        * creating new instances.
        */
-      static sptr make(int transmission_mode, int num_subch, std::string ensemble_label, std::string programme_service_label, std::string service_comp_label, uint8_t service_comp_lang, const std::vector<uint8_t> &protection_mode, const std::vector<uint8_t> &data_rate_n);
+      static sptr make(const std::vector<unsigned char> &puncturing_vector);
     };
 
   } // namespace dab
 } // namespace gr
 
-#endif /* INCLUDED_DAB_FIB_SOURCE_B_H */
+#endif /* INCLUDED_DAB_PUNCTURE_BB_H */
 

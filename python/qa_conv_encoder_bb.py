@@ -21,10 +21,9 @@
 
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
-import os
 import dab
 
-class qa_msc_decode (gr_unittest.TestCase):
+class qa_conv_encoder_bb (gr_unittest.TestCase):
 
     def setUp (self):
         self.tb = gr.top_block ()
@@ -32,19 +31,20 @@ class qa_msc_decode (gr_unittest.TestCase):
     def tearDown (self):
         self.tb = None
 
-# manual check of firecode: firecode should be OK at every fifth frame (each superframe)
-# debug data has to be produced with python script "/../apps/usrp_dab_rx.py"
-    def test_001_t (self):
-        if os.path.exists("debug/transmission_frame.dat") and os.path.exists("debug/transmission_frame_trigger.dat"):
-            self.dab_params = dab.parameters.dab_parameters(1 , 208.064e6, True)
-            self.src01 = blocks.file_source_make(gr.sizeof_float * 2*self.dab_params.num_carriers, "debug/transmission_frame.dat")
-            self.src02 = blocks.file_source_make(gr.sizeof_char, "debug/transmission_frame_trigger.dat")
-            self.msc = dab.msc_decode(self.dab_params, 54, 90, 2, 1, 1)
-            self.firecode = dab.firecode_check_bb_make(15)
-            self.tb.connect(self.src01, (self.msc, 0), self.firecode, blocks.null_sink_make(gr.sizeof_char))
-            self.tb.connect(self.src02, (self.msc, 1))
-            self.tb.run ()
-        pass
+# test of a 2 byte frame with reference data (calculated by hand)
+    def test_001_t(self):
+        data = (0x05, 0x00)
+        expected_result = (0x00, 0x00, 0x0f, 0x62, 0xBF, 0x4D, 0x9F, 0x00, 0x00, 0x00, 0x00)
+        src = blocks.vector_source_b(data)
+        encoder = dab.conv_encoder_bb_make(2)
+        sink = blocks.vector_sink_b()
+        self.tb.connect(src, encoder, sink)
+        self.tb.run()
+        result = sink.data()
+        #print result
+        #print expected_result
+        self.assertEqual(expected_result, result)
+
 
 if __name__ == '__main__':
-    gr_unittest.run(qa_msc_decode, "qa_msc_decode.xml")
+    gr_unittest.run(qa_conv_encoder_bb, "qa_conv_encoder_bb.xml")

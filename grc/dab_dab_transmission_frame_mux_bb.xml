@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<block>
+  <name>DAB: Transmission Frame MUX</name>
+  <key>dab_dab_transmission_frame_mux_bb</key>
+  <category>dab</category>
+  <import>import dab</import>
+  <make>dab.dab_transmission_frame_mux_bb($transmission_mode, $num_subch, $subch_size)</make>
+  <param>
+    <name>Transmission Mode</name>
+    <key>transmission_mode</key>
+    <type>int</type>
+  </param>
+  <param>
+    <name>Number of sub-channels</name>
+    <key>num_subch</key>
+    <type>int</type>
+  </param>
+  <param>
+    <name>Subchannel Sizes</name>
+    <key>subch_size</key>
+    <type>raw</type>
+  </param>
+  <sink>
+    <name>fic</name>
+    <type>byte</type>
+  </sink>
+  <sink>
+    <name>subch</name>
+    <type>byte</type>
+    <nports>$num_subch</nports>
+  </sink>
+  <source>
+    <name>data</name>
+    <type>byte</type>
+  </source>
+  <source>
+    <name>trigger</name>
+    <type>byte</type>
+  </source>
+</block>

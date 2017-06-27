@@ -37,7 +37,10 @@ GR_PYTHON_INSTALL(
     ofdm.py
     parameters.py
     fic.py
-    msc_decode.py DESTINATION ${GR_PYTHON_DIR}/dab
+    msc_decode.py
+    fic_encode.py
+    msc_encode.py
+    transmitter_c.py DESTINATION ${GR_PYTHON_DIR}/dab
 )
 
 ########################################################################
@@ -55,3 +58,9 @@ GR_ADD_TEST(qa_fib_source_b ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_
 GR_ADD_TEST(qa_select_subch_vfvf ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_select_subch_vfvf.py)
 GR_ADD_TEST(qa_unpuncture_ff ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_unpuncture_ff.py)
 GR_ADD_TEST(qa_prune ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_prune.py)
+GR_ADD_TEST(qa_fic_encode ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_fic_encode.py)
+GR_ADD_TEST(qa_puncture_bb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_puncture_bb.py)
+GR_ADD_TEST(qa_msc_encode ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_msc_encode.py)
+GR_ADD_TEST(qa_dab_transmission_frame_mux_bb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_dab_transmission_frame_mux_bb.py)
+GR_ADD_TEST(qa_conv_encoder_bb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_conv_encoder_bb.py)
+GR_ADD_TEST(qa_mapper_bc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_mapper_bc.py)
