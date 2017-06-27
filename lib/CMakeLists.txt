@@ -59,7 +59,6 @@ list(APPEND dab_sources
     prune_impl.cc
     firecode-checker.cpp
     firecode_check_bb_impl.cc
-    append_bb_impl.cc
     puncture_bb_impl.cc
     dab_transmission_frame_mux_bb_impl.cc
     conv_encoder_bb_impl.cc

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <block>
-  <name>magnitude_equalizer_vcc</name>
+  <name>Magnitude Equalizer</name>
   <key>dab_magnitude_equalizer_vcc</key>
-  <category>dab</category>
+  <category>DAB</category>
   <import>import dab</import>
   <make>dab.magnitude_equalizer_vcc($vlen, $num_symbols)</make>
   <param>
@@ -11,7 +11,7 @@
     <type>int</type>
   </param>
   <param>
-    <name>num carriers</name>
+    <name>Number of carriers</name>
     <key>num_carriers</key>
     <type>int</type>
   </param>
@@ -33,7 +33,7 @@
     <type>complex</type>
   </source>
   <source>
-    <name>trigger_out</name>
+    <name>trigger out</name>
     <type>byte</type>
   </source>
 </block>

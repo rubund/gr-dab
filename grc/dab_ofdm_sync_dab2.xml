@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <block>
-  <name>ofdm_sync_dab2</name>
+  <name>OFDM sync v2</name>
   <key>dab_ofdm_sync_dab2</key>
-  <category>dab</category>
+  <category>DAB</category>
   <import>import dab</import>
   <make>dab.ofdm_sync_dab2($dab_params, $rx_params, $debug)</make>
   <param>

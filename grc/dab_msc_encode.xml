@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <block>
-  <name>MSC encode</name>
+  <name>DAB: MSC encode</name>
   <key>dab_msc_encode</key>
   <category>dab</category>
   <import>import dab</import>

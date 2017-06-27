@@ -48,9 +48,9 @@ namespace gr {
     {
       //sanity check
       if (vlen_out % vlen_in != 0)
-        throw std::runtime_error("vlen_out no multiple of vlen_in");
+        throw std::invalid_argument("vlen_out no multiple of vlen_in");
       if (address * vlen_in + vlen_out > total_size * vlen_in)
-        throw std::runtime_error("vlen_out too long or address wrong");
+        throw std::out_of_range("vlen_out too long or address wrong");
 
       set_relative_rate(1 / total_size);
     }

@@ -64,7 +64,7 @@ namespace gr {
           d_num_cifs = 2;
           break;
         default:
-          throw std::runtime_error("Transmission mode %d doesn't exist" + transmission_mode);
+          throw std::invalid_argument("Transmission mode %d doesn't exist" + transmission_mode);
       }
       if (subch_size.size() != num_subch)
         GR_LOG_WARN(d_logger, "sizeof vector subch_size does not match with num_subch");
@@ -75,7 +75,7 @@ namespace gr {
         d_subch_total_len += subch_size[i];
       }
       if (d_subch_total_len * d_cu_len > d_cif_len) {
-        throw std::runtime_error(
+        throw std::out_of_range(
                 "subchannels are %d bytes too long for CIF" + (d_subch_total_len * d_cu_len - d_cif_len));
       }
       set_output_multiple(d_vlen_out);

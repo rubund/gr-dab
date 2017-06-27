@@ -1,11 +1,11 @@
 <block>
-  <name>Frequency interleaver vcc</name>
+  <name>Frequency interleaver</name>
   <key>dab_frequency_interleaver_vcc</key>
   <category>DAB</category>
   <import>import dab</import>
   <make>dab.frequency_interleaver_vcc($interleaving_sequence)</make>
   <param>
-    <name>Interleaving_sequence</name>
+    <name>Interleaving sequence</name>
     <key>interleaving_sequence</key>
     <type>raw</type>
   </param>
