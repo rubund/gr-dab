@@ -33,7 +33,7 @@ class qa_reed_solomon_bb (gr_unittest.TestCase):
 
     def test_001_t (self):
         self.dab_params = dab.parameters.dab_parameters(1 , 208.064e6, True)
-        self.src = blocks.file_source_make(gr.sizeof_char, "debug/checked_firecode.dat")
+        self.src = blocks.file_source_make(gr.sizeof_char, "debug/subch_decoded.dat")
         self.solomon = dab.reed_solomon_bb_make(15)
         self.file_sink = blocks.file_sink_make(gr.sizeof_char, "debug/reed_solomon_repaired.dat")
         self.tb.connect(self.src, self.solomon, self.file_sink)
