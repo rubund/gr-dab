@@ -29,6 +29,8 @@
 #include <sstream>
 #include <boost/format.hpp>
 
+using namespace boost;
+
 namespace gr {
   namespace dab {
 
@@ -52,7 +54,7 @@ namespace gr {
       d_superframe_size = bit_rate_n * 110;
       aacInitialized = false;
       baudRate = 48000;
-      aacHandle = NeAACDecOpen ();
+      //aacHandle = NeAACDecOpen (); //TODO
       memset(d_aac_frame, 0, 960);
     }
 
@@ -128,7 +130,7 @@ namespace gr {
       if (init_result != 0) {
 /*      If some error initializing occured, skip the file */
         GR_LOG_ERROR(d_logger, "Error initializing decoding library");
-        NeAACDecClose(aacHandle);
+        //NeAACDecClose(aacHandle); //TODO
         return false;
       }
       return true;
@@ -177,7 +179,7 @@ namespace gr {
       int16_t samples;
       long unsigned int sampleRate;
       int16_t *outBuffer;
-      NeAACDecFrameInfo hInfo;
+      //NeAACDecFrameInfo hInfo; //TODO
       uint8_t dummy[10000];
       uint8_t channels;
 

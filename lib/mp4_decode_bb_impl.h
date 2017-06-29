@@ -23,7 +23,7 @@
 
 #include <dab/mp4_decode_bb.h>
 #include "dab-constants.h"
-#include "neaacdec.h"
+//#include "neaacdec.h"
 
 namespace gr {
   namespace dab {
@@ -40,7 +40,7 @@ namespace gr {
       uint8_t d_au_start[7];
       uint8_t d_aac_frame[960];
 
-      NeAACDecHandle aacHandle;
+      //NeAACDecHandle aacHandle;
 
       int get_aac_channel_configuration(int16_t m_mpeg_surround_config, uint8_t aacChannelMode);
       bool initialize(uint8_t dacRate,
