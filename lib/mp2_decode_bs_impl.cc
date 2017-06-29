@@ -232,7 +232,7 @@ namespace gr {
       d_bit_rate = d_bit_rate_n * 8;
 
       int16_t i, j;
-      int16_t *nPtr = &N[0][0];
+      int16_t *nPtr = &d_N[0][0];
 
       // compute N[i][j]
       for (i = 0; i < 64; i++)
@@ -244,17 +244,19 @@ namespace gr {
       // perform local initialization:
       for (i = 0; i < 2; ++i)
         for (j = 1023; j >= 0; j--)
-          V[i][j] = 0;
+          d_V[i][j] = 0;
 
-      d_voffs = 0;
-      d_baudRate = 48000;  // default for DAB
-      d_mp2_framesize = 24 * bitRate;  // may be changed
+      d_V_offs = 0;
+      d_baud_rate = 48000;  // default for DAB
+      d_mp2_framesize = 24 * d_bit_rate;  // may be changed
       d_mp2_frame = new uint8_t[2 * d_mp2_framesize];
       d_mp2_header_OK = 0;
       d_mp2_header_count = 0;
       d_mp2_bit_count = 0;
       d_number_of_frames = 0;
       d_error_frames = 0;
+
+      set_output_multiple(24 * d_bit_rate);
     }
 
     /*
@@ -351,10 +353,243 @@ namespace gr {
       bit_window = (bit_window << bit_count) & 0xFFFFFF;
       bits_in_window -= bit_count;
       while (bits_in_window < 16) {
-        bit_window |= (*frame_pos++) << (16 - bits_in_window);
+        bit_window |= (*d_frame_pos++) << (16 - bits_in_window);
         bits_in_window += 8;
       }
       return result;
+    }
+
+////////////////////////////////////////////////////////////////////////////////
+// FRAME DECODE FUNCTION                                                      //
+////////////////////////////////////////////////////////////////////////////////
+
+    int32_t	mp2_decode_bs_impl::mp2_decode_frame (uint8_t *frame, int16_t *pcm) {
+      uint32_t bit_rate_index_minus1;
+      uint32_t sampling_frequency;
+      uint32_t padding_bit;
+      uint32_t mode;
+      uint32_t frame_size;
+      int32_t	bound, sblimit;
+      int32_t sb, ch, gr, part, idx, nch, i, j, sum;
+      int32_t table_idx;
+
+      d_number_of_frames ++;
+      if (d_number_of_frames >= 25) {
+        //show_frameErrors (errorFrames);
+        d_number_of_frames = 0;
+        d_error_frames = 0;
+      }
+
+// check for valid header: syncword OK, MPEG-Audio Layer 2
+      if (( frame[0]         != 0xFF)   // no valid syncword?
+          ||  ((frame[1] & 0xF6) != 0xF4)   // no MPEG-1/2 Audio Layer II?
+          ||  ((frame[2] - 0x10) >= 0xE0))  { // invalid bitrate?
+        d_error_frames ++;
+        return 0;
+      }
+
+      // set up the bitstream reader
+      bit_window	= frame [2] << 16;
+      bits_in_window	= 8;
+      d_frame_pos	= &frame[3];
+
+      // read the rest of the header
+      bit_rate_index_minus1 = get_bits(4) - 1;
+      if (bit_rate_index_minus1 > 13) {
+        GR_LOG_DEBUG(d_logger, "invalid bit rate or unknown format");
+        return 0;  // invalid bit rate or 'free format'
+      }
+
+      sampling_frequency = get_bits(2);
+      if (sampling_frequency == 3)
+        return 0;
+
+      if ((frame[1] & 0x08) == 0) {  // MPEG-2
+        sampling_frequency += 4;
+        bit_rate_index_minus1 += 14;
+      }
+
+      padding_bit = get_bits(1);
+      get_bits(1);  // discard private_bit
+      mode = get_bits(2);
+
+// parse the mode_extension, set up the stereo bound
+      if (mode == JOINT_STEREO)
+        bound = (get_bits(2) + 1) << 2;
+      else {
+        get_bits(2);
+        bound = (mode == MONO) ? 0 : 32;
+      }
+
+// discard the last 4 bits of the header and the CRC value, if present
+      get_bits(4);
+      if ((frame [1] & 1) == 0)
+        get_bits(16);
+
+// compute the frame size
+      frame_size = (144000 * bitrates[bit_rate_index_minus1]
+                    / sample_rates [sampling_frequency]) + padding_bit;
+
+      if (!pcm) {
+        GR_LOG_DEBUG(d_logger, "pcm is NULL ptr - no decoding");
+        return frame_size;  // no decoding
+      }
+
+// prepare the quantizer table lookups
+      if (sampling_frequency & 4) {
+        // MPEG-2 (LSR)
+        table_idx = 2;
+        sblimit = 30;
+      } else {
+        // MPEG-1
+        table_idx = (mode == MONO) ? 0 : 1;
+        table_idx = quant_lut_step1[table_idx][bit_rate_index_minus1];
+        table_idx = quant_lut_step2[table_idx][sampling_frequency];
+        sblimit = table_idx & 63;
+        table_idx >>= 6;
+      }
+
+      if (bound > sblimit)
+        bound = sblimit;
+
+      // read the allocation information
+      for (sb = 0; sb < bound; ++sb)
+        for (ch = 0; ch < 2; ++ch)
+          d_allocation[ch][sb] = read_allocation(sb, table_idx);
+
+      for (sb = bound;  sb < sblimit;  ++sb)
+        d_allocation[0][sb] =
+        d_allocation[1][sb] = read_allocation (sb, table_idx);
+
+      // read scale factor selector information
+      nch = (mode == MONO) ? 1 : 2;
+      for (sb = 0;  sb < sblimit;  ++sb) {
+        for (ch = 0;  ch < nch;  ++ch)
+          if (d_allocation [ch][sb])
+            d_scfsi [ch][sb] = get_bits (2);
+
+        if (mode == MONO)
+          d_scfsi[1][sb] = d_scfsi[0][sb];
+      }
+
+      // read scale factors
+      for (sb = 0;  sb < sblimit;  ++sb) {
+        for (ch = 0;  ch < nch;  ++ch) {
+          if (d_allocation[ch][sb]) {
+            switch (d_scfsi[ch][sb]) {
+              case 0: d_scalefactor[ch][sb][0] = get_bits(6);
+                d_scalefactor[ch][sb][1] = get_bits(6);
+                d_scalefactor[ch][sb][2] = get_bits(6);
+                break;
+              case 1: d_scalefactor[ch][sb][0] =
+                      d_scalefactor[ch][sb][1] = get_bits(6);
+                d_scalefactor[ch][sb][2] = get_bits(6);
+                break;
+              case 2: d_scalefactor[ch][sb][0] =
+                      d_scalefactor[ch][sb][1] =
+                      d_scalefactor[ch][sb][2] = get_bits(6);
+                break;
+              case 3: d_scalefactor[ch][sb][0] = get_bits(6);
+                d_scalefactor[ch][sb][1] =
+                d_scalefactor[ch][sb][2] = get_bits(6);
+                break;
+            }
+          }
+        }
+        if (mode == MONO)
+          for (part = 0;  part < 3;  ++part)
+            d_scalefactor[1][sb][part] = d_scalefactor[0][sb][part];
+      }
+
+// coefficient input and reconstruction
+      for (part = 0;  part < 3;  ++part) {
+        for (gr = 0;  gr < 4;  ++gr) {
+// read the samples
+          for (sb = 0;  sb < bound;  ++sb)
+            for (ch = 0;  ch < 2;  ++ch)
+              read_samples (d_allocation[ch][sb],
+                            d_scalefactor[ch][sb][part],
+                            &d_sample[ch][sb][0]);
+          for (sb = bound;  sb < sblimit;  ++sb) {
+            read_samples (d_allocation[0][sb],
+                          d_scalefactor[0][sb][part],
+                          &d_sample[0][sb][0]);
+            for (idx = 0;  idx < 3;  ++idx)
+              d_sample[1][sb][idx] = d_sample[0][sb][idx];
+          }
+
+          for (ch = 0;  ch < 2;  ++ch)
+            for (sb = sblimit;  sb < 32;  ++sb)
+              for (idx = 0;  idx < 3;  ++idx)
+                d_sample[ch][sb][idx] = 0;
+
+// synthesis loop
+          for (idx = 0;  idx < 3;  ++idx) {
+// shifting step
+            d_V_offs = table_idx = (d_V_offs - 64) & 1023;
+
+            for (ch = 0;  ch < 2;  ++ch) {
+// matrixing
+              for (i = 0;  i < 64;  ++i) {
+                sum = 0;
+                for (j = 0;  j < 32;  ++j) // 8b*15b=23b
+                  sum += d_N[i][j] * d_sample[ch][j][idx];
+// intermediate value is 28 bit (23 + 5), clamp to 14b
+//
+                d_V [ch][table_idx + i] = (sum + 8192) >> 14;
+              }
+
+// construction of U
+              for (i = 0;  i < 8;  ++i)
+                for (j = 0;  j < 32;  ++j) {
+                  d_U [(i << 6) + j]
+                          = d_V [ch][(table_idx + (i << 7) + j) & 1023];
+                  d_U [(i << 6) + j + 32] =
+                          d_V [ch][(table_idx + (i << 7) + j + 96) & 1023];
+                }
+
+// apply window
+              for (i = 0;  i < 512;  ++i)
+                d_U [i] = (d_U [i] * D [i] + 32) >> 6;
+
+// output samples
+              for (j = 0;  j < 32;  ++j) {
+                sum = 0;
+                for (i = 0;  i < 16;  ++i)
+                  sum -= d_U [(i << 5) + j];
+                sum = (sum + 8) >> 4;
+                if (sum < -32768)
+                  sum = -32768;
+                if (sum > 32767)
+                  sum = 32767;
+                pcm[(idx << 6) | (j << 1) | ch] = (uint16_t) sum;
+              }
+            } // end of synthesis channel loop
+          } // end of synthesis sub-block loop
+// adjust PCM output pointer: decoded 3 * 32 = 96 stereo samples
+          pcm += 192;
+        } // decoding of the granule finished
+      }
+      return frame_size;
+    }
+
+    //
+//	bits to MP2 frames, amount is amount of bits
+    void	mp2_decode_bs_impl::add_to_frame (uint8_t *v) {
+
+
+    }
+
+    void	mp2_decode_bs_impl::add_bit_to_mp2 (uint8_t *v, uint8_t b, int16_t nm) {
+      uint8_t	byte	= v [nm / 8];
+      int16_t	bitnr	= 7 - (nm & 7);
+      uint8_t	newbyte = (01 << bitnr);
+
+      if (b == 0)
+        byte	&= ~newbyte;
+      else
+        byte |= newbyte;
+      v [nm / 8] = byte;
     }
 
     void
@@ -369,16 +604,77 @@ namespace gr {
                                      gr_vector_const_void_star &input_items,
                                      gr_vector_void_star &output_items)
     {
-      const <+ITYPE + > *in = (const <+ITYPE + > *) input_items[0];
-      <+OTYPE + > *out = (<+OTYPE + > *) output_items[0];
+      const unsigned char *in = (const unsigned char *) input_items[0]; // input are unpacked bytes
+      uint16_t *out = (uint16_t *) output_items[0];
+      d_out_offset = 0;
 
-      // Do <+signal processing+>
+      for (int logical_frame_count; logical_frame_count < noutput_items/d_mp2_framesize; logical_frame_count++){
+
+        int16_t i, j;
+        int16_t lf = d_baud_rate == 48000 ? d_mp2_framesize : 2 * d_mp2_framesize;
+        int16_t amount = d_mp2_framesize;
+        uint8_t help[24 * d_bit_rate / 8];
+        int16_t vlength = 24 * d_bit_rate / 8;
+
+        for (i = 0; i < 24 * d_bit_rate / 8; i++) {
+          help[i] = 0;
+          for (j = 0; j < 8; j++) {
+            help[i] <<= 1;
+            help[i] |= in[logical_frame_count*d_mp2_framesize + 8 * i + j] & 01;
+          }
+        }
+        {
+          uint8_t L0 = help[vlength - 1];
+          uint8_t L1 = help[vlength - 2];
+          int16_t down = d_bit_rate * 1000 >= 56000 ? 4 : 2;
+          //my_padhandler. processPAD (help, vlength - 2 - down - 1, L1, L0);
+        }
+
+        for (i = 0; i < amount; i++) {
+          if (d_mp2_header_OK == 2) {
+            add_bit_to_mp2(d_mp2_frame, in[logical_frame_count*d_mp2_framesize + i], d_mp2_bit_count++);
+            if (d_mp2_bit_count >= lf) {
+              int16_t sample_buf[KJMP2_SAMPLES_PER_FRAME * 2]; //TODO: -> no need for an extra buffer; write it directly to output buffer
+              // decode mp2 frame and write it into sample_buf
+              if (mp2_decode_frame(d_mp2_frame, sample_buf)) {
+                //buffer -> putDataIntoBuffer (sample_buf, 2 * (int32_t)KJMP2_SAMPLES_PER_FRAME);
+                for (int n = 0; n < KJMP2_SAMPLES_PER_FRAME * 2; n++) {
+                  out[d_out_offset++] = sample_buf[i];
+                }
+              }
+
+              d_mp2_header_OK = 0;
+              d_mp2_header_count = 0;
+              d_mp2_bit_count = 0;
+            }
+          } else if (d_mp2_header_OK == 0) {
+//	apparently , we are not in sync yet
+            if (in[logical_frame_count*d_mp2_framesize + i] == 01) {
+              if (++d_mp2_header_count == 12) {
+                d_mp2_bit_count = 0;
+                for (j = 0; j < 12; j++)
+                  add_bit_to_mp2(d_mp2_frame, 1, d_mp2_bit_count++);
+                d_mp2_header_OK = 1;
+              }
+            } else
+              d_mp2_header_count = 0;
+          } else if (d_mp2_header_OK == 1) {
+            add_bit_to_mp2(d_mp2_frame, in[logical_frame_count*d_mp2_framesize + i], d_mp2_bit_count++);
+            if (d_mp2_bit_count == 24) {
+              set_samplerate(mp2_samplerate(d_mp2_frame));
+              d_mp2_header_OK = 2;
+            }
+          }
+        }
+      }
+
+
       // Tell runtime system how many input items we consumed on
       // each input stream.
       consume_each(noutput_items);
 
       // Tell runtime system how many output items we produced.
-      return noutput_items;
+      return d_out_offset;
     }
 
   } /* namespace dab */
