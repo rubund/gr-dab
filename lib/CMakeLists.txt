@@ -62,7 +62,6 @@ list(APPEND dab_sources
     reed_solomon_bb_impl.cc 
     reed-solomon.cpp
     galois.cpp
-    mp4_decode_bb_impl.cc
     mp2_decode_bs_impl.cc)
 
 set(dab_sources "${dab_sources}" PARENT_SCOPE)

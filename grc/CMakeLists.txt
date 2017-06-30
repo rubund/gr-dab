@@ -55,6 +55,5 @@ install(FILES
     dab_prune.xml
     dab_firecode_check_bb.xml
     dab_reed_solomon_bb.xml
-    dab_mp4_decode_bb.xml
     dab_mp2_decode_bs.xml DESTINATION share/gnuradio/grc/blocks
 )

@@ -71,33 +71,26 @@ namespace gr {
       unsigned char *out = (unsigned char *) output_items[0];
       d_nproduced = 0;
 
-//      for (int i = 0; i < noutput_items / (d_bit_rate_n * 110); i++) {
-//        for (int j = 0; j < d_bit_rate_n; j++) {
-//          int16_t ler = 0;
-//          for (int k = 0; k < 120; k++) {
-//            d_rs_in[k] = in[i*d_bit_rate_n*120 + (j + k * d_bit_rate_n)];
-//          }
-//          ler = d_rs_decoder.dec(d_rs_in, d_rs_out, 135);
-//          if (ler < 0) {
-//            GR_LOG_DEBUG(d_logger, "error repair failed");
-//            // cannot correct error -> dump frame
-//          } else {
-//            GR_LOG_DEBUG(d_logger, "error repair succeeded");
-//            for (int k = 0; k < 110; k++) {
-//              out[i * d_bit_rate_n * 110 + j + k * d_bit_rate_n] = d_rs_out[k];
-//            }
-//            d_nproduced++;
-//          }
-//        }
-//      }
-      for(int i = 0; i < noutput_items / (d_bit_rate_n * 110); i++){
-        for (int j = 0; j < d_bit_rate_n; j++){
-          for (int k = 0; k < 110; k++){
-            out[i * d_bit_rate_n * 110 + j + k * d_bit_rate_n] = in[i*d_bit_rate_n*120 + (j + k * d_bit_rate_n)];
+      for (int i = 0; i < noutput_items / (d_bit_rate_n * 110); i++) {
+        for (int j = 0; j < d_bit_rate_n; j++) {
+          int16_t ler = 0;
+          for (int k = 0; k < 120; k++) {
+            d_rs_in[k] = in[i*d_bit_rate_n*120 + (j + k * d_bit_rate_n)];
           }
-          d_nproduced ++;
+          ler = d_rs_decoder.dec(d_rs_in, d_rs_out, 135);
+          if (ler < 0) {
+            GR_LOG_DEBUG(d_logger, "error repair failed");
+            // cannot correct error -> dump frame
+          } else {
+            GR_LOG_DEBUG(d_logger, "error repair succeeded");
+            for (int k = 0; k < 110; k++) {
+              out[i * d_bit_rate_n * 110 + j + k * d_bit_rate_n] = d_rs_out[k];
+            }
+            d_nproduced++;
+          }
         }
       }
+
       // Tell runtime system how many input items we consumed on
       // each input stream.
       consume_each(noutput_items * (120 / 110));

@@ -93,6 +93,7 @@ class msc_decode(gr.hier_block2):
         self.select_subch = dab.select_subch_vfvf_make(self.dp.msc_cu_size, self.dp.msc_cu_size * self.size, self.address, self.dp.num_cus)
 
         # time deinterleaving
+        self.time_v2s = blocks.vector_to_stream_make(gr.sizeof_float, self.dp.msc_cu_size * self.size)
         self.time_deinterleaver = dab.time_deinterleave_ff_make(self.dp.msc_cu_size * self.size, self.dp.scrambling_vector)
         # unpuncture
         self.conv_v2s = blocks.vector_to_stream(gr.sizeof_float, self.msc_punctured_codeword_length)
@@ -141,8 +142,9 @@ class msc_decode(gr.hier_block2):
                      (self.repartition_msc_to_cus, 0),
                      (self.select_subch, 0),
                      #(self.repartition_cus_to_logical_frame, 0),
+                     self.time_v2s,
                      self.time_deinterleaver,
-                     self.conv_v2s,
+                     #self.conv_v2s,
                      self.unpuncture,
                      self.conv_decode,
                      #self.conv_s2v,
