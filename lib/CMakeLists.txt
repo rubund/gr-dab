@@ -62,7 +62,9 @@ list(APPEND dab_sources
     reed_solomon_bb_impl.cc 
     reed-solomon.cpp
     galois.cpp
-    mp2_decode_bs_impl.cc)
+    mp2_decode_bs_impl.cc
+    reed_solomon2_bb_impl.cc
+    rscodec.cpp)
 
 set(dab_sources "${dab_sources}" PARENT_SCOPE)
 if(NOT dab_sources)

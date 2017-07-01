@@ -23,49 +23,49 @@
 #endif
 
 #include <gnuradio/io_signature.h>
-#include "reed_solomon_bb_impl.h"
+#include "reed_solomon2_bb_impl.h"
 
 namespace gr {
   namespace dab {
 
-    reed_solomon_bb::sptr
-    reed_solomon_bb::make(int bit_rate_n)
+    reed_solomon2_bb::sptr
+    reed_solomon2_bb::make(int bit_rate_n)
     {
       return gnuradio::get_initial_sptr
-              (new reed_solomon_bb_impl(bit_rate_n));
+        (new reed_solomon2_bb_impl(bit_rate_n));
     }
 
     /*
      * The private constructor
      */
-    reed_solomon_bb_impl::reed_solomon_bb_impl(int bit_rate_n)
-            : gr::block("reed_solomon_bb",
-                        gr::io_signature::make(1, 1, sizeof(unsigned char)),
-                        gr::io_signature::make(1, 1, sizeof(unsigned char))),
-              d_bit_rate_n(bit_rate_n)
+    reed_solomon2_bb_impl::reed_solomon2_bb_impl(int bit_rate_n)
+      : gr::block("reed_solomon2_bb",
+              gr::io_signature::make(1, 1, sizeof(unsigned char)),
+              gr::io_signature::make(1, 1, sizeof(unsigned char))),
+        d_bit_rate_n(bit_rate_n)
     {
-      //reedSolomon *d_rs_decoder = new reedSolomon(8, 0435, 0, 1, 10);
       set_output_multiple(d_bit_rate_n * 110);
+      rscodec *d_rs_decoder = new rscodec();
     }
 
     /*
      * Our virtual destructor.
      */
-    reed_solomon_bb_impl::~reed_solomon_bb_impl()
+    reed_solomon2_bb_impl::~reed_solomon2_bb_impl()
     {
     }
 
     void
-    reed_solomon_bb_impl::forecast(int noutput_items, gr_vector_int &ninput_items_required)
+    reed_solomon2_bb_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
       ninput_items_required[0] = noutput_items * (120 / 110);
     }
 
     int
-    reed_solomon_bb_impl::general_work(int noutput_items,
-                                       gr_vector_int &ninput_items,
-                                       gr_vector_const_void_star &input_items,
-                                       gr_vector_void_star &output_items)
+    reed_solomon2_bb_impl::general_work (int noutput_items,
+                       gr_vector_int &ninput_items,
+                       gr_vector_const_void_star &input_items,
+                       gr_vector_void_star &output_items)
     {
       const unsigned char *in = (const unsigned char *) input_items[0];
       unsigned char *out = (unsigned char *) output_items[0];

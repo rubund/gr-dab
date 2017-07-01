@@ -21,9 +21,9 @@
 
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
-import dab
+import dab_swig as dab
 
-class qa_reed_solomon_bb (gr_unittest.TestCase):
+class qa_reed_solomon2_bb (gr_unittest.TestCase):
 
     def setUp (self):
         self.tb = gr.top_block ()
@@ -32,14 +32,10 @@ class qa_reed_solomon_bb (gr_unittest.TestCase):
         self.tb = None
 
     def test_001_t (self):
-        self.dab_params = dab.parameters.dab_parameters(1 , 208.064e6, True)
-        self.src = blocks.file_source_make(gr.sizeof_char, "debug/checked_firecode.dat")
-        self.solomon = dab.reed_solomon2_bb_make(15)
-        self.file_sink = blocks.file_sink_make(gr.sizeof_char, "debug/reed_solomon_repaired.dat")
-        self.tb.connect(self.src, self.solomon, self.file_sink)
+        # set up fg
         self.tb.run ()
-        pass
+        # check data
 
 
 if __name__ == '__main__':
-    gr_unittest.run(qa_reed_solomon_bb, "qa_reed_solomon_bb.xml")
+    gr_unittest.run(qa_reed_solomon2_bb, "qa_reed_solomon2_bb.xml")
