@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /* 
- * Copyright 2017 <+YOU OR YOUR COMPANY+>.
+ * Copyright 2017 Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,9 +21,14 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-
+#include <stdexcept>
+#include <stdio.h>
+#include <sstream>
+#include <boost/format.hpp>
 #include <gnuradio/io_signature.h>
 #include "reed_solomon2_bb_impl.h"
+
+using namespace boost;
 
 namespace gr {
   namespace dab {
@@ -70,33 +75,36 @@ namespace gr {
       const unsigned char *in = (const unsigned char *) input_items[0];
       unsigned char *out = (unsigned char *) output_items[0];
       d_nproduced = 0;
+      d_nconsumed = 0;
 
       for (int i = 0; i < noutput_items / (d_bit_rate_n * 110); i++) {
         for (int j = 0; j < d_bit_rate_n; j++) {
           int16_t ler = 0;
           for (int k = 0; k < 120; k++) {
-            d_rs_in[k] = in[i*d_bit_rate_n*120 + (j + k * d_bit_rate_n)];
+            d_rs_in[k] = in[d_nconsumed*d_bit_rate_n*120 + (j + k * d_bit_rate_n)];
           }
           ler = d_rs_decoder.dec(d_rs_in, d_rs_out, 135);
           if (ler < 0) {
-            GR_LOG_DEBUG(d_logger, "error repair failed");
-            // cannot correct error -> dump frame
+            GR_LOG_DEBUG(d_logger, "error repair failed"); // cannot correct error -> dump frame
+            d_nproduced--;
+            break; //dump whole superframe
           } else {
-            GR_LOG_DEBUG(d_logger, "error repair succeeded");
+            GR_LOG_DEBUG(d_logger, format("error repair succeeded (%d errors)") %ler);
             for (int k = 0; k < 110; k++) {
-              out[i * d_bit_rate_n * 110 + j + k * d_bit_rate_n] = d_rs_out[k];
+              out[d_nproduced * d_bit_rate_n * 110 + j + k * d_bit_rate_n] = d_rs_out[k];
             }
-            d_nproduced++;
           }
         }
+        d_nproduced++;
+        d_nconsumed++;
       }
 
       // Tell runtime system how many input items we consumed on
       // each input stream.
-      consume_each(noutput_items * (120 / 110));
+      consume_each(d_nconsumed *120*d_bit_rate_n);
 
       // Tell runtime system how many output items we produced.
-      return d_nproduced *110;
+      return d_nproduced *110*d_bit_rate_n;
     }
 
   } /* namespace dab */

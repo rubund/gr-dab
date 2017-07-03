@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /* 
- * Copyright 2017 <+YOU OR YOUR COMPANY+>.
+ * Copyright 2017 Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,13 +26,21 @@
 
 namespace gr {
   namespace dab {
-
+/*! \brief reed solomon error repair
+ *
+ * Reed Solomon RS(120, 110, t=5) with virtual interleaving; derived from RS(255, 245, t=5). Details see ETSI TS 102 563 clause 6.0 and 6.1.
+ * Uses rscodec class for RS decoding/error repair.
+ *
+ * @param bit_rate_n data rate in multiples of 8kbit/s
+ *
+ */
     class reed_solomon2_bb_impl : public reed_solomon2_bb
     {
      private:
       int d_bit_rate_n;
       rscodec	d_rs_decoder;
       int d_nproduced;
+      int d_nconsumed;
       uint8_t d_rs_in [120];
       uint8_t d_rs_out [110];
 
