@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
-# Copyright 2017 <+YOU OR YOUR COMPANY+>.
+# Copyright 2017 Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
 # 
 # This is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +21,8 @@
 
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
-import dab_swig as dab
+import dab
+import os
 
 class qa_reed_solomon2_bb (gr_unittest.TestCase):
 
@@ -31,10 +32,16 @@ class qa_reed_solomon2_bb (gr_unittest.TestCase):
     def tearDown (self):
         self.tb = None
 
+# manual check if most frames can be corrected
     def test_001_t (self):
-        # set up fg
-        self.tb.run ()
-        # check data
+        if os.path.exists("debug/checked_firecode.dat"):
+            self.dab_params = dab.parameters.dab_parameters(1, 208.064e6, True)
+            self.src = blocks.file_source_make(gr.sizeof_char, "debug/checked_firecode.dat")
+            self.solomon = dab.reed_solomon2_bb_make(15)
+            self.file_sink = blocks.file_sink_make(gr.sizeof_char, "debug/reed_solomon_repaired.dat")
+            self.tb.connect(self.src, self.solomon, self.file_sink)
+            self.tb.run()
+        pass
 
 
 if __name__ == '__main__':
