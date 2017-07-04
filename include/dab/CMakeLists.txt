@@ -56,5 +56,6 @@ install(FILES
     firecode_check_bb.h
     reed_solomon_bb.h
     mp2_decode_bs.h
-    reed_solomon2_bb.h DESTINATION include/dab
+    reed_solomon2_bb.h
+    mp4_decode_bs.h DESTINATION include/dab
 )

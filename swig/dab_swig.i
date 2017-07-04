@@ -43,6 +43,7 @@
 #include "dab/reed_solomon_bb.h"
 #include "dab/mp2_decode_bs.h"
 #include "dab/reed_solomon2_bb.h"
+#include "dab/mp4_decode_bs.h"
 %}
 
 
@@ -120,3 +121,5 @@ GR_SWIG_BLOCK_MAGIC2(dab, reed_solomon_bb);
 GR_SWIG_BLOCK_MAGIC2(dab, mp2_decode_bs);
 %include "dab/reed_solomon2_bb.h"
 GR_SWIG_BLOCK_MAGIC2(dab, reed_solomon2_bb);
+%include "dab/mp4_decode_bs.h"
+GR_SWIG_BLOCK_MAGIC2(dab, mp4_decode_bs);
