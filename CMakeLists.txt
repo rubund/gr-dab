@@ -43,6 +43,17 @@ if(CMAKE_COMPILER_IS_GNUCXX AND NOT WIN32)
 endif()
 
 ########################################################################
+# Find FAAD
+########################################################################
+find_package(Faad REQUIRED)
+if (NOT FAAD_FOUND )
+    message(FATAL_ERROR "please install libfaad")
+else()
+    message(STATUS "FAAD found")
+endif ()
+
+
+########################################################################
 # Find boost
 ########################################################################
 if(UNIX AND EXISTS "/usr/lib64")
