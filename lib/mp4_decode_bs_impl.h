@@ -34,33 +34,34 @@ namespace gr {
       int d_nsamples_produced;
       int d_bit_rate_n;
       int d_superframe_size;
-      bool aacInitialized;
+      bool d_aacInitialized;
       int32_t baudRate;
       uint8_t d_dac_rate, d_sbr_flag, d_aac_channel_mode, d_ps_flag, d_mpeg_surround, d_num_aus;
-      uint8_t d_au_start[7];
-      uint8_t d_aac_frame[960];
+      int16_t d_au_start[10];
+      unsigned char d_aac_frame[960];
 
       NeAACDecHandle aacHandle;
-
+      bool CRC16(uint8_t *data, size_t length );
+      uint16_t BinToDec(const uint8_t *data, size_t offset, size_t length );
       int get_aac_channel_configuration(int16_t m_mpeg_surround_config, uint8_t aacChannelMode);
       bool initialize(uint8_t dacRate,
                       uint8_t sbrFlag,
                       int16_t mpegSurround,
                       uint8_t aacChannelMode);
-      void handle_aac_frame(uint8_t *v,
+      void handle_aac_frame(const uint8_t *v,
                             int16_t frame_length,
                             uint8_t dacRate,
                             uint8_t sbrFlag,
                             uint8_t mpegSurround,
-                            uint8_t aacChannelMode,
-                            int* out_sample);
+                            uint8_t aacChannelMode/*,
+                            int* out_sample*/);
       int16_t MP42PCM(uint8_t dacRate,
                       uint8_t sbrFlag,
                       int16_t mpegSurround,
                       uint8_t aacChannelMode,
                       uint8_t buffer[],
-                      int16_t bufferLength,
-                      int* out_sample);
+                      int16_t bufferLength/*,
+                      int* out_sample*/);
 
     public:
       mp4_decode_bs_impl(int bit_rate_n);
