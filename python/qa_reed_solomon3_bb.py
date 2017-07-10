@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
-# Copyright 2017 Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
+# Copyright 2017 <+YOU OR YOUR COMPANY+>.
 # 
 # This is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,10 +21,9 @@
 
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
-import os
 import dab
 
-class qa_mp4_decode_bs (gr_unittest.TestCase):
+class qa_reed_solomon3_bb (gr_unittest.TestCase):
 
     def setUp (self):
         self.tb = gr.top_block ()
@@ -33,15 +32,14 @@ class qa_mp4_decode_bs (gr_unittest.TestCase):
         self.tb = None
 
     def test_001_t (self):
-        if os.path.exists("debug/checked_firecode.dat"):
-            #self.dab_params = dab.parameters.dab_parameters(1, 208.064e6, True)
-            self.src = blocks.file_source_make(gr.sizeof_char, "debug/reed_solomon_repaired.dat")
-            self.mp4 = dab.mp4_decode_bs_make(14)
-            self.file_sink = blocks.file_sink_make(gr.sizeof_short, "debug/PCM.dat")
-            self.tb.connect(self.src, self.mp4, self.file_sink)
-            self.tb.run()
+        self.dab_params = dab.parameters.dab_parameters(1, 208.064e6, True)
+        self.src = blocks.file_source_make(gr.sizeof_char, "debug/checked_firecode.dat")
+        self.solomon = dab.reed_solomon3_bb_make(14)
+        self.file_sink = blocks.file_sink_make(gr.sizeof_char, "debug/reed_solomon_repaired.dat")
+        self.tb.connect(self.src, self.solomon, self.file_sink)
+        self.tb.run()
         pass
 
 
 if __name__ == '__main__':
-    gr_unittest.run(qa_mp4_decode_bs, "qa_mp4_decode_bs.xml")
+    gr_unittest.run(qa_reed_solomon3_bb, "qa_reed_solomon3_bb.xml")

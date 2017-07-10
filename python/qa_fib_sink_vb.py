@@ -41,6 +41,16 @@ class qa_fib_sink_vb (gr_unittest.TestCase):
         self.tb.run()
         pass
 
+    def test_002_t (self):
+        self.dab_params = dab.parameters.dab_parameters(1 , 208.064e6, True)
+        self.src01 = blocks.file_source_make(gr.sizeof_float * 2*self.dab_params.num_carriers, "debug/transmission_frame.dat")
+        self.src02 = blocks.file_source_make(gr.sizeof_char, "debug/transmission_frame_trigger.dat")
+        self.fic = dab.fic_decode(self.dab_params)
+        self.tb.connect(self.src01, (self.fic, 0), blocks.null_sink_make(gr.sizeof_char*32))
+        self.tb.connect(self.src02, (self.fic, 1))
+        self.tb.run ()
+        pass
+
 
 if __name__ == '__main__':
     gr_unittest.run(qa_fib_sink_vb, "qa_fib_sink_vb.xml")

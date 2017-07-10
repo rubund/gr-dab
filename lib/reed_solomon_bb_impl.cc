@@ -42,9 +42,9 @@ namespace gr {
             : gr::block("reed_solomon_bb",
                         gr::io_signature::make(1, 1, sizeof(unsigned char)),
                         gr::io_signature::make(1, 1, sizeof(unsigned char))),
+              d_rs_decoder(8, 0435, 0, 1, 10),
               d_bit_rate_n(bit_rate_n)
     {
-      //reedSolomon *d_rs_decoder = new reedSolomon(8, 0435, 0, 1, 10);
       set_output_multiple(d_bit_rate_n * 110);
     }
 

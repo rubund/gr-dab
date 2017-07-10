@@ -38,7 +38,7 @@ namespace gr {
       int32_t baudRate;
       uint8_t d_dac_rate, d_sbr_flag, d_aac_channel_mode, d_ps_flag, d_mpeg_surround, d_num_aus;
       int16_t d_au_start[10];
-      unsigned char d_aac_frame[960];
+      //unsigned char d_aac_frame[960];
 
       NeAACDecHandle aacHandle;
       bool CRC16(uint8_t *data, size_t length );
@@ -53,15 +53,15 @@ namespace gr {
                             uint8_t dacRate,
                             uint8_t sbrFlag,
                             uint8_t mpegSurround,
-                            uint8_t aacChannelMode/*,
-                            int* out_sample*/);
+                            uint8_t aacChannelMode,
+                            int16_t* out_sample);
       int16_t MP42PCM(uint8_t dacRate,
                       uint8_t sbrFlag,
                       int16_t mpegSurround,
                       uint8_t aacChannelMode,
                       uint8_t buffer[],
-                      int16_t bufferLength/*,
-                      int* out_sample*/);
+                      int16_t bufferLength,
+                      int16_t* out_sample);
 
     public:
       mp4_decode_bs_impl(int bit_rate_n);

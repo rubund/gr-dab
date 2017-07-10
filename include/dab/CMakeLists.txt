@@ -57,5 +57,6 @@ install(FILES
     reed_solomon_bb.h
     mp2_decode_bs.h
     reed_solomon2_bb.h
-    mp4_decode_bs.h DESTINATION include/dab
+    mp4_decode_bs.h
+    reed_solomon3_bb.h DESTINATION include/dab
 )

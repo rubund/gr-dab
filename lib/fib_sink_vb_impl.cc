@@ -32,6 +32,7 @@
 #include <boost/format.hpp>
 #include "crc16.h"
 #include "FIC.h"
+#include "dab-constants.h"
 
 using namespace boost;
 
@@ -48,16 +49,18 @@ namespace gr {
 
         fib_sink_vb_impl::fib_sink_vb_impl()
                 : gr::sync_block("fib_sink_vb",
-                                 gr::io_signature::make(1, 1, sizeof(char) * 32),
+                                 gr::io_signature::make(1, 1, sizeof(unsigned char) * 32),
                                  gr::io_signature::make(0, 0, 0))
         {
         }
 
         int
-        fib_sink_vb_impl::process_fib(const char *fib)
+        fib_sink_vb_impl::process_fib(const unsigned char *fib)
         {
             uint8_t type, length, pos;
-            if (crc16(fib, FIB_LENGTH, FIB_CRC_POLY, FIB_CRC_INITSTATE) != 0) {
+            memcpy(frame, fib, 32);
+            if (!CRC16_SDR(frame, FIB_LENGTH)) {
+            //if(!check_crc_bytes(fib, FIB_LENGTH-2)){
                 GR_LOG_DEBUG(d_logger, "FIB CRC error");
                 return 1;
             }
@@ -76,7 +79,7 @@ namespace gr {
         }
 
         int
-        fib_sink_vb_impl::process_fig(uint8_t type, const char *data, uint8_t length)
+        fib_sink_vb_impl::process_fig(uint8_t type, const unsigned char *data, uint8_t length)
         {
             uint8_t cn, oe, pd, extension;
             switch (type) {
@@ -281,7 +284,7 @@ namespace gr {
                                gr_vector_const_void_star &input_items,
                                gr_vector_void_star &output_items)
         {
-            const char *in = (const char *) input_items[0];
+            const unsigned char *in = (const unsigned char *) input_items[0];
 
             for (int i = 0; i < noutput_items; i++) {
                 process_fib(in);

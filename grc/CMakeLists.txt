@@ -57,5 +57,6 @@ install(FILES
     dab_reed_solomon_bb.xml
     dab_mp2_decode_bs.xml
     dab_reed_solomon2_bb.xml
-    dab_mp4_decode_bs.xml DESTINATION share/gnuradio/grc/blocks
+    dab_mp4_decode_bs.xml
+    dab_reed_solomon3_bb.xml DESTINATION share/gnuradio/grc/blocks
 )

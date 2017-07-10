@@ -31,8 +31,9 @@ namespace gr {
         class fib_sink_vb_impl : public fib_sink_vb {
 
         private:
-            int process_fib(const char *fib);
-            int process_fig(uint8_t type, const char *data, uint8_t length);
+          unsigned char frame [32];
+            int process_fib(const unsigned char *fib);
+            int process_fig(uint8_t type, const unsigned char *data, uint8_t length);
 
 
         public:
