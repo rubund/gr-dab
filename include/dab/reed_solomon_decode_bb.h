@@ -19,8 +19,8 @@
  */
 
 
-#ifndef INCLUDED_DAB_REED_SOLOMON3_BB_H
-#define INCLUDED_DAB_REED_SOLOMON3_BB_H
+#ifndef INCLUDED_DAB_REED_SOLOMON_DECODE_BB_H
+#define INCLUDED_DAB_REED_SOLOMON_DECODE_BB_H
 
 #include <dab/api.h>
 #include <gnuradio/block.h>
@@ -33,10 +33,10 @@ namespace gr {
      * \ingroup dab
      *
      */
-    class DAB_API reed_solomon3_bb : virtual public gr::block
+    class DAB_API reed_solomon_decode_bb : virtual public gr::block
     {
      public:
-      typedef boost::shared_ptr<reed_solomon3_bb> sptr;
+      typedef boost::shared_ptr<reed_solomon_decode_bb> sptr;
 
       /*!
        * \brief Return a shared_ptr to a new instance of dab::reed_solomon3_bb.
@@ -52,5 +52,5 @@ namespace gr {
   } // namespace dab
 } // namespace gr
 
-#endif /* INCLUDED_DAB_REED_SOLOMON3_BB_H */
+#endif /* INCLUDED_DAB_REED_SOLOMON_DECODE_BB_H */
 

@@ -22,8 +22,9 @@
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
 import dab
+import os
 
-class qa_reed_solomon3_bb (gr_unittest.TestCase):
+class qa_reed_solomon_decode_bb (gr_unittest.TestCase):
 
     def setUp (self):
         self.tb = gr.top_block ()
@@ -32,14 +33,19 @@ class qa_reed_solomon3_bb (gr_unittest.TestCase):
         self.tb = None
 
     def test_001_t (self):
-        self.dab_params = dab.parameters.dab_parameters(1, 208.064e6, True)
-        self.src = blocks.file_source_make(gr.sizeof_char, "debug/checked_firecode.dat")
-        self.solomon = dab.reed_solomon3_bb_make(14)
-        self.file_sink = blocks.file_sink_make(gr.sizeof_char, "debug/reed_solomon_repaired.dat")
-        self.tb.connect(self.src, self.solomon, self.file_sink)
-        self.tb.run()
+        log = gr.logger("log")
+        if os.path.exists("debug/checked_firecode.dat"):
+            self.dab_params = dab.parameters.dab_parameters(1, 208.064e6, True)
+            self.src = blocks.file_source_make(gr.sizeof_char, "debug/checked_firecode.dat")
+            self.solomon = dab.reed_solomon_decode_bb_make(14)
+            self.file_sink = blocks.file_sink_make(gr.sizeof_char, "debug/reed_solomon_repaired.dat")
+            self.tb.connect(self.src, self.solomon, self.file_sink)
+            self.tb.run()
+        else:
+            log.debug("debug file not found - skipped test")
+            log.set_level("WARN")
         pass
 
 
 if __name__ == '__main__':
-    gr_unittest.run(qa_reed_solomon3_bb, "qa_reed_solomon3_bb.xml")
+    gr_unittest.run(qa_reed_solomon_decode_bb, "qa_reed_solomon_decode_bb.xml")

@@ -44,7 +44,7 @@
 #include "dab/mp2_decode_bs.h"
 #include "dab/reed_solomon2_bb.h"
 #include "dab/mp4_decode_bs.h"
-#include "dab/reed_solomon3_bb.h"
+#include "dab/reed_solomon_decode_bb.h"
 %}
 
 
@@ -106,23 +106,19 @@ GR_SWIG_BLOCK_MAGIC2(dab, crc16_bb);
 GR_SWIG_BLOCK_MAGIC2(dab, fib_source_b);
 %include "dab/select_subch_vfvf.h"
 GR_SWIG_BLOCK_MAGIC2(dab, select_subch_vfvf);
-
 %include "dab/unpuncture_ff.h"
 GR_SWIG_BLOCK_MAGIC2(dab, unpuncture_ff);
 %include "dab/prune.h"
 GR_SWIG_BLOCK_MAGIC2(dab, prune);
 %include "dab/firecode_check_bb.h"
 GR_SWIG_BLOCK_MAGIC2(dab, firecode_check_bb);
-
-
 %include "dab/reed_solomon_bb.h"
 GR_SWIG_BLOCK_MAGIC2(dab, reed_solomon_bb);
-
 %include "dab/mp2_decode_bs.h"
 GR_SWIG_BLOCK_MAGIC2(dab, mp2_decode_bs);
 %include "dab/reed_solomon2_bb.h"
 GR_SWIG_BLOCK_MAGIC2(dab, reed_solomon2_bb);
 %include "dab/mp4_decode_bs.h"
 GR_SWIG_BLOCK_MAGIC2(dab, mp4_decode_bs);
-%include "dab/reed_solomon3_bb.h"
-GR_SWIG_BLOCK_MAGIC2(dab, reed_solomon3_bb);
+%include "dab/reed_solomon_decode_bb.h"
+GR_SWIG_BLOCK_MAGIC2(dab, reed_solomon_decode_bb);

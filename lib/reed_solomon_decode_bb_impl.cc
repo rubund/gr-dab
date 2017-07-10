@@ -1,6 +1,12 @@
 /* -*- c++ -*- */
 /* 
- * Copyright 2017 <+YOU OR YOUR COMPANY+>.
+ * Reed-Solomon decoder for DAB+
+ * Copyright 2002 Phil Karn, KA9Q
+ * May be used under the terms of the GNU General Public License (GPL)
+ *
+ * Rewritten into a GNU Radio block for gr-dab
+ * Copyright 2017 Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
+
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,25 +33,25 @@
 #include <sstream>
 #include <boost/format.hpp>
 #include <gnuradio/io_signature.h>
-#include "reed_solomon3_bb_impl.h"
+#include "reed_solomon_decode_bb_impl.h"
 
 using namespace boost;
 
 namespace gr {
   namespace dab {
 
-    reed_solomon3_bb::sptr
-    reed_solomon3_bb::make(int bit_rate_n)
+    reed_solomon_decode_bb::sptr
+    reed_solomon_decode_bb::make(int bit_rate_n)
     {
       return gnuradio::get_initial_sptr
-              (new reed_solomon3_bb_impl(bit_rate_n));
+              (new reed_solomon_decode_bb_impl(bit_rate_n));
     }
 
     /*
      * The private constructor
      */
-    reed_solomon3_bb_impl::reed_solomon3_bb_impl(int bit_rate_n)
-            : gr::block("reed_solomon3_bb",
+    reed_solomon_decode_bb_impl::reed_solomon_decode_bb_impl(int bit_rate_n)
+            : gr::block("reed_solomon_decode_bb",
                         gr::io_signature::make(1, 1, sizeof(unsigned char)),
                         gr::io_signature::make(1, 1, sizeof(unsigned char))),
               d_bit_rate_n(bit_rate_n)
@@ -64,12 +70,12 @@ namespace gr {
     /*
      * Our virtual destructor.
      */
-    reed_solomon3_bb_impl::~reed_solomon3_bb_impl()
+    reed_solomon_decode_bb_impl::~reed_solomon_decode_bb_impl()
     {
       free_rs_char(rs_handle);
     }
 
-    void reed_solomon3_bb_impl::DecodeSuperframe(uint8_t *sf, size_t sf_len)
+    void reed_solomon_decode_bb_impl::DecodeSuperframe(uint8_t *sf, size_t sf_len)
     {
 //	// insert errors for test
 //	sf[0] ^= 0xFF;
@@ -99,8 +105,6 @@ namespace gr {
           int pos = corr_pos[j] - 135;
           if (pos < 0)
             continue;
-
-//			fprintf(stderr, "j: %d, pos: %d, sf-index: %d\n", j, pos, pos * subch_index + i);
           sf[pos * subch_index + i] = rs_packet[pos];
         }
       }
@@ -109,13 +113,13 @@ namespace gr {
 
 
     void
-    reed_solomon3_bb_impl::forecast(int noutput_items, gr_vector_int &ninput_items_required)
+    reed_solomon_decode_bb_impl::forecast(int noutput_items, gr_vector_int &ninput_items_required)
     {
       ninput_items_required[0] = noutput_items;
     }
 
     int
-    reed_solomon3_bb_impl::general_work(int noutput_items,
+    reed_solomon_decode_bb_impl::general_work(int noutput_items,
                                         gr_vector_int &ninput_items,
                                         gr_vector_const_void_star &input_items,
                                         gr_vector_void_star &output_items)

@@ -32,8 +32,9 @@ class qa_reed_solomon2_bb (gr_unittest.TestCase):
     def tearDown (self):
         self.tb = None
 
-# manual check if most frames can be corrected
+# manual check if Reed Solomon could correct most of the frames
     def test_001_t (self):
+        log = gr.logger("log")
         if os.path.exists("debug/checked_firecode.dat"):
             self.dab_params = dab.parameters.dab_parameters(1, 208.064e6, True)
             self.src = blocks.file_source_make(gr.sizeof_char, "debug/checked_firecode.dat")
@@ -41,6 +42,9 @@ class qa_reed_solomon2_bb (gr_unittest.TestCase):
             self.file_sink = blocks.file_sink_make(gr.sizeof_char, "debug/reed_solomon_repaired.dat")
             self.tb.connect(self.src, self.solomon, self.file_sink)
             self.tb.run()
+        else:
+            log.debug("debug file not found - skipped test")
+            log.set_level("WARN")
         pass
 
 

@@ -1,6 +1,12 @@
 /* -*- c++ -*- */
 /* 
- * Copyright 2017 <+YOU OR YOUR COMPANY+>.
+ * Reed-Solomon decoder for DAB+
+ * Copyright 2002 Phil Karn, KA9Q
+ * May be used under the terms of the GNU General Public License (GPL)
+ *
+ * Rewritten into a GNU Radio block for gr-dab
+ * Copyright 2017 Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
+
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,18 +24,24 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef INCLUDED_DAB_REED_SOLOMON3_BB_IMPL_H
-#define INCLUDED_DAB_REED_SOLOMON3_BB_IMPL_H
+#ifndef INCLUDED_DAB_REED_SOLOMON_DECODE_BB_IMPL_H
+#define INCLUDED_DAB_REED_SOLOMON_DECODE_BB_IMPL_H
 
-#include <dab/reed_solomon3_bb.h>
+#include <dab/reed_solomon_decode_bb.h>
 extern "C" {
 #include <fec/fec.h>
 }
 
 namespace gr {
   namespace dab {
-
-    class reed_solomon3_bb_impl : public reed_solomon3_bb
+/*! \brief Reed-Solomon decoder configured for DAB+
+ *
+ * Reed Solomon RS(120, 110, t=5) with virtual interleaving; derived from RS(255, 245, t=5). Details see ETSI TS 102 563 clause 6.0 and 6.1.
+ *
+ * @param bit_rate_n data rate in multiples of 8kbit/s
+ *
+ */
+    class reed_solomon_decode_bb_impl : public reed_solomon_decode_bb
     {
      private:
       int d_bit_rate_n;
@@ -41,8 +53,8 @@ namespace gr {
       void DecodeSuperframe(uint8_t *sf, size_t sf_len);
 
      public:
-      reed_solomon3_bb_impl(int bit_rate_n);
-      ~reed_solomon3_bb_impl();
+      reed_solomon_decode_bb_impl(int bit_rate_n);
+      ~reed_solomon_decode_bb_impl();
 
       // Where all the action really happens
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
@@ -56,5 +68,5 @@ namespace gr {
   } // namespace dab
 } // namespace gr
 
-#endif /* INCLUDED_DAB_REED_SOLOMON3_BB_IMPL_H */
+#endif /* INCLUDED_DAB_REED_SOLOMON_DECODE_BB_IMPL_H */
 
