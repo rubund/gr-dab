@@ -73,5 +73,19 @@ class qa_time_interleave_bb (gr_unittest.TestCase):
         #print result
         self.assertEqual(expected_result, result)
 
+    def test_004_t(self):
+        vector01 =          (1, 2, 3, 4, 5, 6,  7, 8, 9, 10, 11, 12,     13, 14, 15, 16, 17, 18,  19, 20, 21, 22, 23, 24,     25, 26, 27, 28, 29, 30,  31, 32, 33, 34, 35, 36)
+        expected_result =   (0, 0, 3, 0, 0, 0, 7, 0,    0, 0, 11, 4, 0, 0, 15, 8,           1, 0, 19, 12, 5, 0, 23, 16,         9, 2, 27, 20, 13, 6, 31, 24)
+        src = blocks.vector_source_b(vector01, True)
+        s2v = blocks.stream_to_vector(gr.sizeof_char, 8)
+        time_interleaver = dab.time_interleave_bb(8, [2, 3, 0, 1])
+        v2s = blocks.vector_to_stream(gr.sizeof_char, 8)
+        dst = blocks.vector_sink_b()
+        self.tb.connect(src, s2v, time_interleaver, blocks.head_make(gr.sizeof_char * 8, 4), v2s, dst)
+        self.tb.run()
+        result = dst.data()
+        #print result
+        self.assertEqual(expected_result, result)
+
 if __name__ == '__main__':
     gr_unittest.run(qa_time_interleave_bb, "qa_time_interleave_bb.xml")

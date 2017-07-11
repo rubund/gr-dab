@@ -37,3 +37,4 @@ lib/html/
 log_default.conf
 python/.unittests/
 .idea/
+examples/top_block.py

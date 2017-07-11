@@ -32,6 +32,7 @@
 #include <boost/format.hpp>
 #include "crc16.h"
 #include "FIC.h"
+#include "dab-constants.h"
 
 using namespace boost;
 
@@ -57,6 +58,7 @@ namespace gr {
         fib_sink_vb_impl::process_fib(const char *fib)
         {
             uint8_t type, length, pos;
+            memcpy(frame, fib, 32);
             if (crc16(fib, FIB_LENGTH, FIB_CRC_POLY, FIB_CRC_INITSTATE) != 0) {
                 GR_LOG_DEBUG(d_logger, "FIB CRC error");
                 return 1;

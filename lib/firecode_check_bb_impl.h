@@ -39,6 +39,7 @@ namespace gr {
     private:
       int d_frame_size;
       int d_bit_rate_n;
+      int d_nproduced, d_nconsumed;
       firecode_checker fc;
 
     public:

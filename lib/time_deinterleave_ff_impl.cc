@@ -40,12 +40,13 @@ namespace gr {
     time_deinterleave_ff_impl::time_deinterleave_ff_impl(int vector_length,
                                                          const std::vector<unsigned char> &scrambling_vector)
             : gr::sync_block("time_deinterleave_ff",
-                             gr::io_signature::make(1, 1, sizeof(float) * vector_length),
-                             gr::io_signature::make(1, 1, sizeof(float) * vector_length)),
+                             gr::io_signature::make(1, 1, sizeof(float)),
+                             gr::io_signature::make(1, 1, sizeof(float))),
               d_vector_length(vector_length), d_scrambling_vector(scrambling_vector)
     {
       d_scrambling_length = scrambling_vector.size(); // size of the scrambling vector
-      set_history(d_scrambling_length); //need for max delay of (scrambling_length-1) * 24ms
+      set_output_multiple(d_vector_length);
+      set_history((d_scrambling_length-1)*d_vector_length + 1); //need for max delay of (scrambling_length-1) * 24ms
     }
 
     /*
@@ -63,11 +64,11 @@ namespace gr {
       const float *in = (const float *) input_items[0];
       float *out = (float *) output_items[0];
 
-      for (int i = 0; i < noutput_items; i++) {
+      for (int i = 0; i < noutput_items/d_vector_length; i++) {
         // produce output vectors
         for (int j = 0; j < d_vector_length; j++) {
-          *out++ = in[d_vector_length * (i + (d_scrambling_length - 1) -
-                                         (d_scrambling_length - 1 - d_scrambling_vector[j % d_scrambling_length])) + j];
+          *out++ = in[d_vector_length * (i + (d_scrambling_length - 1) - ((d_scrambling_length - 1) - d_scrambling_vector[j % d_scrambling_length])) + j];
+          //*out++ = in[i*d_vector_length + d_scrambling_vector[j%d_scrambling_length]*d_vector_length + j - (j%d_scrambling_length) + d_scrambling_vector[j%d_scrambling_length]];
         }
       }
       // Tell runtime system how many output items we produced.

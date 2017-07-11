@@ -33,25 +33,15 @@ class qa_fib_sink_vb (gr_unittest.TestCase):
 
 #manual check of print outs with reference data of debug file (SWR radio station)
     def test_001_t (self):
-        data01 = (0x05, 0x00, 0x10, 0xea, 0x04, 0x24, 0x06, 0x02, 0xd3, 0xa6, 0x01, 0x3f, 0x06, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4c, 0x89)
-        src = blocks.vector_source_b(data01)
-        fibout = blocks.stream_to_vector(1, 32)
-        fibsink = dab.fib_sink_vb()
-        self.tb.connect(src, blocks.head(gr.sizeof_char, 300), fibout, fibsink)
-        self.tb.run()
-        pass
-
-    def test_002_t (self):
-        data02 = (
+        data = (
         0x05, 0x00, 0x10, 0xEA, 0x04, 0x24, 0x06, 0x02, 0xD3, 0xA6, 0x01, 0x3F, 0x06, 0xFF, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4C, 0x89)
-        src = blocks.vector_source_b(data02, True)
+        src = blocks.vector_source_b(data, True)
         fibout = blocks.stream_to_vector(1, 32)
         fibsink = dab.fib_sink_vb()
         self.tb.connect(src, blocks.head(gr.sizeof_char, 300), fibout, fibsink)
         self.tb.run()
         pass
-
 
 if __name__ == '__main__':
     gr_unittest.run(qa_fib_sink_vb, "qa_fib_sink_vb.xml")

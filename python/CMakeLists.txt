@@ -40,7 +40,8 @@ GR_PYTHON_INSTALL(
     msc_decode.py
     fic_encode.py
     msc_encode.py
-    transmitter_c.py DESTINATION ${GR_PYTHON_DIR}/dab
+    transmitter_c.py
+    dabplus_audio_decoder_ff.py DESTINATION ${GR_PYTHON_DIR}/dab
 )
 
 ########################################################################
@@ -64,3 +65,9 @@ GR_ADD_TEST(qa_msc_encode ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_ms
 GR_ADD_TEST(qa_dab_transmission_frame_mux_bb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_dab_transmission_frame_mux_bb.py)
 GR_ADD_TEST(qa_conv_encoder_bb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_conv_encoder_bb.py)
 GR_ADD_TEST(qa_mapper_bc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_mapper_bc.py)
+GR_ADD_TEST(qa_reed_solomon_bb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_reed_solomon_bb.py)
+GR_ADD_TEST(qa_mp2_decode_bs ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_mp2_decode_bs.py)
+GR_ADD_TEST(qa_reed_solomon2_bb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_reed_solomon2_bb.py)
+GR_ADD_TEST(qa_mp4_decode_bs ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_mp4_decode_bs.py)
+GR_ADD_TEST(qa_dabplus_audio_decoder_ff ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_dabplus_audio_decoder_ff.py)
+GR_ADD_TEST(qa_reed_solomon_decode_bb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_reed_solomon_decode_bb.py)

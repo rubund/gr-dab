@@ -332,7 +332,7 @@ int16_t	Sum	= 0;
 }
 
 static inline
-bool	check_crc_bytes (uint8_t *msg, int16_t len) {
+bool	check_crc_bytes (const uint8_t *msg, int16_t len) {
 int i, j;
 uint16_t	accumulator	= 0xFFFF;
 uint16_t	crc;
@@ -352,7 +352,39 @@ uint16_t	genpoly		= 0x1021;
 //	ok, now check with the crc that is contained
 //	in the au
 	crc	= ~((msg [len] << 8) | msg [len + 1]) & 0xFFFF;
+	//fprintf(stderr, "qt-dab CRC = %d\n", (crc ^ accumulator));
 	return (crc ^ accumulator) == 0;
+}
+
+static inline
+bool CRC16_SDR(uint8_t *data, size_t length ){
+
+	uint16_t CRC = 0xFFFF;
+	uint16_t poly= 0x1020;
+
+	*(data+length-2) ^= 0xFF;
+	*(data+length-1) ^= 0xFF;
+
+	for( size_t i=0; i<length; ++i ){
+		for( size_t b=0; b<8; ++b ){
+			if( ((CRC&0x8000)>>15) ^ ((data[i]>>(7-b))&0x0001) ){
+				CRC <<=1;
+				CRC ^= poly;
+				CRC |= 0x0001;
+			} else {
+				CRC <<=1;
+				CRC &=0xFFFE;
+			}
+		}
+	}
+
+	*(data+length-2) ^= 0xFF;
+	*(data+length-1) ^= 0xFF;
+	fprintf(stderr, "SDR-DAB CRC = %d\n", CRC);
+	if(CRC)
+		return false;
+	else
+		return true;
 }
 #endif
 
