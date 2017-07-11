@@ -1,7 +1,15 @@
 /* -*- c++ -*- */
-/* 
+/*
  * Copyright 2017 Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
- * 
+ *
+ * GNU Radio block written for gr-dab including the following third party elements:
+ * -QT-DAB: classes mp4Processor and faad-decoder except the reed-solomon class
+ *  Copyright (C) 2013
+ *  Jan van Katwijk (J.vanKatwijk@gmail.com)
+ *  Lazy Chair Computing
+ * -KA9Q: the char-sized Reed-Solomon encoder and decoder of the libfec library
+ *  (details on the license see /fec/LICENCE)
+ *
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3, or (at your option)
@@ -29,8 +37,6 @@
 #include <sstream>
 #include <boost/format.hpp>
 #include "neaacdec.h"
-#include "crc16.h"
-#include "FIC.h"
 
 using namespace boost;
 
@@ -56,7 +62,7 @@ namespace gr {
       d_superframe_size = bit_rate_n * 110;
       d_aacInitialized = false;
       baudRate = 48000;
-      set_output_multiple(960*4); //TODO: right? baudRate*0.12 for output of one superframe
+      set_output_multiple(960 * 4); //TODO: right? baudRate*0.12 for output of one superframe
       aacHandle = NeAACDecOpen();
       //memset(d_aac_frame, 0, 960);
     }
@@ -96,22 +102,22 @@ namespace gr {
     {
       long unsigned int sample_rate;
       uint8_t channels;
-/* AudioSpecificConfig structure (the only way to select 960 transform here!)
- *
- *  00010 = AudioObjectType 2 (AAC LC)
- *  xxxx  = (core) sample rate index
- *  xxxx  = (core) channel config
- *  100   = GASpecificConfig with 960 transform
- *
- * SBR: implicit signaling sufficient - libfaad2
- * automatically assumes SBR on sample rates <= 24 kHz
- * => explicit signaling works, too, but is not necessary here
- *
- * PS:  implicit signaling sufficient - libfaad2
- * therefore always uses stereo output (if PS support was enabled)
- * => explicit signaling not possible, as libfaad2 does not
- * support AudioObjectType 29 (PS)
- */
+      /* AudioSpecificConfig structure (the only way to select 960 transform here!)
+      *
+      *  00010 = AudioObjectType 2 (AAC LC)
+      *  xxxx  = (core) sample rate index
+      *  xxxx  = (core) channel config
+      *  100   = GASpecificConfig with 960 transform
+      *
+      * SBR: implicit signaling sufficient - libfaad2
+      * automatically assumes SBR on sample rates <= 24 kHz
+      * => explicit signaling works, too, but is not necessary here
+      *
+      * PS:  implicit signaling sufficient - libfaad2
+      * therefore always uses stereo output (if PS support was enabled)
+      * => explicit signaling not possible, as libfaad2 does not
+      * support AudioObjectType 29 (PS)
+      */
 
       int core_sr_index =
               dacRate ? (sbrFlag ? 6 : 3) :
@@ -145,31 +151,29 @@ namespace gr {
                                               uint8_t sbrFlag,
                                               uint8_t mpegSurround,
                                               uint8_t aacChannelMode,
-                                              int16_t* out_sample)
+                                              int16_t *out_sample)
     {
-      uint8_t theAudioUnit[2 * 960 + 10];  // sure, large enough
+      // copy AU to process it
+      uint8_t au[2 * 960 + 10]; // sure, large enough
+      memcpy(au, v, frame_length);
+      memset(&au[frame_length], 0, 10);
 
-      memcpy(theAudioUnit, v, frame_length);
-      memset(&theAudioUnit[frame_length], 0, 10);
-
-      if (((theAudioUnit[0] >> 5) & 07) == 4) {
-        int16_t count = theAudioUnit[1];
+      if (((au[0] >> 5) & 07) == 4) {
+        int16_t count = au[1];
         uint8_t buffer[count];
-        memcpy(buffer, &theAudioUnit[2], count);
+        memcpy(buffer, &au[2], count);
         uint8_t L0 = buffer[count - 1];
         uint8_t L1 = buffer[count - 2];
-        //my_padhandler. processPAD (buffer, count - 3, L1, L0);
+        // TODO: handle PADs
       }
 
       int tmp = MP42PCM(dacRate,
                         sbrFlag,
                         mpegSurround,
                         aacChannelMode,
-                        theAudioUnit,
+                        au,
                         frame_length,
                         out_sample);
-      //*error	= tmp == 0;
-      //GR_LOG_DEBUG(d_logger, format("produced %d samples") % tmp);
     }
 
     int16_t mp4_decode_bs_impl::MP42PCM(uint8_t dacRate,
@@ -178,15 +182,16 @@ namespace gr {
                                         uint8_t aacChannelMode,
                                         uint8_t buffer[],
                                         int16_t bufferLength,
-                                        int16_t* out_sample)
+                                        int16_t *out_sample)
     {
       int16_t samples;
-      long unsigned int sampleRate;
+      long unsigned int sample_rate;
       int16_t *outBuffer;
       NeAACDecFrameInfo hInfo;
       uint8_t dummy[10000];
       uint8_t channels;
 
+      // initialize AAC decoder at the beginning
       if (!d_aacInitialized) {
         if (!initialize(dacRate, sbrFlag, mpegSurround, aacChannelMode))
           return 0;
@@ -194,28 +199,20 @@ namespace gr {
         GR_LOG_DEBUG(d_logger, "AAC initialized");
       }
 
-      outBuffer = (int16_t *) NeAACDecDecode(aacHandle,
-                                             &hInfo, buffer, bufferLength);
-      sampleRate = hInfo.samplerate;
+      outBuffer = (int16_t *) NeAACDecDecode(aacHandle, &hInfo, buffer, bufferLength);
+      sample_rate = hInfo.samplerate;
 
       samples = hInfo.samples;
-      if ((sampleRate == 24000) ||
-          (sampleRate == 32000) ||
-          (sampleRate == 48000) ||
-          (sampleRate != (long unsigned) baudRate)) {
-        baudRate = sampleRate;
+      if ((sample_rate == 24000) ||
+          (sample_rate == 32000) ||
+          (sample_rate == 48000) ||
+          (sample_rate != (long unsigned) baudRate)) {
+        baudRate = sample_rate;
       }
       GR_LOG_DEBUG(d_logger, format("bytes consumed %d") % (int) (hInfo.bytesconsumed));
       GR_LOG_DEBUG(d_logger,
-                   format("samplerate = %d, samples = %d, channels = %d, error = %d, sbr = %d") % sampleRate % samples %
+                   format("sample_rate = %d, samples = %d, channels = %d, error = %d, sbr = %d") % sample_rate % samples %
                    (int) (hInfo.channels) % (int) (hInfo.error) % (int) (hInfo.sbr));
-
-//      fprintf (stderr, "bytes consumed %d\n", (int)(hInfo. bytesconsumed));
-//      fprintf (stderr, "samplerate = %d, samples = %d, channels = %d, error = %d, sbr = %d\n", sampleRate, samples,
-//               hInfo. channels,
-//               hInfo. error,
-//               hInfo. sbr);
-//      fprintf (stderr, "header = %d\n", hInfo. header_type);
       channels = hInfo.channels;
       if (hInfo.error != 0) {
         fprintf(stderr, "Warning: %s\n",
@@ -223,66 +220,56 @@ namespace gr {
         return 0;
       }
 
-
       // write samples to output buffer
       if (channels == 2) {
-        //audioBuffer  -> putDataIntoBuffer (outBuffer, samples);
+        // the 2 channels are transmitted intereleaved; each channel gets samples/2 PCM samples
         for (int n = 0; n < samples; n++) {
-          out_sample[n +d_nsamples_produced] = (int16_t) outBuffer[n];
+          out_sample[n + d_nsamples_produced] = (int16_t) outBuffer[n];
         }
-        GR_LOG_DEBUG(d_logger, format("Produced %d PCM samples") %(samples/2));
-        /*if (audioBuffer -> GetRingBufferReadAvailable () > sampleRate / 8)
-          newAudio (sampleRate);*/
       } else if (channels == 1) {
         int16_t *buffer = (int16_t *) alloca(2 * samples);
         int16_t i;
         for (i = 0; i < samples; i++) {
+          // only 1 channel -> reproduce each sample to send it to a stereo output
           buffer[2 * i] = ((int16_t *) outBuffer)[i];
           buffer[2 * i + 1] = buffer[2 * i];
         }
-        //audioBuffer  -> putDataIntoBuffer (buffer, samples);
         for (int n = 0; n < samples; n++) {
-          out_sample[n] = (int) buffer[n];
+          out_sample[n] = buffer[n];
         }
-        /*if (audioBuffer -> GetRingBufferReadAvailable () > sampleRate / 8)
-          newAudio (sampleRate);*/
       } else
         GR_LOG_ERROR(d_logger, "Cannot handle these channels -> dump samples");
 
-
+      GR_LOG_DEBUG(d_logger, format("Produced %d PCM samples (for each channel)") % (samples / 2));
       d_nsamples_produced += samples;
-      return samples / 2; //TODO: for channels == 1 return samples or for loop to samples/2
+      return samples / 2;
     }
-
-    bool mp4_decode_bs_impl::CRC16(uint8_t *data, size_t length)
+/*! \brief CRC16 check
+ * CRC16 check according to ETSI EN 300 401
+ * @param msg data to check
+ * @param len length of dataword without the 2 bytes crc at the end
+ * @return true if CRC passed
+ */
+    bool mp4_decode_bs_impl::crc16(const uint8_t *msg, int16_t len)
     {
+      int i, j;
+      uint16_t accumulator = 0xFFFF;
+      uint16_t crc;
+      uint16_t genpoly = 0x1021;
 
-      uint16_t CRC = 0xFFFF;
-      uint16_t poly = 0x1020;
-
-      *(data + length - 2) ^= 0xFF;
-      *(data + length - 1) ^= 0xFF;
-
-      for (size_t i = 0; i < length; ++i) {
-        for (size_t b = 0; b < 8; ++b) {
-          if (((CRC & 0x8000) >> 15) ^ ((data[i] >> (7 - b)) & 0x0001)) {
-            CRC <<= 1;
-            CRC ^= poly;
-            CRC |= 0x0001;
-          } else {
-            CRC <<= 1;
-            CRC &= 0xFFFE;
-          }
+      for (i = 0; i < len; i++) {
+        int16_t data = msg[i] << 8;
+        for (j = 8; j > 0; j--) {
+          if ((data ^ accumulator) & 0x8000)
+            accumulator = ((accumulator << 1) ^ genpoly) & 0xFFFF;
+          else
+            accumulator = (accumulator << 1) & 0xFFFF;
+          data = (data << 1) & 0xFFFF;
         }
       }
-
-      *(data + length - 2) ^= 0xFF;
-      *(data + length - 1) ^= 0xFF;
-      GR_LOG_DEBUG(d_logger, format("CRC = %d") % CRC);
-      if (CRC)
-        return false;
-      else
-        return true;
+      // compare calculated CRC with CRC in the AU
+      crc = ~((msg[len] << 8) | msg[len + 1]) & 0xFFFF;
+      return (crc ^ accumulator) == 0;
     }
 
     uint16_t mp4_decode_bs_impl::BinToDec(const uint8_t *data, size_t offset, size_t length)
@@ -304,44 +291,39 @@ namespace gr {
       int16_t *out = (int16_t *) output_items[0];
       d_nsamples_produced = 0;
 
-      for (int n = 0; n < noutput_items / (960*4); n++) {
-        //process superframe header
-        //	bits 0 .. 15 is firecode
-        //	bit 16 is unused
-        d_dac_rate = (in[n * d_superframe_size + 2] >> 6) & 01;  // bit 17
-        d_sbr_flag = (in[n * d_superframe_size + 2] >> 5) & 01;  // bit 18
-        d_aac_channel_mode = (in[n * d_superframe_size + 2] >> 4) & 01;  // bit 19
-        d_ps_flag = (in[n * d_superframe_size + 2] >> 3) & 01;  // bit 20
-        d_mpeg_surround = (in[n * d_superframe_size + 2] & 07);    // bits 21 .. 23
+      for (int n = 0; n < noutput_items / (960 * 4); n++) {
+        // process superframe header
+        // bits 0 .. 15 is firecode
+        // bit 16 is unused
+        d_dac_rate = (in[n * d_superframe_size + 2] >> 6) & 01; // bit 17
+        d_sbr_flag = (in[n * d_superframe_size + 2] >> 5) & 01; // bit 18
+        d_aac_channel_mode = (in[n * d_superframe_size + 2] >> 4) & 01; // bit 19
+        d_ps_flag = (in[n * d_superframe_size + 2] >> 3) & 01; // bit 20
+        d_mpeg_surround = (in[n * d_superframe_size + 2] & 07); // bits 21 .. 23
+        // log header information
         GR_LOG_DEBUG(d_logger,
                      format("superframe header: dac_rate %d, sbr_flag %d, aac_mode %d, ps_flag %d, surround %d") %
                      (int) d_dac_rate % (int) d_sbr_flag % (int) d_aac_channel_mode % (int) d_ps_flag %
                      (int) d_mpeg_surround);
-        GR_LOG_DEBUG(d_logger, format("case = %d") %(2 * d_dac_rate + d_sbr_flag));
 
         switch (2 * d_dac_rate + d_sbr_flag) {
           default:    // cannot happen
           case 0:
             d_num_aus = 4;
             d_au_start[0] = 8;
-            GR_LOG_DEBUG(d_logger, format("au%d start: %d") % 0 % d_au_start[0]);
             d_au_start[1] = in[n * d_superframe_size + 3] * 16 + (in[n * d_superframe_size + 4] >> 4);
-            GR_LOG_DEBUG(d_logger, format("au%d start: %d") % 1 % d_au_start[1]);
             d_au_start[2] = (in[n * d_superframe_size + 4] & 0xf) * 256 + in[n * d_superframe_size + 5];
-            GR_LOG_DEBUG(d_logger, format("au%d start: %d") % 2 % d_au_start[2]);
             d_au_start[3] = in[n * d_superframe_size + 6] * 16 + (in[n * d_superframe_size + 7] >> 4);
-            GR_LOG_DEBUG(d_logger, format("au%d start: %d") % 3 % d_au_start[3]);
             d_au_start[4] = d_superframe_size;
-            GR_LOG_DEBUG(d_logger, format("au%d start: %d") % 4 % d_au_start[4]);
             break;
-//
+
           case 1:
             d_num_aus = 2;
             d_au_start[n * d_superframe_size + 0] = 5;
             d_au_start[1] = in[n * d_superframe_size + 3] * 16 + (in[n * d_superframe_size + 4] >> 4);
             d_au_start[2] = d_superframe_size;
             break;
-//
+
           case 2:
             d_num_aus = 6;
             d_au_start[0] = 11;
@@ -352,7 +334,7 @@ namespace gr {
             d_au_start[5] = in[n * d_superframe_size + 9] * 16 + (in[n * d_superframe_size + 10] >> 4);
             d_au_start[6] = d_superframe_size;
             break;
-//
+
           case 3:
             d_num_aus = 3;
             d_au_start[0] = 6;
@@ -362,45 +344,25 @@ namespace gr {
             break;
         }
 
-
-/**
-  *	OK, the result is N * 110 * 8 bits (still single bit per byte!!!)
-  *	extract the AU's, and prepare a buffer,  with the sufficient
-  *	lengthy for conversion to PCM samples
-  */
-
+        // each of the d_num_aus AUs of each superframe (110 * d_bit_rate_n packed bytes) is now processed separately
 
         for (int i = 0; i < d_num_aus; i++) {
           int16_t aac_frame_length;
 
-          // sanity check 1
+          // sanity check for the address
           if (d_au_start[i + 1] < d_au_start[i]) {
-            GR_LOG_ERROR(d_logger, "au start address wrong");
-            // should not happen, all errors were corrected
+            throw std::runtime_error("AU start address invalid");
+            // should not happen, the header is firecode checked
           }
           aac_frame_length = d_au_start[i + 1] - d_au_start[i] - 2;
 
-          // just a sanity check
+          // sanity check for the aac_frame_length
           if ((aac_frame_length >= 960) || (aac_frame_length < 0)) {
-            GR_LOG_WARN(d_logger, "aac frame length not in range");
+            throw std::out_of_range("aac frame length not in range (%d)" +aac_frame_length);
           }
 
-          //memcpy(d_aac_frame, &in[n * d_superframe_size + d_au_start[i]], aac_frame_length + 2);
-
-          // calculate a some CRCs to compare
-          // CRC gr-dab
-          //uint16_t crc = crc16((char *) &in[n * d_superframe_size + d_au_start[i]], aac_frame_length + 2, FIB_CRC_POLY,
-          //                     FIB_CRC_INITSTATE);
-          //fprintf(stderr, "gr-dab CRC = %d\n", crc);
-          // CRC qt-dab
-          //check_crc_bytes(&in[n * d_superframe_size + d_au_start[i]], aac_frame_length);
-          // CRC SDR
-          //CRC16(d_aac_frame, aac_frame_length + 2);
-
-
-
-          // first the crc check
-          if (check_crc_bytes(&in[n * d_superframe_size + d_au_start[i]], aac_frame_length)) {
+          // CRC check of each AU (the 2 byte (16 bit) CRC word is excluded in aac_frame_length)
+          if (crc16(&in[n * d_superframe_size + d_au_start[i]], aac_frame_length)) {
             GR_LOG_DEBUG(d_logger, format("CRC check of AU %d successful") % i);
             // handle proper AU
             handle_aac_frame(&in[n * d_superframe_size + d_au_start[i]],
@@ -415,76 +377,11 @@ namespace gr {
             GR_LOG_DEBUG(d_logger, format("CRC failure with dab+ frame"));
           }
         }
-        //############################################################################################################################################################################
-// implementation of SDR DAB to compare
-        //######################################################################################################################################################################
-/*        // decoding ADTS starts here
-        uint8_t dac_sbr = (in[n * d_superframe_size + 2] & 0x60) >> 5;    // (18-19) dec_rate & sbr_flag at once
-        uint8_t num_aus = 0;
-        uint8_t adts_dacsbr = 0;                      // use last 4 bits
-        uint8_t adts_chanconf = 0;                    // last 3 bits for channel index
-        uint16_t au_start[7];                       // worst case num_aus+1
-        memset(au_start, 0, 7 * sizeof(uint16_t));
-
-        switch (dac_sbr) {
-          case 0:                                     // 00b, dac=0, sbr=0
-            num_aus = 4;                            // number of Access Units (AUs)
-            au_start[0] = 8;                        // address of the first AU
-            adts_dacsbr = 0x05;                     // [0 1 0 1] freq index for ADTS header
-            break;
-          case 1:                                     // 01b, dac=0, sbr=1
-            num_aus = 2;                            // number of AUs
-            au_start[0] = 5;                        // address of the first AU
-            adts_dacsbr = 0x08;                     // [1 0 0 0] freq index for ADTS header
-            break;
-          case 2:                                     // 10b, dac=1, sbr=0
-            num_aus = 6;                            // number of AUs
-            au_start[0] = 11;                       // address of the first AU
-            adts_dacsbr = 0x03;                     // [0 0 1 1] freq index for ADTS header
-            break;
-          case 3:                                         // 11b, dac=1, sbr=1
-            num_aus = 3;                            // number of AUs
-            au_start[0] = 6;                        // address of the first AU
-            adts_dacsbr = 0x06;                     // [0 1 1 0] freq index for ADTS header
-            break;
-        }
-
-        //bool aac_channel_mode = (adts_frame[2]&0x10)>>3;  // (20-bit) 0=mono, 1=stereo
-        if (in[n * d_superframe_size + 2] & 0x08) {                             // (21-bit) parametric stereo (PS)
-          adts_chanconf = 0x2;                            // [ 0 1 0 ] channel index for ADTS header
-        } else {
-          adts_chanconf = 0x1;                            // [ 0 0 1 ] channel index for ADTS header
-        }
-        //uint8_t mpeg_surround_config = adts_frame[2]&0x07;
-
-        for (size_t r = 1; r < num_aus; ++r)                                // addresses of the AUs from 2:last
-          au_start[r] = BinToDec(&in[n * d_superframe_size], 24 + 12 * (r - 1), 12);      // start from 25bit, each ADDR has 12bits
-        au_start[num_aus] = d_superframe_size;
-
-        GR_LOG_DEBUG(d_logger, "POLSKA reading now:");
-        GR_LOG_DEBUG(d_logger,
-                     format("superframe header: dac&sbr_flag %d, aac_mode %d, ps_flag %d, surround %d") %
-                     (int) dac_sbr % (int) adts_chanconf % (int) d_ps_flag %
-                     (int) d_mpeg_surround);
-
-        for (size_t r = 0; r < num_aus; ++r) {
-          size_t au_size = au_start[r + 1] - au_start[r] - 2;               // AU size in bytes, without CRC; -2 bytes?
-          size_t adts_size = au_size + 7;                             // frame size = au_size bytes of AU + 7 bytes of the adts-header
-          GR_LOG_DEBUG(d_logger, format("au%d start: %d") %r % d_au_start[r]);
-        }
-*/
       }
-
-
-
-      //consume items to dump them
-      /*for (int i = 0; i < noutput_items; ++i) {
-        out[i] = in[i];
-      }*/
 
       // Tell runtime system how many input items we consumed on
       // each input stream.
-      consume_each(noutput_items * d_superframe_size / (960*4));
+      consume_each(noutput_items * d_superframe_size / (960 * 4));
 
       // Tell runtime system how many output items we produced.
       return d_nsamples_produced;

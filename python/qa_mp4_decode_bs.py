@@ -32,6 +32,7 @@ class qa_mp4_decode_bs (gr_unittest.TestCase):
     def tearDown (self):
         self.tb = None
 
+# manula check, if header info makes sense and if AAC gives errors
     def test_001_t (self):
         if os.path.exists("debug/checked_firecode.dat"):
             #self.dab_params = dab.parameters.dab_parameters(1, 208.064e6, True)

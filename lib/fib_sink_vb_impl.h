@@ -32,8 +32,8 @@ namespace gr {
 
         private:
           unsigned char frame [32];
-            int process_fib(const unsigned char *fib);
-            int process_fig(uint8_t type, const unsigned char *data, uint8_t length);
+            int process_fib(const char *fib);
+            int process_fig(uint8_t type, const char *data, uint8_t length);
 
 
         public:
