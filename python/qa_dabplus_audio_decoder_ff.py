@@ -24,7 +24,7 @@ from gnuradio import blocks
 import os
 import dab
 
-class qa_msc_decode (gr_unittest.TestCase):
+class qa_dabplus_audio_decoder_ff (gr_unittest.TestCase):
 
     def setUp (self):
         self.tb = gr.top_block ()
@@ -32,25 +32,25 @@ class qa_msc_decode (gr_unittest.TestCase):
     def tearDown (self):
         self.tb = None
 
-# manual check of firecode for dab+: firecode should be OK at every fifth frame (each superframe)
+# manual check, if header info makes sense and if AAC gives errors
     def test_001_t (self):
-        log = gr.logger("log")
         if os.path.exists("debug/transmission_frame.dat") and os.path.exists("debug/transmission_frame_trigger.dat"):
-            self.dab_params = dab.parameters.dab_parameters(1 , 208.064e6, True)
-            self.src01 = blocks.file_source_make(gr.sizeof_float * 2*self.dab_params.num_carriers, "debug/transmission_frame.dat")
+            self.dab_params = dab.parameters.dab_parameters(1, 208.064e6, True)
+            self.src01 = blocks.file_source_make(gr.sizeof_float * 2 * self.dab_params.num_carriers,
+                                                 "debug/transmission_frame.dat")
             self.src02 = blocks.file_source_make(gr.sizeof_char, "debug/transmission_frame_trigger.dat")
-            self.msc = dab.msc_decode(self.dab_params, 54, 84, 2, 1, 1)
-            self.firecode = dab.firecode_check_bb_make(14)
-            self.file_sink_subch_decoded = blocks.file_sink_make(gr.sizeof_char, "debug/subch_decoded.dat")
-            self.file_sink_firecode_checked = blocks.file_sink_make(gr.sizeof_char, "debug/checked_firecode.dat")
-            self.tb.connect(self.src01, (self.msc, 0), self.firecode, self.file_sink_firecode_checked)
-            self.tb.connect(self.src02, (self.msc, 1))
-            self.tb.connect(self.msc, self.file_sink_subch_decoded)
-            self.tb.run ()
+            self.dabplus = dab.dabplus_audio_decoder_ff(self.dab_params, 112, 54, 84, 2, True)
+            self.file_sink_left = blocks.file_sink_make(gr.sizeof_float, "debug/PCM_left2.dat")
+            self.file_sink_right = blocks.file_sink_make(gr.sizeof_float, "debug/PCM_right2.dat")
+            self.tb.connect(self.src01, (self.dabplus, 0), self.file_sink_left)
+            self.tb.connect(self.src02, (self.dabplus, 1), self.file_sink_right)
+            self.tb.run()
         else:
+            log = gr.logger("log")
             log.debug("debug file not found - skipped test")
             log.set_level("WARN")
         pass
 
+
 if __name__ == '__main__':
-    gr_unittest.run(qa_msc_decode, "qa_msc_decode.xml")
+    gr_unittest.run(qa_dabplus_audio_decoder_ff, "qa_dabplus_audio_decoder_ff.xml")

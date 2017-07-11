@@ -40,7 +40,7 @@ class qa_time_deinterleave_ff (gr_unittest.TestCase):
         time_deinterleaver = dab.time_deinterleave_ff_make(6, [0, 1])
         v2s = blocks.vector_to_stream(gr.sizeof_float, 6)
         dst = blocks.vector_sink_f()
-        self.tb.connect(src, b2f, s2v, time_deinterleaver, blocks.head_make(gr.sizeof_float * 6, 3), v2s, dst)
+        self.tb.connect(src, b2f, time_deinterleaver, blocks.head_make(gr.sizeof_float, 6*3), dst)
         self.tb.run()
         result = dst.data()
         #print result
@@ -55,7 +55,7 @@ class qa_time_deinterleave_ff (gr_unittest.TestCase):
         time_deinterleaver = dab.time_deinterleave_ff_make(4, [0, 3, 2, 1])
         v2s = blocks.vector_to_stream(gr.sizeof_float, 4)
         dst = blocks.vector_sink_f()
-        self.tb.connect(src, b2f, s2v, time_deinterleaver, blocks.head_make(gr.sizeof_float * 4, 4), v2s, dst)
+        self.tb.connect(src, b2f, time_deinterleaver, blocks.head_make(gr.sizeof_float, 4*4), dst)
         self.tb.run()
         result = dst.data()
         #print result
@@ -70,7 +70,7 @@ class qa_time_deinterleave_ff (gr_unittest.TestCase):
         time_deinterleaver = dab.time_deinterleave_ff_make(8, [2, 3, 0, 1])
         v2s = blocks.vector_to_stream(gr.sizeof_float, 8)
         dst = blocks.vector_sink_f()
-        self.tb.connect(src, b2f, s2v, time_deinterleaver, blocks.head_make(gr.sizeof_float * 8, 4), v2s, dst)
+        self.tb.connect(src, b2f, time_deinterleaver, blocks.head_make(gr.sizeof_float, 8*4), dst)
         self.tb.run()
         result = dst.data()
         #print result
@@ -85,7 +85,7 @@ class qa_time_deinterleave_ff (gr_unittest.TestCase):
         time_deinterleaver = dab.time_deinterleave_ff_make(16, [0, 1, 2, 4])
         v2s = blocks.vector_to_stream(gr.sizeof_float, 16)
         dst = blocks.vector_sink_f()
-        self.tb.connect(src, b2f, s2v, time_deinterleaver, blocks.head_make(gr.sizeof_float * 16, 2), v2s, dst)
+        self.tb.connect(src, b2f, time_deinterleaver, blocks.head_make(gr.sizeof_float, 16*2), dst)
         self.tb.run()
         result = dst.data()
         #print result

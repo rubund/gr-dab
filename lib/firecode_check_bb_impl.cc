@@ -25,7 +25,6 @@
 
 #include <gnuradio/io_signature.h>
 #include "firecode_check_bb_impl.h"
-
 #include <stdio.h>
 #include <stdexcept>
 #include <sstream>
@@ -52,7 +51,7 @@ namespace gr {
                         gr::io_signature::make(1, 1, sizeof(unsigned char)))
     {
       d_frame_size = 24 * bit_rate_n;
-      set_output_multiple(d_frame_size); //logical frame
+      set_output_multiple(d_frame_size * 5); //logical frame
     }
 
     /*
@@ -65,7 +64,7 @@ namespace gr {
     void
     firecode_check_bb_impl::forecast(int noutput_items, gr_vector_int &ninput_items_required)
     {
-      ninput_items_required[0] = noutput_items; //TODO: error rate???
+      ninput_items_required[0] = noutput_items;
     }
 
     int
@@ -76,21 +75,27 @@ namespace gr {
     {
       const unsigned char *in = (const unsigned char *) input_items[0];
       unsigned char *out = (unsigned char *) output_items[0];
+      d_nproduced = 0;
+      d_nconsumed = 0;
 
-      for (int i = 0; i < noutput_items / d_frame_size; i++) {
-        if (fc.check(&in[i * d_frame_size])) {
-          GR_LOG_DEBUG(d_logger, format("fire code OK at frame %d") % (nitems_written(0) / d_frame_size));
+      while (d_nconsumed < noutput_items / d_frame_size - 4) {
+        if (fc.check(&in[d_nconsumed * d_frame_size])) {
+          GR_LOG_DEBUG(d_logger, format("fire code OK at frame %d") % (nitems_read(0) / d_frame_size));
+          // fire code OK, copy superframe to output
+          memcpy(out + d_nproduced * d_frame_size, in + d_nconsumed * d_frame_size, d_frame_size * 5);
+          d_nproduced += 5;
+          d_nconsumed += 5;
         } else {
-          GR_LOG_DEBUG(d_logger, format("fire code failed at frame %d") % (nitems_written(0) / d_frame_size));
+          GR_LOG_DEBUG(d_logger, format("fire code failed at frame %d") % (nitems_read(0) / d_frame_size));
+          // shift of one logical frame
+          d_nconsumed++;
         }
       }
-      memcpy(out, in, noutput_items);
-
       // Tell runtime system how many input items we consumed on
       // each input stream.
-      consume_each(noutput_items);
+      consume_each(d_nconsumed * d_frame_size);
       // Tell runtime system how many output items we produced.
-      return noutput_items;
+      return d_nproduced * d_frame_size;
     }
 
   } /* namespace dab */
