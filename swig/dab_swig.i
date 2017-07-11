@@ -44,9 +44,7 @@
 #include "dab/dab_transmission_frame_mux_bb.h"
 #include "dab/conv_encoder_bb.h"
 #include "dab/mapper_bc.h"
-#include "dab/reed_solomon_bb.h"
 #include "dab/mp2_decode_bs.h"
-#include "dab/reed_solomon2_bb.h"
 #include "dab/mp4_decode_bs.h"
 #include "dab/reed_solomon_decode_bb.h"
 %}
@@ -124,12 +122,10 @@ GR_SWIG_BLOCK_MAGIC2(dab, dab_transmission_frame_mux_bb);
 GR_SWIG_BLOCK_MAGIC2(dab, conv_encoder_bb);
 %include "dab/mapper_bc.h"
 GR_SWIG_BLOCK_MAGIC2(dab, mapper_bc);
-%include "dab/reed_solomon_bb.h"
-GR_SWIG_BLOCK_MAGIC2(dab, reed_solomon_bb);
+
 %include "dab/mp2_decode_bs.h"
 GR_SWIG_BLOCK_MAGIC2(dab, mp2_decode_bs);
-%include "dab/reed_solomon2_bb.h"
-GR_SWIG_BLOCK_MAGIC2(dab, reed_solomon2_bb);
+
 %include "dab/mp4_decode_bs.h"
 GR_SWIG_BLOCK_MAGIC2(dab, mp4_decode_bs);
 %include "dab/reed_solomon_decode_bb.h"

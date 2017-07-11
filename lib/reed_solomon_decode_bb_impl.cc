@@ -120,9 +120,9 @@ namespace gr {
 
     int
     reed_solomon_decode_bb_impl::general_work(int noutput_items,
-                                        gr_vector_int &ninput_items,
-                                        gr_vector_const_void_star &input_items,
-                                        gr_vector_void_star &output_items)
+                                              gr_vector_int &ninput_items,
+                                              gr_vector_const_void_star &input_items,
+                                              gr_vector_void_star &output_items)
     {
       const unsigned char *in = (const unsigned char *) input_items[0];
       unsigned char *out = (unsigned char *) output_items[0];
@@ -131,11 +131,11 @@ namespace gr {
         uint8_t superframe[d_superframe_size];
         memcpy(superframe, &in[n * d_superframe_size], d_superframe_size);
         DecodeSuperframe(superframe, d_superframe_size);
-        memcpy(&out[n*d_superframe_size_rs], superframe, d_superframe_size_rs);
+        memcpy(&out[n * d_superframe_size_rs], superframe, d_superframe_size_rs);
       }
       // Tell runtime system how many input items we consumed on
       // each input stream.
-      consume_each(noutput_items*120/110);
+      consume_each(noutput_items * 120 / 110);
 
       // Tell runtime system how many output items we produced.
       return noutput_items;

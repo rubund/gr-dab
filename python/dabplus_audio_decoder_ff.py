@@ -24,7 +24,13 @@ import dab
 
 class dabplus_audio_decoder_ff(gr.hier_block2):
     """
-    docstring for block dabplus_audio_decoder_ff
+    Hier block for decoding dab+ audio frames out of whole DAB transmission frame
+    containing the following blocks:
+    -msc_decode: extract subchannel and decode it
+    -firecode checker
+    -Reed Solomon error repair
+    -mp4 decoder
+    See the single blocks for more details
     """
 
     def __init__(self, dab_params, bit_rate, address, subch_size, protection, output_float, verbose=True, debug=True):

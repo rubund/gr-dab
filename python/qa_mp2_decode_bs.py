@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
-# Copyright 2017 <+YOU OR YOUR COMPANY+>.
+# Copyright 2017 Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
 # 
 # This is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,10 +31,9 @@ class qa_mp2_decode_bs (gr_unittest.TestCase):
     def tearDown (self):
         self.tb = None
 
+# test will be set up, when mp2 encoder is implemented
     def test_001_t (self):
-        # set up fg
-        self.tb.run ()
-        # check data
+        pass
 
 
 if __name__ == '__main__':

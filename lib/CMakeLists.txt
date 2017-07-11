@@ -63,12 +63,7 @@ list(APPEND dab_sources
     dab_transmission_frame_mux_bb_impl.cc
     conv_encoder_bb_impl.cc
     mapper_bc_impl.cc
-    reed_solomon_bb_impl.cc 
-    reed-solomon.cpp
-    galois.cpp
     mp2_decode_bs_impl.cc
-    reed_solomon2_bb_impl.cc
-    rscodec.cpp
     mp4_decode_bs_impl.cc
     reed_solomon_decode_bb_impl.cc
     fec/decode_rs_char.c

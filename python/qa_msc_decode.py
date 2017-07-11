@@ -34,17 +34,22 @@ class qa_msc_decode (gr_unittest.TestCase):
 
 # manual check of firecode for dab+: firecode should be OK at every fifth frame (each superframe)
     def test_001_t (self):
-        self.dab_params = dab.parameters.dab_parameters(1 , 208.064e6, True)
-        self.src01 = blocks.file_source_make(gr.sizeof_float * 2*self.dab_params.num_carriers, "debug/transmission_frame.dat")
-        self.src02 = blocks.file_source_make(gr.sizeof_char, "debug/transmission_frame_trigger.dat")
-        self.msc = dab.msc_decode(self.dab_params, 54, 84, 2, 1, 1)
-        self.firecode = dab.firecode_check_bb_make(14)
-        self.file_sink_subch_decoded = blocks.file_sink_make(gr.sizeof_char, "debug/subch_decoded.dat")
-        self.file_sink_firecode_checked = blocks.file_sink_make(gr.sizeof_char, "debug/checked_firecode.dat")
-        self.tb.connect(self.src01, (self.msc, 0), self.firecode, self.file_sink_firecode_checked)
-        self.tb.connect(self.src02, (self.msc, 1))
-        self.tb.connect(self.msc, self.file_sink_subch_decoded)
-        self.tb.run ()
+        log = gr.logger("log")
+        if os.path.exists("debug/transmission_frame.dat") and os.path.exists("debug/transmission_frame_trigger.dat"):
+            self.dab_params = dab.parameters.dab_parameters(1 , 208.064e6, True)
+            self.src01 = blocks.file_source_make(gr.sizeof_float * 2*self.dab_params.num_carriers, "debug/transmission_frame.dat")
+            self.src02 = blocks.file_source_make(gr.sizeof_char, "debug/transmission_frame_trigger.dat")
+            self.msc = dab.msc_decode(self.dab_params, 54, 84, 2, 1, 1)
+            self.firecode = dab.firecode_check_bb_make(14)
+            self.file_sink_subch_decoded = blocks.file_sink_make(gr.sizeof_char, "debug/subch_decoded.dat")
+            self.file_sink_firecode_checked = blocks.file_sink_make(gr.sizeof_char, "debug/checked_firecode.dat")
+            self.tb.connect(self.src01, (self.msc, 0), self.firecode, self.file_sink_firecode_checked)
+            self.tb.connect(self.src02, (self.msc, 1))
+            self.tb.connect(self.msc, self.file_sink_subch_decoded)
+            self.tb.run ()
+        else:
+            log.debug("debug file not found - skipped test")
+            log.set_level("WARN")
         pass
 
 if __name__ == '__main__':

@@ -63,9 +63,7 @@ install(FILES
     dab_transmitter_c.xml
     dab_conv_encoder_bb.xml
     dab_mapper_bc.xml
-    dab_reed_solomon_bb.xml
     dab_mp2_decode_bs.xml
-    dab_reed_solomon2_bb.xml
     dab_mp4_decode_bs.xml
     dab_reed_solomon_decode_bb.xml
     dab_dabplus_audio_decoder_ff.xml DESTINATION share/gnuradio/grc/blocks

@@ -1,38 +1,121 @@
 <?xml version="1.0"?>
 <block>
-  <name>dabplus_audio_decoder_ff</name>
+  <name>DAB: DAB+ Audio Decoder</name>
   <key>dab_dabplus_audio_decoder_ff</key>
-  <category>dab</category>
+  <category>DAB</category>
   <import>import dab</import>
   <make>dab.dabplus_audio_decoder_ff($dab_params, $bit_rate, $address, $subch_size, $protection, $output_float, $verbose, $debug)</make>
-  <!-- Make one 'param' node for every Parameter you want settable from the GUI.
-       Sub-nodes:
-       * name
-       * key (makes the value accessible as $keyname, e.g. in the make node)
-       * type -->
   <param>
-    <name>...</name>
-    <key>...</key>
-    <type>...</type>
+    <name>DAB parameter</name>
+    <key>dab_params</key>
+    <type>raw</type>
   </param>
-
-  <!-- Make one 'sink' node per input. Sub-nodes:
-       * name (an identifier for the GUI)
-       * type
-       * vlen
-       * optional (set to 1 for optional inputs) -->
+  <param>
+    <name>Bit rate</name>
+    <key>bit_rate</key>
+    <type>int</type>
+  </param>
+  <param>
+    <name>Subchannel address</name>
+    <key>address</key>
+    <type>int</type>
+  </param>
+  <param>
+    <name>Subchannel size</name>
+    <key>size</key>
+    <type>int</type>
+  </param>
+  <param>
+    <name>Protection mode</name>
+    <key>protection</key>
+    <type>int</type>
+    <option>
+    	<name>A1</name>
+    	<key>0</key>
+    </option>
+    <option>
+    	<name>A2</name>
+    	<key>1</key>
+    </option>
+    <option>
+    	<name>A3</name>
+    	<key>2</key>
+    </option>
+    <option>
+    	<name>A4</name>
+    	<key>3</key>
+    </option>
+  </param>
+  <param>
+    <name>Output type</name>
+    <key>output_float</key>
+    <type>bool</type>
+    <option>
+    	<name>Float</name>
+    	<key>True</key>
+    </option>
+    <option>
+    	<name>16 bit signed int</name>
+    	<key>False</key>
+    </option>
+  </param>
+  <param>
+    <name>Verbose</name>
+    <key>verbose</key>
+    <type>bool</type>
+    <option>
+    	<name>True</name>
+    	<key>True</key>
+    </option>
+    <option>
+    	<name>False</name>
+    	<key>False</key>
+    </option>
+  </param>
+  <param>
+    <name>Debug</name>
+    <key>debug</key>
+    <type>bool</type>
+    <option>
+    	<name>True</name>
+    	<key>True</key>
+    </option>
+    <option>
+    	<name>False</name>
+    	<key>False</key>
+    </option>
+  </param>
   <sink>
-    <name>in</name>
-    <type><!-- e.g. int, float, complex, byte, short, xxx_vector, ...--></type>
+    <name>data</name>
+    <type>float</type>
   </sink>
-
-  <!-- Make one 'source' node per output. Sub-nodes:
-       * name (an identifier for the GUI)
-       * type
-       * vlen
-       * optional (set to 1 for optional inputs) -->
-  <source>
-    <name>out</name>
-    <type><!-- e.g. int, float, complex, byte, short, xxx_vector, ...--></type>
-  </source>
+  <sink>
+    <name>trigger</name>
+    <type>byte</type>
+  </sink>
+  <if>
+    <condition> $output_float = True</condition>
+    <statements>
+      <source>
+        <name>pcm_left</name>
+        <type>float</type>
+      </source>
+      <source>
+        <name>pcm_right</name>
+        <type>float</type>
+      </source>
+    </statements>
+  </if>
+  <else>
+    <statements>
+      <source>
+        <name>pcm_left</name>
+        <type>short</type>
+      </source>
+      <source>
+        <name>pcm_right</name>
+        <type>short</type>
+      </source>
+    </statements>
+  </else>
 </block>

@@ -25,7 +25,6 @@
 
 #include <gnuradio/io_signature.h>
 #include "firecode_check_bb_impl.h"
-
 #include <stdio.h>
 #include <stdexcept>
 #include <sstream>
@@ -52,7 +51,7 @@ namespace gr {
                         gr::io_signature::make(1, 1, sizeof(unsigned char)))
     {
       d_frame_size = 24 * bit_rate_n;
-      set_output_multiple(d_frame_size*5); //logical frame
+      set_output_multiple(d_frame_size * 5); //logical frame
     }
 
     /*
@@ -79,11 +78,11 @@ namespace gr {
       d_nproduced = 0;
       d_nconsumed = 0;
 
-      while(d_nconsumed < noutput_items/d_frame_size-4) {
+      while (d_nconsumed < noutput_items / d_frame_size - 4) {
         if (fc.check(&in[d_nconsumed * d_frame_size])) {
           GR_LOG_DEBUG(d_logger, format("fire code OK at frame %d") % (nitems_read(0) / d_frame_size));
           // fire code OK, copy superframe to output
-          memcpy(out + d_nproduced*d_frame_size, in + d_nconsumed*d_frame_size, d_frame_size*5);
+          memcpy(out + d_nproduced * d_frame_size, in + d_nconsumed * d_frame_size, d_frame_size * 5);
           d_nproduced += 5;
           d_nconsumed += 5;
         } else {
@@ -94,7 +93,7 @@ namespace gr {
       }
       // Tell runtime system how many input items we consumed on
       // each input stream.
-      consume_each(d_nconsumed*d_frame_size);
+      consume_each(d_nconsumed * d_frame_size);
       // Tell runtime system how many output items we produced.
       return d_nproduced * d_frame_size;
     }

@@ -34,7 +34,7 @@ class qa_mp4_decode_bs (gr_unittest.TestCase):
 
 # manula check, if header info makes sense and if AAC gives errors
     def test_001_t (self):
-        if os.path.exists("debug/checked_firecode.dat"):
+        if os.path.exists("debug/reed_solomon_repaired.dat"):
             #self.dab_params = dab.parameters.dab_parameters(1, 208.064e6, True)
             self.src = blocks.file_source_make(gr.sizeof_char, "debug/reed_solomon_repaired.dat")
             self.mp4 = dab.mp4_decode_bs_make(14)
@@ -43,6 +43,10 @@ class qa_mp4_decode_bs (gr_unittest.TestCase):
             self.tb.connect(self.src, (self.mp4, 0), self.file_sink_left)
             self.tb.connect((self.mp4, 1), self.file_sink_right)
             self.tb.run()
+        else:
+            log = gr.logger("log")
+            log.debug("debug file not found - skipped test")
+            log.set_level("WARN")
         pass
 
 

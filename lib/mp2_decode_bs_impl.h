@@ -63,34 +63,42 @@ namespace gr {
       int d_out_offset;
       uint16_t *d_out;
 
-      int16_t	d_V_offs;
-      int32_t	d_baud_rate;
+      int16_t d_V_offs;
+      int32_t d_baud_rate;
       int16_t d_mp2_framesize;
       int16_t d_mp2_header_OK;
       int16_t d_mp2_header_count;
       int16_t d_mp2_bit_count;
       int16_t d_number_of_frames;
       int16_t d_error_frames;
-      int32_t	bit_window;
+      int32_t bit_window;
       int32_t bits_in_window;
-      uint8_t	*d_frame_pos;
-      uint8_t	*d_mp2_frame;
-      int16_t	d_V [2][1024];
-      int16_t	d_N [64][32];
-      int32_t	d_scfsi[2][32];
-      int32_t	d_scalefactor[2][32][3];
-      int32_t	d_sample[2][32][3];
-      int32_t	d_U[512];
+      uint8_t *d_frame_pos;
+      uint8_t *d_mp2_frame;
+      int16_t d_V[2][1024];
+      int16_t d_N[64][32];
+      int32_t d_scfsi[2][32];
+      int32_t d_scalefactor[2][32][3];
+      int32_t d_sample[2][32][3];
+      int32_t d_U[512];
 
-      void set_samplerate	(int32_t);
-      int32_t	mp2_samplerate	(uint8_t *);
-      struct quantizer_spec *read_allocation (int, int);
+      void set_samplerate(int32_t);
+
+      int32_t mp2_samplerate(uint8_t *);
+
+      struct quantizer_spec *read_allocation(int, int);
+
       struct quantizer_spec *d_allocation[2][32];
-      void read_samples (struct quantizer_spec *, int, int *);
-      int32_t get_bits (int32_t);
-      int32_t	mp2_decode_frame (uint8_t *, int16_t *);
-      void add_to_frame	(uint8_t *);
-      void add_bit_to_mp2	(uint8_t *, uint8_t, int16_t);
+
+      void read_samples(struct quantizer_spec *, int, int *);
+
+      int32_t get_bits(int32_t);
+
+      int32_t mp2_decode_frame(uint8_t *, int16_t *);
+
+      void add_to_frame(uint8_t *);
+
+      void add_bit_to_mp2(uint8_t *, uint8_t, int16_t);
 
     public:
       mp2_decode_bs_impl(int bit_rate_n);

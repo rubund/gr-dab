@@ -23,7 +23,6 @@
 #define INCLUDED_DAB_FIRECODE_CHECK_BB_IMPL_H
 
 #include <dab/firecode_check_bb.h>
-#include "dab-constants.h"
 #include "firecode-checker.h"
 
 namespace gr {

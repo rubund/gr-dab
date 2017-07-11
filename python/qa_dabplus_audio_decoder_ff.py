@@ -32,9 +32,9 @@ class qa_dabplus_audio_decoder_ff (gr_unittest.TestCase):
     def tearDown (self):
         self.tb = None
 
-# manula check, if header info makes sense and if AAC gives errors
+# manual check, if header info makes sense and if AAC gives errors
     def test_001_t (self):
-        if os.path.exists("debug/checked_firecode.dat"):
+        if os.path.exists("debug/transmission_frame.dat") and os.path.exists("debug/transmission_frame_trigger.dat"):
             self.dab_params = dab.parameters.dab_parameters(1, 208.064e6, True)
             self.src01 = blocks.file_source_make(gr.sizeof_float * 2 * self.dab_params.num_carriers,
                                                  "debug/transmission_frame.dat")
@@ -45,6 +45,10 @@ class qa_dabplus_audio_decoder_ff (gr_unittest.TestCase):
             self.tb.connect(self.src01, (self.dabplus, 0), self.file_sink_left)
             self.tb.connect(self.src02, (self.dabplus, 1), self.file_sink_right)
             self.tb.run()
+        else:
+            log = gr.logger("log")
+            log.debug("debug file not found - skipped test")
+            log.set_level("WARN")
         pass
 
 

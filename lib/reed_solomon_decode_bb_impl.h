@@ -28,6 +28,7 @@
 #define INCLUDED_DAB_REED_SOLOMON_DECODE_BB_IMPL_H
 
 #include <dab/reed_solomon_decode_bb.h>
+
 extern "C" {
 #include <fec/fec.h>
 }
@@ -41,28 +42,29 @@ namespace gr {
  * @param bit_rate_n data rate in multiples of 8kbit/s
  *
  */
-    class reed_solomon_decode_bb_impl : public reed_solomon_decode_bb
-    {
-     private:
+    class reed_solomon_decode_bb_impl : public reed_solomon_decode_bb {
+    private:
       int d_bit_rate_n;
       int d_superframe_size;
       int d_superframe_size_rs;
       void *rs_handle;
       uint8_t rs_packet[120];
       int corr_pos[10];
+
       void DecodeSuperframe(uint8_t *sf, size_t sf_len);
 
-     public:
+    public:
       reed_solomon_decode_bb_impl(int bit_rate_n);
+
       ~reed_solomon_decode_bb_impl();
 
       // Where all the action really happens
-      void forecast (int noutput_items, gr_vector_int &ninput_items_required);
+      void forecast(int noutput_items, gr_vector_int &ninput_items_required);
 
       int general_work(int noutput_items,
-           gr_vector_int &ninput_items,
-           gr_vector_const_void_star &input_items,
-           gr_vector_void_star &output_items);
+                       gr_vector_int &ninput_items,
+                       gr_vector_const_void_star &input_items,
+                       gr_vector_void_star &output_items);
     };
 
   } // namespace dab
