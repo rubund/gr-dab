@@ -24,7 +24,7 @@ from gnuradio import blocks
 import os
 import dab
 
-class qa_mp4_decode_bs (gr_unittest.TestCase):
+class qa_dabplus_audio_decoder_ff (gr_unittest.TestCase):
 
     def setUp (self):
         self.tb = gr.top_block ()
@@ -35,16 +35,18 @@ class qa_mp4_decode_bs (gr_unittest.TestCase):
 # manula check, if header info makes sense and if AAC gives errors
     def test_001_t (self):
         if os.path.exists("debug/checked_firecode.dat"):
-            #self.dab_params = dab.parameters.dab_parameters(1, 208.064e6, True)
-            self.src = blocks.file_source_make(gr.sizeof_char, "debug/reed_solomon_repaired.dat")
-            self.mp4 = dab.mp4_decode_bs_make(14)
-            self.file_sink_left = blocks.file_sink_make(gr.sizeof_short, "debug/PCM_left.dat")
-            self.file_sink_right = blocks.file_sink_make(gr.sizeof_short, "debug/PCM_right.dat")
-            self.tb.connect(self.src, (self.mp4, 0), self.file_sink_left)
-            self.tb.connect((self.mp4, 1), self.file_sink_right)
+            self.dab_params = dab.parameters.dab_parameters(1, 208.064e6, True)
+            self.src01 = blocks.file_source_make(gr.sizeof_float * 2 * self.dab_params.num_carriers,
+                                                 "debug/transmission_frame.dat")
+            self.src02 = blocks.file_source_make(gr.sizeof_char, "debug/transmission_frame_trigger.dat")
+            self.dabplus = dab.dabplus_audio_decoder_ff(self.dab_params, 112, 54, 84, 2, True)
+            self.file_sink_left = blocks.file_sink_make(gr.sizeof_float, "debug/PCM_left2.dat")
+            self.file_sink_right = blocks.file_sink_make(gr.sizeof_float, "debug/PCM_right2.dat")
+            self.tb.connect(self.src01, (self.dabplus, 0), self.file_sink_left)
+            self.tb.connect(self.src02, (self.dabplus, 1), self.file_sink_right)
             self.tb.run()
         pass
 
 
 if __name__ == '__main__':
-    gr_unittest.run(qa_mp4_decode_bs, "qa_mp4_decode_bs.xml")
+    gr_unittest.run(qa_dabplus_audio_decoder_ff, "qa_dabplus_audio_decoder_ff.xml")

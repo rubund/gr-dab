@@ -56,7 +56,7 @@ namespace gr {
     mp4_decode_bs_impl::mp4_decode_bs_impl(int bit_rate_n)
             : gr::block("mp4_decode_bs",
                         gr::io_signature::make(1, 1, sizeof(unsigned char)),
-                        gr::io_signature::make(1, 1, sizeof(int16_t))),
+                        gr::io_signature::make(2, 2, sizeof(int16_t))),
               d_bit_rate_n(bit_rate_n)
     {
       d_superframe_size = bit_rate_n * 110;
@@ -151,7 +151,8 @@ namespace gr {
                                               uint8_t sbrFlag,
                                               uint8_t mpegSurround,
                                               uint8_t aacChannelMode,
-                                              int16_t *out_sample)
+                                              int16_t *out_sample1,
+                                              int16_t *out_sample2)
     {
       // copy AU to process it
       uint8_t au[2 * 960 + 10]; // sure, large enough
@@ -173,7 +174,8 @@ namespace gr {
                         aacChannelMode,
                         au,
                         frame_length,
-                        out_sample);
+                        out_sample1,
+                        out_sample2);
     }
 
     int16_t mp4_decode_bs_impl::MP42PCM(uint8_t dacRate,
@@ -182,7 +184,8 @@ namespace gr {
                                         uint8_t aacChannelMode,
                                         uint8_t buffer[],
                                         int16_t bufferLength,
-                                        int16_t *out_sample)
+                                        int16_t *out_sample1,
+                                        int16_t *out_sample2)
     {
       int16_t samples;
       long unsigned int sample_rate;
@@ -211,7 +214,8 @@ namespace gr {
       }
       GR_LOG_DEBUG(d_logger, format("bytes consumed %d") % (int) (hInfo.bytesconsumed));
       GR_LOG_DEBUG(d_logger,
-                   format("sample_rate = %d, samples = %d, channels = %d, error = %d, sbr = %d") % sample_rate % samples %
+                   format("sample_rate = %d, samples = %d, channels = %d, error = %d, sbr = %d") % sample_rate %
+                   samples %
                    (int) (hInfo.channels) % (int) (hInfo.error) % (int) (hInfo.sbr));
       channels = hInfo.channels;
       if (hInfo.error != 0) {
@@ -223,27 +227,26 @@ namespace gr {
       // write samples to output buffer
       if (channels == 2) {
         // the 2 channels are transmitted intereleaved; each channel gets samples/2 PCM samples
-        for (int n = 0; n < samples; n++) {
-          out_sample[n + d_nsamples_produced] = (int16_t) outBuffer[n];
+        for (int n = 0; n < samples / 2; n++) {
+          out_sample1[n + d_nsamples_produced] = (int16_t) outBuffer[n * 2];
+          out_sample2[n + d_nsamples_produced] = (int16_t) outBuffer[n * 2 + 1];
         }
       } else if (channels == 1) {
         int16_t *buffer = (int16_t *) alloca(2 * samples);
         int16_t i;
-        for (i = 0; i < samples; i++) {
-          // only 1 channel -> reproduce each sample to send it to a stereo output
-          buffer[2 * i] = ((int16_t *) outBuffer)[i];
-          buffer[2 * i + 1] = buffer[2 * i];
-        }
-        for (int n = 0; n < samples; n++) {
-          out_sample[n] = buffer[n];
+        for (int n = 0; n < samples / 2; n++) {
+          // only 1 channel -> reproduce each sample to send it to a stereo output anyway
+          out_sample1[n + d_nsamples_produced] = (int16_t) outBuffer[n * 2];
+          out_sample2[n + d_nsamples_produced] = (int16_t) outBuffer[n * 2 + 1];
         }
       } else
         GR_LOG_ERROR(d_logger, "Cannot handle these channels -> dump samples");
 
       GR_LOG_DEBUG(d_logger, format("Produced %d PCM samples (for each channel)") % (samples / 2));
-      d_nsamples_produced += samples;
+      d_nsamples_produced += samples / 2;
       return samples / 2;
     }
+
 /*! \brief CRC16 check
  * CRC16 check according to ETSI EN 300 401
  * @param msg data to check
@@ -288,7 +291,8 @@ namespace gr {
                                      gr_vector_void_star &output_items)
     {
       const unsigned char *in = (const unsigned char *) input_items[0] + d_superframe_size;
-      int16_t *out = (int16_t *) output_items[0];
+      int16_t *out1 = (int16_t *) output_items[0];
+      int16_t *out2 = (int16_t *) output_items[1];
       d_nsamples_produced = 0;
 
       for (int n = 0; n < noutput_items / (960 * 4); n++) {
@@ -358,7 +362,7 @@ namespace gr {
 
           // sanity check for the aac_frame_length
           if ((aac_frame_length >= 960) || (aac_frame_length < 0)) {
-            throw std::out_of_range("aac frame length not in range (%d)" +aac_frame_length);
+            throw std::out_of_range("aac frame length not in range (%d)" + aac_frame_length);
           }
 
           // CRC check of each AU (the 2 byte (16 bit) CRC word is excluded in aac_frame_length)
@@ -371,7 +375,8 @@ namespace gr {
                              d_sbr_flag,
                              d_mpeg_surround,
                              d_aac_channel_mode,
-                             out);
+                             out1,
+                             out2);
           } else {
             // dump corrupted AU
             GR_LOG_DEBUG(d_logger, format("CRC failure with dab+ frame"));

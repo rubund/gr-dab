@@ -67,7 +67,8 @@ namespace gr {
                             uint8_t sbrFlag,
                             uint8_t mpegSurround,
                             uint8_t aacChannelMode,
-                            int16_t *out_sample);
+                            int16_t *out_sample1,
+                            int16_t *out_sample2);
 
       int16_t MP42PCM(uint8_t dacRate,
                       uint8_t sbrFlag,
@@ -75,7 +76,8 @@ namespace gr {
                       uint8_t aacChannelMode,
                       uint8_t buffer[],
                       int16_t bufferLength,
-                      int16_t *out_sample);
+                      int16_t *out_sample1,
+                      int16_t *out_sample2);
 
     public:
       mp4_decode_bs_impl(int bit_rate_n);

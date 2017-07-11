@@ -49,6 +49,7 @@ install(FILES
     dab_time_interleave_bb.xml
     dab_time_deinterleave_ff.xml
     dab_crc16_bb.xml
+    dab_msc_decode.xml
     dab_fib_source_b.xml
     dab_select_subch_vfvf.xml
     dab_unpuncture_ff.xml
@@ -58,5 +59,6 @@ install(FILES
     dab_mp2_decode_bs.xml
     dab_reed_solomon2_bb.xml
     dab_mp4_decode_bs.xml
-    dab_reed_solomon_decode_bb.xml DESTINATION share/gnuradio/grc/blocks
+    dab_reed_solomon_decode_bb.xml
+    dab_dabplus_audio_decoder_ff.xml DESTINATION share/gnuradio/grc/blocks
 )
