@@ -60,5 +60,6 @@ install(FILES
     mapper_bc.h
     mp2_decode_bs.h
     mp4_decode_bs.h
-    reed_solomon_decode_bb.h DESTINATION include/dab
+    reed_solomon_decode_bb.h
+    reed_solomon_encode_bb.h DESTINATION include/dab
 )

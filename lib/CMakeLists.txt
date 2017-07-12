@@ -68,7 +68,8 @@ list(APPEND dab_sources
     reed_solomon_decode_bb_impl.cc
     fec/decode_rs_char.c
     fec/encode_rs_char.c
-    fec/init_rs_char.c)
+    fec/init_rs_char.c
+    reed_solomon_encode_bb_impl.cc)
 
 set(dab_sources "${dab_sources}" PARENT_SCOPE)
 if(NOT dab_sources)
