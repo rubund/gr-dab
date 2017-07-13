@@ -158,11 +158,10 @@ namespace gr {
       //change service comp language
       bit_adaption(d_service_comp_language + d_size_service_comp_language, service_comp_lang, 8);
       if (protection_mode.size() != num_subch) {
-        throw std::invalid_argument("size of vector protection_mode (%d) does not fit with number of subchannels (%d)" + protection_mode.size() + num_subch);
+        throw std::invalid_argument((boost::format("size of vector protection_mode (%d) does not fit with number of subchannels (%d)") % protection_mode.size() % num_subch).str());
       }
       if (data_rate_n.size() != num_subch) {
-        throw std::invalid_argument(
-                "size of vector data_rate_n (%d) does not fit with number of subchannels (%d)" + data_rate_n.size() +  num_subch);
+        throw std::invalid_argument((boost::format("size of vector data_rate_n (%d) does not fit with number of subchannels (%d)") % data_rate_n.size() %  num_subch).str());
       }
     }
 
