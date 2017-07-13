@@ -53,7 +53,8 @@ namespace gr {
     reed_solomon_encode_bb_impl::reed_solomon_encode_bb_impl(int bit_rate_n)
       : gr::block("reed_solomon_encode_bb",
               gr::io_signature::make(1, 1, sizeof(unsigned char)),
-              gr::io_signature::make(1, 1, sizeof(unsigned char)))
+              gr::io_signature::make(1, 1, sizeof(unsigned char))),
+        d_bit_rate_n(bit_rate_n)
     {
       //initialize Reed Solomon
       rs_handle = init_rs_char(8, 0x11D, 0, 1, 10, 135);
@@ -89,28 +90,25 @@ namespace gr {
     {
       const unsigned char *in = (const unsigned char *) input_items[0];
       unsigned char *out = (unsigned char *) output_items[0];
+      unsigned char rs_in[110];
+      unsigned char rs_parity[10];
 
-      for (int n = 0; n < noutput_items / d_superframe_size_rs; n++){
-        //copy data bits to output
-        memcpy(&out[d_superframe_size_rs*n], &in[d_superframe_size_in*n], d_superframe_size_in);
-        //now calculate parity bits
-        // buffer to feed to encoder (110*bit_rate_n, still without parity words)
-        unsigned char buf_to_rs_enc[110];
-        unsigned char rs_parity[10];
-        int col, row;
-        // virtual interleaving
-        for(row = 0; row < d_bit_rate_n; row++){
-          for(col = 0; col < 110; col++){
-            buf_to_rs_enc[col] = in[d_superframe_size_in*n + d_bit_rate_n*col + row];
+      for(int n=0; n < noutput_items/d_superframe_size_rs; n++){
+        // virtual interleaving: a d_bit_rate_n x 110 block is now read row wise instead of column wise
+        for (int row = 0; row < d_bit_rate_n; row++) {
+          // write scrambled in_vector for RS
+          for (int i = 0; i < 110; ++i) {
+            rs_in[i] = in[n * d_superframe_size_in + d_bit_rate_n*i + row];
           }
-          // RS encoding
-          encode_rs_char(rs_handle, buf_to_rs_enc, rs_parity);
-          // write parity bytes to output buffer
-          /*for(col = 110; col < 120; col++){
-            //out[d_superframe_size_rs*n + d_bit_rate_n*col + row] = rs_parity[col-110];
-            GR_LOG_DEBUG(d_logger, format("write parity bit at index %d") %(d_superframe_size_rs*n + d_bit_rate_n*col + row));
-            //out[d_superframe_size_rs*n + d_bit_rate_n*col + row] = 3;
-          }*/
+          // calculate parity bytes
+          encode_rs_char(rs_handle, rs_in, rs_parity);
+          // write to output buffer
+          for (int i = 0; i < 110; ++i) {
+            out[n*d_superframe_size_rs + d_bit_rate_n*i + row] = rs_in[i];
+          }
+          for (int i = 110; i < 120; ++i) {
+            out[n*d_superframe_size_rs + d_bit_rate_n*i + row] = rs_parity[i-110];
+          }
         }
       }
 
