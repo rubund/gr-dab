@@ -21,7 +21,7 @@
 
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
-import dab_swig as dab
+import dab
 
 class qa_mp4_encode_sb (gr_unittest.TestCase):
 
@@ -32,7 +32,7 @@ class qa_mp4_encode_sb (gr_unittest.TestCase):
         self.tb = None
 
     def test_001_t (self):
-        # set up fg
+        self.mp4 = dab.mp4_encode_sb_make(14, 2, 32000, 1)
         self.tb.run ()
         # check data
 

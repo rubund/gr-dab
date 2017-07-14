@@ -23,6 +23,7 @@
 
 #include <dab/mp4_encode_sb.h>
 #include "aacenc_lib.h"
+#include "FDK_audio.h"
 
 namespace gr {
   namespace dab {
@@ -31,7 +32,7 @@ namespace gr {
     {
      private:
       int d_bit_rate_n, d_channels, d_samp_rate, d_afterburner, d_aot;
-      HANDLE_AACENCODER *d_aac_encoder;
+      HANDLE_AACENCODER d_aac_encoder;
       bool init_aac_encoder(HANDLE_AACENCODER *encoder,
                             int subchannel_index,
                             int channels,

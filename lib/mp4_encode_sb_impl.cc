@@ -59,12 +59,12 @@ namespace gr {
         throw std::invalid_argument("samp_rate must be 32kHz or 48kHz, not %d" + d_samp_rate);
       }
       // prepare AAC encoder
-      *d_aot = AOT_NONE;
-      if(init_aac_encoder(d_aac_encoder, d_bit_rate_n, d_channels, d_samp_rate, d_afterburner, &d_aot)){
-        GR_LOG_INFO(d_logger, "AAC encoder init succeeded");
+      d_aot = AOT_NONE;
+      if(init_aac_encoder(&d_aac_encoder, d_bit_rate_n, d_channels, d_samp_rate, d_afterburner, &d_aot)){
+        GR_LOG_INFO(d_logger, "AAC enc init succeeded");
       }
       else{
-        GR_LOG_ERROR(d_logger, "AAC encoder init failed");
+        GR_LOG_ERROR(d_logger, "AAC enc init failed");
 
       }
     }
@@ -95,29 +95,29 @@ namespace gr {
       }
 
       // allocate encoder instance with required \ref encOpen "configuration"
-      if (aacEncOpen(encoder, 0x01|0x02|0x04, channels) != AACENC_OK) {
+      if (aacEncOpen(encoder, 0, 0) != AACENC_OK) {
         GR_LOG_ERROR(d_logger, "Unable to open encoder");
         return false;
       }
 
-      // set AOT \TODO: is PseudoStereo supported???
+      // set AOT \TODO: is Parametric Stereo supported???
       if (*aot == AOT_NONE) {
         if(channels == 2 && subchannel_index <= 6) {
           *aot = AOT_DABPLUS_PS;
+          GR_LOG_INFO(d_logger, "AOT set to AAC Parametric Stereo");
         }
         else if((channels == 1 && subchannel_index <= 8) || subchannel_index <= 10) {
           *aot = AOT_DABPLUS_SBR;
+          GR_LOG_INFO(d_logger, "AOT set to AAC SBR (Spectral Band Replication)");
         }
         else {
           *aot = AOT_DABPLUS_AAC_LC;
+          GR_LOG_INFO(d_logger, "AOT set to AAC LC (Low Complexity)");
         }
       }
 
-      GR_LOG_INFO(d_logger, format("Using %d subchannels. AAC type:%s%s%s. channels=%d, sample_rate=%d")
+      GR_LOG_INFO(d_logger, format("Using %d subchannels. channels = %d, sample_rate = %d")
               %subchannel_index
-              %*aot == AOT_DABPLUS_PS ? "HE-AAC v2" : ""
-              %*aot == AOT_DABPLUS_SBR ? "HE-AAC" : ""
-              %*aot == AOT_DABPLUS_AAC_LC ? "AAC-LC" : ""
               %channels
               %sample_rate);
 
@@ -147,13 +147,13 @@ namespace gr {
         return false;
       }
 
-      /*if (aacEncoder_SetParam(*encoder, AACENC_BITRATEMODE, AACENC_BR_MODE_SFR)
-       * != AACENC_OK) {
-          fprintf(stderr, "Unable to set the bitrate mode\n");
-          return 1;
-      }*/
+//      if (aacEncoder_SetParam(*encoder, AACENC_BITRATEMODE, AACENC_BR_MODE_SFR)
+//       * != AACENC_OK) {
+//          fprintf(stderr, "Unable to set the bitrate mode\n");
+//          return 1;
+//      }
 
-      GR_LOG_ERROR(d_logger, format("AAC bitrate set to: %d") %subchannel_index*8000);
+      GR_LOG_ERROR(d_logger, format("AAC bitrate set to: %d") %(subchannel_index*8000));
       if (aacEncoder_SetParam(*encoder, AACENC_BITRATE, subchannel_index*8000) != AACENC_OK) {
         GR_LOG_ERROR(d_logger, "Unalbe to set the bitrate");
         return false;
@@ -169,7 +169,7 @@ namespace gr {
         GR_LOG_ERROR(d_logger, "Unalbe to initialize the encoder");
         return false;
       }
-      return 0;
+      return true;
     }
 
     void
