@@ -46,7 +46,7 @@ namespace gr {
        * class. dab::mp4_encode_sb::make is the public interface for
        * creating new instances.
        */
-      static sptr make(int bit_rate_n, int channels, samp_rate, int afterburner);
+      static sptr make(int bit_rate_n, int channels, int samp_rate, int afterburner);
     };
 
   } // namespace dab

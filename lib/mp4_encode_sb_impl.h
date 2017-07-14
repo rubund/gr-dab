@@ -22,7 +22,7 @@
 #define INCLUDED_DAB_MP4_ENCODE_SB_IMPL_H
 
 #include <dab/mp4_encode_sb.h>
-#include "libAACenc/include/aacenc_lib.h"
+#include "aacenc_lib.h"
 
 namespace gr {
   namespace dab {
@@ -40,7 +40,7 @@ namespace gr {
                             int *aot);
 
      public:
-      mp4_encode_sb_impl(int bit_rate_n, int channels, samp_rate, int afterburner);
+      mp4_encode_sb_impl(int bit_rate_n, int channels, int samp_rate, int afterburner);
       ~mp4_encode_sb_impl();
 
       // Where all the action really happens

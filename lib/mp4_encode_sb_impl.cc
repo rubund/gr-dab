@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <sstream>
 #include <boost/format.hpp>
+#include "aacenc_lib.h"
 
 using namespace boost;
 
@@ -35,7 +36,7 @@ namespace gr {
   namespace dab {
 
     mp4_encode_sb::sptr
-    mp4_encode_sb::make(int bit_rate_n, int channels, samp_rate, int afterburner)
+    mp4_encode_sb::make(int bit_rate_n, int channels, int samp_rate, int afterburner)
     {
       return gnuradio::get_initial_sptr
               (new mp4_encode_sb_impl(bit_rate_n, channels, samp_rate, afterburner));
@@ -44,7 +45,7 @@ namespace gr {
     /*
      * The private constructor
      */
-    mp4_encode_sb_impl::mp4_encode_sb_impl(int bit_rate_n, int channels, samp_rate, int afterburner)
+    mp4_encode_sb_impl::mp4_encode_sb_impl(int bit_rate_n, int channels, int samp_rate, int afterburner)
             : gr::block("mp4_encode_sb",
                         gr::io_signature::make(1, 1, sizeof(int16_t)),
                         gr::io_signature::make(1, 1, sizeof(unsigned char))),
@@ -58,8 +59,8 @@ namespace gr {
         throw std::invalid_argument("samp_rate must be 32kHz or 48kHz, not %d" + d_samp_rate);
       }
       // prepare AAC encoder
-      aot = AOT_NONE;
-      if(prepare_aac_encoder(d_aac_encoder, d_bit_rate_n, d_channels, d_samp_rate, d_afterburner, d_aot)){
+      *d_aot = AOT_NONE;
+      if(init_aac_encoder(d_aac_encoder, d_bit_rate_n, d_channels, d_samp_rate, d_afterburner, &d_aot)){
         GR_LOG_INFO(d_logger, "AAC encoder init succeeded");
       }
       else{
@@ -75,7 +76,7 @@ namespace gr {
     {
     }
 
-    int mp4_encode_sb_impl::prepare_aac_encoder(
+    bool mp4_encode_sb_impl::init_aac_encoder(
             HANDLE_AACENCODER *encoder,
             int subchannel_index,
             int channels,
