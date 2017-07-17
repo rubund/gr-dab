@@ -41,10 +41,10 @@ class qa_dabplus_audio_decoder_ff (gr_unittest.TestCase):
             self.src01 = blocks.file_source_make(gr.sizeof_float * 2 * self.dab_params.num_carriers,
                                                  "debug/transmission_frame.dat")
             self.src02 = blocks.file_source_make(gr.sizeof_char, "debug/transmission_frame_trigger.dat")
-            self.dabplus = dab.dabplus_audio_decoder_ff(self.dab_params, 112, 54, 84, 2, True)
+            self.dabplus = dab.dabplus_audio_decoder_ff(self.dab_params, 112, 234, 84, 2, False)
             self.wav_sink = blocks.wavfile_sink_make("debug/music.wav", 2, 32000)
-            self.file_sink_left = blocks.file_sink_make(gr.sizeof_float, "debug/PCM_left2.dat")
-            self.file_sink_right = blocks.file_sink_make(gr.sizeof_float, "debug/PCM_right2.dat")
+            self.file_sink_left = blocks.file_sink_make(gr.sizeof_float, "debug/PCM_left.dat")
+            self.file_sink_right = blocks.file_sink_make(gr.sizeof_float, "debug/PCM_right.dat")
             self.tb.connect(self.src01, (self.dabplus, 0), self.file_sink_left)
             self.tb.connect(self.src02, (self.dabplus, 1), self.file_sink_right)
             self.tb.connect((self.dabplus, 0), (self.wav_sink, 0))

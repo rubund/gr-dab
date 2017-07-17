@@ -32,13 +32,19 @@ namespace gr {
     {
      private:
       int d_bit_rate_n, d_channels, d_samp_rate, d_afterburner, d_aot;
+      int nconsumed, nproduced;
+      int d_input_size, d_output_size;
       HANDLE_AACENCODER d_aac_encoder;
+      AACENC_InfoStruct info = { 0 };
+
+
       bool init_aac_encoder(HANDLE_AACENCODER *encoder,
                             int subchannel_index,
                             int channels,
                             int sample_rate,
                             int afterburner,
                             int *aot);
+      bool encode(int16_t *input_buffer, int size_input_buffer, unsigned char *output_buffer, int size_output_buffer);
 
      public:
       mp4_encode_sb_impl(int bit_rate_n, int channels, int samp_rate, int afterburner);

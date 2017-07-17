@@ -32,9 +32,15 @@ class qa_mp4_encode_sb (gr_unittest.TestCase):
         self.tb = None
 
     def test_001_t (self):
+        self.src_left = blocks.file_source_make(gr.sizeof_short, "debug/PCM_left.dat")
+        self.src_right = blocks.file_source_make(gr.sizeof_short, "debug/PCM_right.dat")
         self.mp4 = dab.mp4_encode_sb_make(14, 2, 32000, 1)
+        self.file_sink = blocks.file_sink_make(gr.sizeof_char, "debug/mp4_encoded.dat")
+        self.tb.connect(self.src_left, (self.mp4, 0), self.file_sink)
+        self.tb.connect(self.src_right, (self.mp4, 1))
         self.tb.run ()
         # check data
+
 
 
 if __name__ == '__main__':
