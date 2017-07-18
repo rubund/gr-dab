@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /* 
- * Copyright 2017 <+YOU OR YOUR COMPANY+>.
+ * Copyright 2017 Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ namespace gr {
   namespace dab {
 
     /*!
-     * \brief <+description of block+>
+     * \brief block to encode a PCM stream in HE-AAC with DAB+ specific parameters (960 granule length)
      * \ingroup dab
      *
      */

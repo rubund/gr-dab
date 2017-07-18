@@ -35,7 +35,7 @@ extern "C" {
 
 namespace gr {
   namespace dab {
-/*! Reed Solomon encoder for DAB+ transmission
+/*! \brief Reed Solomon encoder for DAB+ transmission
  * Reed Solomon RS(120, 110, t=5) with virtual interleaving; derived from RS(255, 245, t=5). Details see ETSI TS 102 563 clause 6.0 and 6.1.
  * @param bit_rate_n data rate in multiples of 8kbit/s
  */

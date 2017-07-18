@@ -1,7 +1,12 @@
 /* -*- c++ -*- */
 /* 
- * Copyright 2017 <+YOU OR YOUR COMPANY+>.
- * 
+ * Copyright 2017 Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
+ *
+ * Code from the following third party modules is used:
+ * - ODR-AudioEnc, Copyright (C) 2011 Martin Storsjo, (C) 2017 Matthias P. Braendli; Licensed under the Apache License, Version 2.0 (the "License")
+ * - the FDK AAC Codec Library for Android is used as a shared library but not modified or used in source and binary form; © Copyright  1995 - 2012 Fraunhofer-Gesellschaft zur Förderung der angewandten Forschung e.V.
+  All rights reserved.
+ *
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3, or (at your option)
@@ -27,7 +32,11 @@
 
 namespace gr {
   namespace dab {
-
+/*! \brief block to encode a PCM stream in HE-AAC with DAB+ specific parameters (960 granule length)
+ *
+ * @param bit_rate_n data rate in multiples of 8kbit/s
+ * @param channels number of input audio channels
+ */
     class mp4_encode_sb_impl : public mp4_encode_sb
     {
      private:
@@ -37,9 +46,7 @@ namespace gr {
       HANDLE_AACENCODER d_aac_encoder;
       AACENC_InfoStruct info = { 0 };
 
-
       bool init_aac_encoder(HANDLE_AACENCODER *encoder,
-                            int subchannel_index,
                             int channels,
                             int sample_rate,
                             int afterburner,
