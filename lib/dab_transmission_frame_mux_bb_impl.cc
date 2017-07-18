@@ -23,6 +23,7 @@
 #endif
 
 #include <gnuradio/io_signature.h>
+#include <boost/format.hpp>
 #include "dab_transmission_frame_mux_bb_impl.h"
 
 namespace gr {
@@ -64,7 +65,7 @@ namespace gr {
           d_num_cifs = 2;
           break;
         default:
-          throw std::invalid_argument("Transmission mode %d doesn't exist" + transmission_mode);
+          throw std::invalid_argument((boost::format("Transmission mode %d doesn't exist") % transmission_mode).str());
       }
       if (subch_size.size() != num_subch)
         GR_LOG_WARN(d_logger, "sizeof vector subch_size does not match with num_subch");
@@ -75,8 +76,7 @@ namespace gr {
         d_subch_total_len += subch_size[i];
       }
       if (d_subch_total_len * d_cu_len > d_cif_len) {
-        throw std::out_of_range(
-                "subchannels are %d bytes too long for CIF" + (d_subch_total_len * d_cu_len - d_cif_len));
+        throw std::out_of_range((boost::format("subchannels are %d bytes too long for CIF") % (d_subch_total_len * d_cu_len - d_cif_len)).str());
       }
       set_output_multiple(d_vlen_out);
 

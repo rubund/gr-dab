@@ -180,7 +180,7 @@ namespace gr {
                                 uint16_t service_reference = (uint16_t)(data[service_comp_counter + 2] & 0x0f) << 8 |
                                                              (uint8_t) data[service_comp_counter + 3];
                                 uint8_t SCIdS = (uint8_t)(data[service_comp_counter + 4] & 0x0f);
-                                if (data[service_comp_counter + 5] & 0x80 == 0) {
+                                if ((data[service_comp_counter + 5] & 0x80) == 0) {
                                     uint8_t subchID = (uint8_t)(data[service_comp_counter + 5] & 0x3f);
                                     GR_LOG_DEBUG(d_logger, format("service component global definition: reference %d, SCIdS %d, subchID %d") %service_reference %(int)SCIdS %(int)subchID);
                                     service_comp_counter += 5;

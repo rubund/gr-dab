@@ -52,6 +52,16 @@ else()
     message(STATUS "FAAD found")
 endif ()
 
+########################################################################
+# Find FDK-AAC
+########################################################################
+find_package(Fdk-aac REQUIRED)
+if (NOT FDK-AAC_FOUND )
+    message(FATAL_ERROR "please install fdk-aac")
+else()
+    message(STATUS "FDK-AAC found")
+endif ()
+
 
 ########################################################################
 # Find boost
