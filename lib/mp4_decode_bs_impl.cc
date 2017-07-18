@@ -362,7 +362,7 @@ namespace gr {
 
           // sanity check for the aac_frame_length
           if ((aac_frame_length >= 960) || (aac_frame_length < 0)) {
-            throw std::out_of_range("aac frame length not in range (%d)" + aac_frame_length);
+            throw std::out_of_range((boost::format("aac frame length not in range (%d)") % aac_frame_length).str());
           }
 
           // CRC check of each AU (the 2 byte (16 bit) CRC word is excluded in aac_frame_length)
