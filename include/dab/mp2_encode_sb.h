@@ -1,7 +1,11 @@
 /* -*- c++ -*- */
 /* 
- * Copyright 2017 <+YOU OR YOUR COMPANY+>.
- * 
+ * Copyright 2017 Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
+ *
+ * Code from the following third party modules is used:
+ * - ODR-AudioEnc, Copyright (C) 2011 Martin Storsjo, (C) 2017 Matthias P. Braendli; Licensed under the Apache License, Version 2.0 (the "License")
+ * - libtoolame-dab taken from ODR-AudioEnc, derived from TooLAME, licensed under LGPL v2.1 or later. See libtoolame-dab/LGPL.txt. This is built into a shared library.
+ *
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3, or (at your option)
@@ -29,7 +33,7 @@ namespace gr {
   namespace dab {
 
     /*!
-     * \brief <+description of block+>
+     * \brief block to encode a 16bit PCM stream to MPEG2 for DAB
      * \ingroup dab
      *
      */

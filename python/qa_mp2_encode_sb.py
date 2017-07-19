@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
-# Copyright 2017 <+YOU OR YOUR COMPANY+>.
+# Copyright 2017 Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
 # 
 # This is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,11 +31,12 @@ class qa_mp2_encode_sb (gr_unittest.TestCase):
     def tearDown (self):
         self.tb = None
 
+# encodes a PCM sample, the resulting mp2 file can be verified by playing it wiht an audio player (e.g. VLC media player)
     def test_001_t (self):
-        self.src_left = blocks.file_source_make(gr.sizeof_short, "debug/PCM_left.dat")
-        self.src_right = blocks.file_source_make(gr.sizeof_short, "debug/PCM_right.dat")
-        self.mp2 = dab.mp2_encode_sb_make(14, 2, 32000)
-        self.file_sink = blocks.file_sink_make(gr.sizeof_char, "debug/mp2_encoded.dat")
+        self.src_left = blocks.file_source_make(gr.sizeof_short, "debug/PCM_piano_left.dat")
+        self.src_right = blocks.file_source_make(gr.sizeof_short, "debug/PCM_piano_right.dat")
+        self.mp2 = dab.mp2_encode_sb_make(14, 2, 48000)
+        self.file_sink = blocks.file_sink_make(gr.sizeof_char, "debug/mp2_encoded.mp2")
         self.tb.connect(self.src_left, (self.mp2, 0), self.file_sink)
         self.tb.connect(self.src_right, (self.mp2, 1))
         self.tb.run ()
