@@ -93,7 +93,6 @@ list(APPEND dab_sources
     libtoolame-dab/psycho_n1.c
     libtoolame-dab/encode_new.c
     libtoolame-dab/portableio.c
-#    libtoolame-dab/pds_subband.c
 )
 
 
