@@ -29,7 +29,7 @@ namespace gr {
   namespace dab {
 
     /*!
-     * \brief mp2 decoder for DAB logical frames
+     * \brief block that decodes DAB audio frames (= MPEG2 audio frames) to PCM frames
      * \ingroup dab
      *
      */

@@ -1,4 +1,11 @@
 /* -*- c++ -*- */
+
+/*
+* 2017 by Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
+* A major part of this code is adapted from the kjmp2 library, slightly modified and written into a GNURadio block.
+* Note that this is an altered version of kjmp2 and not the original library.
+*/
+
 /******************************************************************************
 ** kjmp2 -- a minimal MPEG-1/2 Audio Layer II decoder library                **
 ** version 1.1                                                               **
@@ -22,24 +29,23 @@
 **      distribution.                                                        **
 ******************************************************************************/
 
-/*
-*	Code adapted of the original code:
-*	whole code is made into a GNU Radio block for use within the gr module gr-dab
-* 2017 by Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
-*
-*/
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
+#include <stdexcept>
+#include <stdio.h>
+#include <sstream>
+#include <boost/format.hpp>
 #include <gnuradio/io_signature.h>
 #include "mp2_decode_bs_impl.h"
+
+using namespace boost;
 
 namespace gr {
   namespace dab {
 
-    // mode constants
+// channel mode constants
 #define STEREO       0
 #define JOINT_STEREO 1
 #define DUAL_CHANNEL 2
@@ -131,7 +137,6 @@ namespace gr {
             0x00005, 0x00005, 0x00004, 0x00004, 0x00003, 0x00003, 0x00002, 0x00002,
             0x00002, 0x00002, 0x00001, 0x00001, 0x00001, 0x00001, 0x00001, 0x00001
     };
-
 
 ///////////// Table 3-B.2: Possible quantization per subband ///////////////////
 
@@ -226,7 +231,7 @@ namespace gr {
     mp2_decode_bs_impl::mp2_decode_bs_impl(int bit_rate_n)
             : gr::block("mp2_decode_bs",
                         gr::io_signature::make(1, 1, sizeof(unsigned char)),
-                        gr::io_signature::make(1, 1, sizeof(int16_t))),
+                        gr::io_signature::make(2, 2, sizeof(int16_t))), /* output is always stereo*/
               d_bit_rate_n(bit_rate_n)
     {
       d_bit_rate = d_bit_rate_n * 8;
@@ -248,15 +253,16 @@ namespace gr {
 
       d_V_offs = 0;
       d_baud_rate = 48000;  // default for DAB
-      d_mp2_framesize = 24 * d_bit_rate;  // may be changed
+      d_mp2_framesize = 24 * d_bit_rate;  // framesize in unpacked bits!!!
       d_mp2_frame = new uint8_t[2 * d_mp2_framesize];
       d_mp2_header_OK = 0;
       d_mp2_header_count = 0;
       d_mp2_bit_count = 0;
       d_number_of_frames = 0;
       d_error_frames = 0;
+      d_output_size = KJMP2_SAMPLES_PER_FRAME;
 
-      set_output_multiple(24 * d_bit_rate);
+      set_output_multiple(d_output_size);
     }
 
     /*
@@ -431,9 +437,10 @@ namespace gr {
 // compute the frame size
       frame_size = (144000 * bitrates[bit_rate_index_minus1]
                     / sample_rates[sampling_frequency]) + padding_bit;
+      GR_LOG_DEBUG(d_logger, format("frame_size = %d") % frame_size);
 
       if (!pcm) {
-        GR_LOG_DEBUG(d_logger, "pcm is NULL ptr - no decoding");
+        GR_LOG_ERROR(d_logger, "pcm is NULL ptr - no decoding");
         return frame_size;  // no decoding
       }
 
@@ -579,14 +586,6 @@ namespace gr {
       return frame_size;
     }
 
-    //
-//	bits to MP2 frames, amount is amount of bits
-    void mp2_decode_bs_impl::add_to_frame(uint8_t *v)
-    {
-
-
-    }
-
     void mp2_decode_bs_impl::add_bit_to_mp2(uint8_t *v, uint8_t b, int16_t nm)
     {
       uint8_t byte = v[nm / 8];
@@ -603,7 +602,7 @@ namespace gr {
     void
     mp2_decode_bs_impl::forecast(int noutput_items, gr_vector_int &ninput_items_required)
     {
-      /* <+forecast+> e.g. ninput_items_required[0] = noutput_items */
+      ninput_items_required[0] = noutput_items / d_output_size * d_mp2_framesize;
     }
 
     int
@@ -613,43 +612,35 @@ namespace gr {
                                      gr_vector_void_star &output_items)
     {
       const unsigned char *in = (const unsigned char *) input_items[0]; // input are unpacked bytes
-      uint16_t *out = (uint16_t *) output_items[0];
-      d_out_offset = 0;
+      int16_t *out_left = (int16_t *) output_items[0];
+      int16_t *out_right = (int16_t *) output_items[1];
+      d_nproduced = 0;
 
-      for (int logical_frame_count; logical_frame_count < noutput_items / d_mp2_framesize; logical_frame_count++) {
-
+      for (int logical_frame_count; logical_frame_count < noutput_items / d_output_size; logical_frame_count++) {
         int16_t i, j;
         int16_t lf = d_baud_rate == 48000 ? d_mp2_framesize : 2 * d_mp2_framesize;
-        int16_t amount = d_mp2_framesize;
-        uint8_t help[24 * d_bit_rate / 8];
+        uint8_t help[24 * d_bit_rate_n];
         int16_t vlength = 24 * d_bit_rate / 8;
 
-        for (i = 0; i < 24 * d_bit_rate / 8; i++) {
-          help[i] = 0;
-          for (j = 0; j < 8; j++) {
-            help[i] <<= 1;
-            help[i] |= in[logical_frame_count * d_mp2_framesize + 8 * i + j] & 01;
-          }
-        }
-        {
-          uint8_t L0 = help[vlength - 1];
-          uint8_t L1 = help[vlength - 2];
-          int16_t down = d_bit_rate * 1000 >= 56000 ? 4 : 2;
-          //my_padhandler. processPAD (help, vlength - 2 - down - 1, L1, L0);
-        }
+        /* pad reading is not supported yet */
 
-        for (i = 0; i < amount; i++) {
+        for (i = 0; i < d_mp2_framesize; i++) {
+          // decoder is in sync with MPEG frame
           if (d_mp2_header_OK == 2) {
             add_bit_to_mp2(d_mp2_frame, in[logical_frame_count * d_mp2_framesize + i], d_mp2_bit_count++);
             if (d_mp2_bit_count >= lf) {
-              int16_t sample_buf[KJMP2_SAMPLES_PER_FRAME *
-                                 2]; //TODO: -> no need for an extra buffer; write it directly to output buffer
-              // decode mp2 frame and write it into sample_buf
+              // prepare buffer for PCM stereo samples
+              int16_t sample_buf[KJMP2_SAMPLES_PER_FRAME * 2];
+              // decode mp2 frame and write it into buffer
               if (mp2_decode_frame(d_mp2_frame, sample_buf)) {
-                //buffer -> putDataIntoBuffer (sample_buf, 2 * (int32_t)KJMP2_SAMPLES_PER_FRAME);
-                for (int n = 0; n < KJMP2_SAMPLES_PER_FRAME * 2; n++) {
-                  out[d_out_offset++] = sample_buf[i];
+                // write successfully decoded data to output buffer
+                for (int n = 0; n < KJMP2_SAMPLES_PER_FRAME; n++) {
+                  out_left[d_nproduced + n] = sample_buf[n*2];
+                  out_right[d_nproduced + n] = sample_buf[n*2+1];
                 }
+                d_nproduced += KJMP2_SAMPLES_PER_FRAME;
+              } else {
+                GR_LOG_DEBUG(d_logger, "mp2 decoding failed");
               }
 
               d_mp2_header_OK = 0;
@@ -680,10 +671,10 @@ namespace gr {
 
       // Tell runtime system how many input items we consumed on
       // each input stream.
-      consume_each(noutput_items);
+      consume_each(noutput_items / d_output_size * d_mp2_framesize);
 
       // Tell runtime system how many output items we produced.
-      return d_out_offset;
+      return d_nproduced;
     }
 
   } /* namespace dab */
