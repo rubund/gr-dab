@@ -22,6 +22,10 @@ This package requires that gnuradio-core is already installed.  It
 also depends on some GNU Radio prerequisites, such as Boost and
 cppunit.
 
+Requirements for Audio coding:
+-FDK-AAC with the DAB+ patches (https://github.com/Opendigitalradio/fdk-aac)
+-FAAD2 with sudo apt-get install libfaad-dev
+
 To build the examples from the tarball run these commands:
 
   $ mkdir build
