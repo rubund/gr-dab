@@ -54,6 +54,8 @@ namespace gr {
        * creating new instances.
        */
       static sptr make(int length, uint16_t generator, uint16_t initial_state);
+
+      virtual int getwert() = 0;
     };
 
   } // namespace dab

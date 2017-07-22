@@ -65,6 +65,7 @@ class qa_crc16_bb(gr_unittest.TestCase):
         crc16 = dab.crc16_bb(32, 0x1021, 0xffff)
         v2s = blocks.vector_to_stream(gr.sizeof_char, 32)
         dst = blocks.vector_sink_b()
+        test = crc16.getwert()
         self.tb.connect(src, s2v, crc16, v2s, dst)
         self.tb.run()
         result_data = dst.data()
