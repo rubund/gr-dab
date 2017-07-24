@@ -33,7 +33,7 @@ class dabplus_audio_decoder_ff(gr.hier_block2):
     See the single blocks for more details
     """
 
-    def __init__(self, dab_params, bit_rate, address, subch_size, protection, output_float, verbose=True, debug=True):
+    def __init__(self, dab_params, bit_rate, address, subch_size, protection, output_float, verbose=False, debug=False):
         if output_float: # map short samples to the range [-1,1] in floats
             gr.hier_block2.__init__(self,
                                     "dabplus_audio_decoder_ff",

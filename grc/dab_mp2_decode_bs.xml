@@ -17,4 +17,8 @@
     <name>out</name>
     <type>raw</type>
   </source>
+  <source>
+    <name>out</name>
+    <type>raw</type>
+  </source>
 </block>

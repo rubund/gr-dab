@@ -281,7 +281,7 @@ namespace gr {
       do {
         // copy frame to buffer
         if (d_channels == 1){
-          memcpy(input_buffer, in_ch1, d_input_size * sizeof(int16_t));
+          memcpy(input_buffer, &in_ch1[nconsumed], d_input_size * sizeof(int16_t));
         }
         else if(d_channels == 2) { // merge channels if stereo
           const int16_t *in_ch2 = (const int16_t *) input_items[1];

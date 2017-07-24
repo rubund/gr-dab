@@ -41,7 +41,7 @@ class fic_decode(gr.hier_block2):
     - get FIC information
     """
 
-    def __init__(self, dab_params, verbose=False, debug=True):
+    def __init__(self, dab_params, verbose=False, debug=False):
         """
         Hierarchical block for FIC decoding
 

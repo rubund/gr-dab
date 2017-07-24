@@ -70,7 +70,31 @@ list(APPEND dab_sources
     fec/encode_rs_char.c
     fec/init_rs_char.c
     reed_solomon_encode_bb_impl.cc
-    mp4_encode_sb_impl.cc)
+    mp4_encode_sb_impl.cc
+    mp2_encode_sb_impl.cc
+    libtoolame-dab/ath.c
+    libtoolame-dab/crc.c
+    libtoolame-dab/fft.c
+    libtoolame-dab/mem.c
+    libtoolame-dab/utils.c
+    libtoolame-dab/common.c
+    libtoolame-dab/encode.c
+    libtoolame-dab/tables.c
+    libtoolame-dab/subband.c
+    libtoolame-dab/toolame.c
+    libtoolame-dab/psycho_0.c
+    libtoolame-dab/psycho_1.c
+    libtoolame-dab/psycho_2.c
+    libtoolame-dab/psycho_3.c
+    libtoolame-dab/psycho_4.c
+    libtoolame-dab/availbits.c
+    libtoolame-dab/bitstream.c
+    libtoolame-dab/ieeefloat.c
+    libtoolame-dab/psycho_n1.c
+    libtoolame-dab/encode_new.c
+    libtoolame-dab/portableio.c
+)
+
 
 set(dab_sources "${dab_sources}" PARENT_SCOPE)
 if(NOT dab_sources)

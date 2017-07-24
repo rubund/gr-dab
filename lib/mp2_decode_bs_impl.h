@@ -1,4 +1,11 @@
 /* -*- c++ -*- */
+
+/*
+* 2017 by Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
+* A major part of this code is adapted from the kjmp2 library, slightly modified and written into a GNURadio block.
+* Note that this is an altered version of kjmp2 and not the original library.
+*/
+
 /******************************************************************************
 ** kjmp2 -- a minimal MPEG-1/2 Audio Layer II decoder library                **
 ** version 1.1                                                               **
@@ -22,13 +29,6 @@
 **      distribution.                                                        **
 ******************************************************************************/
 
-/*
-*	Code adapted of the original code:
-*	whole code is made into a GNU Radio block for use within the gr module gr-dab
-* 2017 by Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
-*
-*/
-
 #ifndef INCLUDED_DAB_MP2_DECODE_BS_IMPL_H
 #define INCLUDED_DAB_MP2_DECODE_BS_IMPL_H
 
@@ -40,9 +40,10 @@
 
 namespace gr {
   namespace dab {
-/*! \brief block that decodes DAB audio frames to PCM frames
+/*! \brief block that decodes DAB audio frames (= MPEG2 audio frames) to PCM frames
  *
  * DAB standard conform audio decoding after ETSI TS 103 466 V1.1.1
+ * The block always produces a stereo output. The sampling rate is 48kHz.
  *
  * @param bit_rate_n data rate in multiples of 8kbit/s
  */
@@ -60,12 +61,13 @@ namespace gr {
     private:
       int d_bit_rate_n;
       int d_bit_rate;
-      int d_out_offset;
+      int d_nproduced;
       uint16_t *d_out;
 
       int16_t d_V_offs;
       int32_t d_baud_rate;
       int16_t d_mp2_framesize;
+      int16_t d_output_size;
       int16_t d_mp2_header_OK;
       int16_t d_mp2_header_count;
       int16_t d_mp2_bit_count;
@@ -95,8 +97,6 @@ namespace gr {
       int32_t get_bits(int32_t);
 
       int32_t mp2_decode_frame(uint8_t *, int16_t *);
-
-      void add_to_frame(uint8_t *);
 
       void add_bit_to_mp2(uint8_t *, uint8_t, int16_t);
 
