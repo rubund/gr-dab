@@ -48,7 +48,18 @@
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="spinBox_3"/>
+           <widget class="QSpinBox" name="spinbox_frequency">
+            <property name="maximum">
+             <number>1000000000</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_receive">
+            <property name="text">
+             <string>Receive!</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -107,21 +118,30 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_5">
           <item>
-           <widget class="QPushButton" name="pushButton_2">
+           <widget class="QPushButton" name="btn_play">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Play</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_3">
+           <widget class="QPushButton" name="btn_stop">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Stop</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="btn_record">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Record</string>
             </property>
