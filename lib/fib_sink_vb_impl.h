@@ -24,24 +24,29 @@
 #include <dab/fib_sink_vb.h>
 
 namespace gr {
-    namespace dab {
+  namespace dab {
 /*! \brief sink for DAB FIBs, interprets MSC and SI
  *
  */
-        class fib_sink_vb_impl : public fib_sink_vb {
+    class fib_sink_vb_impl : public fib_sink_vb {
 
-        private:
-            int process_fib(const char *fib);
-            int process_fig(uint8_t type, const char *data, uint8_t length);
+    private:
+      int process_fib(const char *fib);
 
+      int process_fig(uint8_t type, const char *data, uint8_t length);
+      std::string d_json;
 
-        public:
-            fib_sink_vb_impl();
-            int work(int noutput_items,
-                     gr_vector_const_void_star &input_items,
-                     gr_vector_void_star &output_items);
-        };
-    }
+    public:
+      fib_sink_vb_impl();
+
+      virtual std::string get_mci()
+      { return d_json; }
+
+      int work(int noutput_items,
+               gr_vector_const_void_star &input_items,
+               gr_vector_void_star &output_items);
+    };
+  }
 }
 
 #endif /* INCLUDED_DAB_FIB_SINK_B_H */

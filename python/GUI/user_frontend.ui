@@ -81,6 +81,13 @@
          <widget class="QTableWidget" name="tableWidget"/>
         </item>
         <item>
+         <widget class="QPushButton" name="btn_debug">
+          <property name="text">
+           <string>DEBUG</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QListWidget" name="listWidget"/>
         </item>
        </layout>

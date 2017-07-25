@@ -48,6 +48,8 @@ namespace gr {
        * creating new instances.
        */
       static sptr make();
+
+      virtual std::string get_mci() = 0;
     };
 
   } // namespace dab

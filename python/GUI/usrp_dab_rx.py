@@ -95,6 +95,8 @@ class usrp_dab_rx(gr.top_block):
         self.rx_gain = float(g.start() + g.stop()) / 2
         self.src.set_gain(self.rx_gain)
 
+    def get_mci(self):
+        return self.fic_dec.get_mci()
 
     def update_ui_function(self):
         while self.run_ui_update_thread:

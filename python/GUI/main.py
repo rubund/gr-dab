@@ -5,7 +5,7 @@ from PyQt4.QtCore import QThread
 import sys
 import user_frontend
 import usrp_dab_rx
-
+import json
 
 class receive_thread(QThread):
 
@@ -34,6 +34,9 @@ class receive_thread(QThread):
         except RuntimeError:
             print 'error'
 
+    def get_mci(self):
+        return self.rx.get_mci()
+
 
 
 class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
@@ -49,6 +52,8 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
 
         # receive button initializes receiver with center frequency
         self.btn_receive.clicked.connect(self.receive)
+
+        self.btn_debug.clicked.connect(self.test)
 
 
 
@@ -69,8 +74,10 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
         self.btn_play.setEnabled(True)
 
     def test(self):
-        self.btn_receive.setEnabled(True)
-        print 'test'
+        # load string mci and convert it to dictionary
+        mci = json.loads(self.my_receiver.get_mci())
+        json.dumps(mci)
+        print mci["SWR1_BW"]["reference"]
 
 
 
