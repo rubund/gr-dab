@@ -3,20 +3,15 @@
 #
 # LIBTOOLAME-DAB_SOURCE_DIRS - where to find toolame.h, etc.
 
-find_path(LIBTOOLAME-DAB_SOURCE_DIR libtoolame-dab/toolame.h
+find_path(LIBTOOLAME-DAB_INCLUDE_DIR libtoolame-dab/toolame.h
   ${CMAKE_SOURCE_DIR}/ODR-AudioEnc
-  /opt/local/include
-  /usr/local/include
-  /usr/local/include/libtoolame-dab
-  /usr/include
-  /usr/include/libtoolame-dab
+  NO_DEFAULT_PATH NO_CMAKE_PATH NO_CMAKE_SYSTEM_PATH
 )
 
-if(LIBTOOLAME-DAB_SOURCE_DIR)
-  set(LIBTOOLAME-DAB_INCLUDE_DIR "${LIBTOOLAME-DAB_SOURCE_DIR}")
-  set(LIBTOOLAME-DAB_SOURCE_DIR "${LIBTOOLAME-DAB_SOURCE_DIR}/libtoolame-dab")
+if(LIBTOOLAME-DAB_INCLUDE_DIR)
+  set(LIBTOOLAME-DAB_SOURCE_DIR "${LIBTOOLAME-DAB_INCLUDE_DIR}/libtoolame-dab")
   set(LIBTOOLAME-DAB_FOUND 1)
-endif(LIBTOOLAME-DAB_SOURCE_DIR)
+endif(LIBTOOLAME-DAB_INCLUDE_DIR)
 
 
 mark_as_advanced(LIBTOOLAME-DAB_SOURCE_DIR)

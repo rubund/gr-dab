@@ -69,7 +69,7 @@ find_package(Libtoolame-dab REQUIRED)
 if (NOT LIBTOOLAME-DAB_FOUND )
     message(FATAL_ERROR "please make sure the libtoolame-dab source can be found")
 else()
-    message(STATUS "LIBTOOLAME-DAB found")
+    message(STATUS "LIBTOOLAME-DAB found: ${LIBTOOLAME-DAB_SOURCE_DIR}")
 endif ()
 
 
