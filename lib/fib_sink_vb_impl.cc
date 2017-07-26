@@ -52,7 +52,7 @@ namespace gr {
                              gr::io_signature::make(1, 1, sizeof(char) * 32),
                              gr::io_signature::make(0, 0, 0))
     {
-      d_json = "{\"SWR1_BW\":{\"reference\":769,\"type\":\"DAB+\",\"primary\":true,\"ID\":2,\"address\":54,\"size\":84,\"protection\":3,\"bitrate\":112}}";
+      d_json = "{\"SWR1_BW\":{\"reference\":769,\"type\":\"DAB+\",\"primary\":true,\"ID\":2,\"address\":54,\"size\":84,\"protection\":3,\"bitrate\":112},\"SWR2\":{\"reference\":123,\"type\":\"DAB+\",\"primary\":true,\"ID\":3,\"address\":138,\"size\":96,\"protection\":3,\"bitrate\":128}}";
     }
 
     int

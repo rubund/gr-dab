@@ -35,7 +35,11 @@ class receive_thread(QThread):
             print 'error'
 
     def get_mci(self):
-        return self.rx.get_mci()
+        # load string mci and convert it to dictionary
+        self.mci = json.loads(self.rx.get_mci())
+        json.dumps(self.mci)
+        return self.mci
+
 
 
 
@@ -56,16 +60,12 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
         self.btn_debug.clicked.connect(self.test)
 
 
-
-
     def receive(self):
         # write center frequency from spin box value
         self.frequency = self.spinbox_frequency.value()
         # create a new Thread for reception and start it
         self.my_receiver = receive_thread(self.frequency, self.bit_rate, self.address, self.size, self.protection)
         self.my_receiver.start()
-
-
 
     def stop_reception(self):
         self.my_receiver.stop_reception()
@@ -74,10 +74,20 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
         self.btn_play.setEnabled(True)
 
     def test(self):
-        # load string mci and convert it to dictionary
-        mci = json.loads(self.my_receiver.get_mci())
-        json.dumps(mci)
-        print mci["SWR1_BW"]["reference"]
+        data = self.my_receiver.get_mci()
+        for n, key in enumerate(sorted(data.keys())):
+            # add a new row
+            self.table_mci.insertRow(n)
+            # print ID
+            self.table_mci.setItem(n, 0, QtGui.QTableWidgetItem(str(data[key]['ID'])))
+            # print label
+            self.table_mci.setItem(n, 1, QtGui.QTableWidgetItem(key))
+            # print bitrate
+            self.table_mci.setItem(n, 2, QtGui.QTableWidgetItem(str(data[key]['bitrate'])))
+
+        self.table_mci.resizeColumnsToContents()
+        self.table_mci.resizeRowsToContents()
+
 
 
 
