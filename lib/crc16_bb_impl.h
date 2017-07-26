@@ -24,7 +24,7 @@
 #include <dab/crc16_bb.h>
 
 namespace gr {
-    namespace dab {
+  namespace dab {
 /*! \brief crc16 is written in the last 2 bits of input vector
  *
  * input:  char vector of length length (packed bytes)
@@ -37,27 +37,25 @@ namespace gr {
  * @param generator Generator polynom for shift register. (default is 0x1021 for DAB)
  * @param initial_state Initial state of shift register. (default is 0xffff for DAB)
  */
-        class crc16_bb_impl : public crc16_bb
-        {
-        private:
-            uint16_t d_crc;
-            int d_length, d_generator, d_initial_state;
+    class crc16_bb_impl : public crc16_bb {
+    private:
+      uint16_t d_crc;
+      int d_length, d_generator, d_initial_state;
 
-        public:
-            crc16_bb_impl(int length, uint16_t generator, uint16_t initial_state);
-            ~crc16_bb_impl();
+    public:
+      crc16_bb_impl(int length, uint16_t generator, uint16_t initial_state);
 
-            void forecast (int noutput_items, gr_vector_int &ninput_items_required);
+      ~crc16_bb_impl();
 
-            int getwert() {return 3;}
+      void forecast(int noutput_items, gr_vector_int &ninput_items_required);
 
-            int general_work(int noutput_items,
-                             gr_vector_int &ninput_items,
-                             gr_vector_const_void_star &input_items,
-                             gr_vector_void_star &output_items);
-        };
+      int general_work(int noutput_items,
+                       gr_vector_int &ninput_items,
+                       gr_vector_const_void_star &input_items,
+                       gr_vector_void_star &output_items);
+    };
 
-    }
+  }
 }
 
 #endif /* INCLUDED_DAB_CRC16_BB_IMPL_H */
