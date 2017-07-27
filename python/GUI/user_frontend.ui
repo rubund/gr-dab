@@ -39,11 +39,17 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_6">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
-           <widget class="QLabel" name="label">
+           <widget class="QRadioButton" name="rbtn_USRP">
             <property name="text">
-             <string>set frequency</string>
+             <string>USRP</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+            <property name="autoRepeat">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -52,29 +58,67 @@
             <property name="maximum">
              <number>1000000000</number>
             </property>
+            <property name="value">
+             <number>208064000</number>
+            </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="btn_receive">
+           <widget class="QLabel" name="label_frequency">
             <property name="text">
-             <string>Receive!</string>
+             <string>frequency</string>
             </property>
            </widget>
           </item>
          </layout>
         </item>
         <item>
-         <widget class="QComboBox" name="comboBox">
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
           <item>
-           <property name="text">
-            <string>receive</string>
-           </property>
+           <widget class="QRadioButton" name="rbtn_File">
+            <property name="text">
+             <string>File</string>
+            </property>
+           </widget>
           </item>
           <item>
-           <property name="text">
-            <string>transmit</string>
-           </property>
+           <widget class="QLabel" name="label_path">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>select path</string>
+            </property>
+           </widget>
           </item>
+          <item>
+           <widget class="QToolButton" name="btn_file_path">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QPushButton" name="btn_init">
+            <property name="text">
+             <string>init</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_update_info">
+          <property name="text">
+           <string>update</string>
+          </property>
          </widget>
         </item>
         <item>
@@ -86,12 +130,12 @@
           </column>
           <column>
            <property name="text">
-            <string>Label</string>
+            <string>Reference</string>
            </property>
           </column>
           <column>
            <property name="text">
-            <string>Bitrate</string>
+            <string>Type</string>
            </property>
           </column>
          </widget>
@@ -103,16 +147,10 @@
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QListWidget" name="listWidget"/>
-        </item>
        </layout>
       </item>
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_7">
-        <item>
-         <widget class="QTextBrowser" name="textBrowser"/>
-        </item>
         <item>
          <widget class="Line" name="line">
           <property name="orientation">
@@ -120,7 +158,10 @@
           </property>
          </widget>
         </item>
-        <item alignment="Qt::AlignHCenter">
+        <item>
+         <widget class="QPlainTextEdit" name="txt_info"/>
+        </item>
+        <item>
          <widget class="QLabel" name="label_2">
           <property name="font">
            <font>

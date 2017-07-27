@@ -29,6 +29,7 @@
 #include <stdexcept>
 #include <stdio.h>
 #include <sstream>
+#include <string>
 #include <boost/format.hpp>
 #include "crc16.h"
 #include "FIC.h"
@@ -52,7 +53,9 @@ namespace gr {
                              gr::io_signature::make(1, 1, sizeof(char) * 32),
                              gr::io_signature::make(0, 0, 0))
     {
-      d_json = "{\"SWR1_BW\":{\"reference\":769,\"type\":\"DAB+\",\"primary\":true,\"ID\":2,\"address\":54,\"size\":84,\"protection\":3,\"bitrate\":112},\"SWR2\":{\"reference\":123,\"type\":\"DAB+\",\"primary\":true,\"ID\":3,\"address\":138,\"size\":96,\"protection\":3,\"bitrate\":128}}";
+      d_service_info_written_trigger = -1;
+      d_service_labels_written_trigger = -1;
+      d_subch_info_written_trigger = -1;
     }
 
     int
@@ -113,15 +116,15 @@ namespace gr {
               GR_LOG_DEBUG(d_logger, "subchannel orga: ");
               do {
                 uint8_t subchID = (uint8_t)((data[2 + subch_counter] & 0xfc) >> 2);
-                uint16_t start_adress = (uint16_t)((data[2 + subch_counter] & 0x03) << 8) |
+                uint16_t start_address = (uint16_t)((data[2 + subch_counter] & 0x03) << 8) |
                                         (uint8_t)(data[3 + subch_counter]);
                 uint8_t sl_form = (uint8_t)(data[4] & 0x80);
                 if (sl_form == 0) {
                   uint8_t table_switch = (uint8_t)(data[4 + subch_counter] & 0x40);
                   if (table_switch != 0) GR_LOG_DEBUG(d_logger, " [WARNING: OTHER TABLE USED] ");
                   uint8_t table_index = (uint8_t)(data[4 + subch_counter] & 0x3f);
-                  GR_LOG_DEBUG(d_logger, format("subchID = %d , start adress = %d, index %d") % (int) subchID %
-                                         (int) start_adress % (int) table_index);
+                  GR_LOG_DEBUG(d_logger, format("subchID = %d , start address = %d, index %d") % (int) subchID %
+                                         (int) start_address % (int) table_index);
                   subch_counter += 3;
                 } else {
                   uint8_t option = (uint8_t)(data[4 + subch_counter] & 0x70);
@@ -129,10 +132,27 @@ namespace gr {
                   uint16_t subch_size = (uint16_t)((data[4 + subch_counter] & 0x03) << 8) |
                                         (uint8_t)(data[5 + subch_counter]);
                   GR_LOG_DEBUG(d_logger,
-                               format("subchID = %d , start adress = %d, option %d, protect level %d, subch size %d") %
-                               (int) subchID % (int) start_adress % (int) option % (int) protect_level %
+                               format("subchID = %d , start address = %d, option %d, protect level %d, subch size %d") %
+                               (int) subchID % (int) start_address % (int) option % (int) protect_level %
                                (int) subch_size);
                   subch_counter += 4;
+
+                  // write sub-channel info to json
+                  if(d_subch_info_written_trigger < 0){
+                    d_subch_info_written_trigger = (int)subchID;
+                  }else {
+                    std::stringstream ss;
+                    ss << d_subch_info_current << ",{" << "\"ID\":" << (int)subchID << ",\"address\":" << (int)start_address << ",\"protection\":" << (int)protect_level << ",\"size\":" << (int)subch_size << "}\0";
+                    d_subch_info_current = ss.str();
+                    if ((int) subchID == d_subch_info_written_trigger) {
+                      std::stringstream ss_json;
+                      ss_json << d_subch_info_current << "]" << "\0";
+                      d_subch_info_current = "\0";
+                      d_json_subch_info = ss_json.str();
+                      d_json_subch_info[0] = '[';
+                      d_subch_info_written_trigger = -1;
+                    }
+                  }
                 }
               } while (1 + subch_counter < length);
               break;
@@ -158,6 +178,23 @@ namespace gr {
                     GR_LOG_DEBUG(d_logger,
                                  format("(audio stream, type %d, subchID %d, primary %d)") % (int) comp_type %
                                  (int) subchID % (int) ps);
+                    // write service info from specififc subchannel to json
+                    if(d_service_info_written_trigger < 0){
+                      d_service_info_written_trigger = (int)subchID;
+                    }else {
+                      std::stringstream ss;
+                      ss << d_service_info_current << ",{" << "\"reference\":" << (int) service_reference << ",\"ID\":"
+                         << (int) subchID << ",\"primary\":" << ((ps == 1) ? "true" : "false") << "}\0";
+                      d_service_info_current = ss.str();
+                      if ((int) subchID == d_service_info_written_trigger) {
+                        std::stringstream ss_json;
+                        ss_json << d_service_info_current << "]" << "\0";
+                        d_service_info_current = "\0";
+                        d_json_service_info = ss_json.str();
+                        d_json_service_info[0] = '[';
+                        d_service_info_written_trigger = -1;
+                      }
+                    }
                   } else if (TMID == 1) {
                     GR_LOG_DEBUG(d_logger,
                                  format("(data stream, type %d, subchID %d, primary %d)") % (int) comp_type %
@@ -233,21 +270,43 @@ namespace gr {
           }
           break;
         case FIB_FIG_TYPE_LABEL1:
-        case FIB_FIG_TYPE_LABEL2:
+        case FIB_FIG_TYPE_LABEL2: {
           GR_LOG_DEBUG(d_logger, "FIG type 2");
-          char label[16];
+          char label[17];
+          label[16] = '\0';
           extension = (uint8_t)(data[1] & 0x07);
           switch (extension) {
-            case FIB_SI_EXTENSION_ENSEMBLE_LABEL:
+            case FIB_SI_EXTENSION_ENSEMBLE_LABEL: {
+              uint8_t country_ID = (uint8_t)((data[2] & 0xf0) >> 4);
               memcpy(label, &data[4], 16);
-              memcpy(label, &data[4], 16);
-              GR_LOG_DEBUG(d_logger, format("[ensemble label]: %s ") % label);
+              GR_LOG_DEBUG(d_logger, format("[ensemble label](%d): %s") %(int)country_ID % label);
+              // write json for ensemble label and country ID
+              std::stringstream ss;
+              ss << "{" << "\"" << label << "\":{" << "\"countr_ID\":" << (int)country_ID << "}}";
+              d_json_ensemble_info = ss.str();
               break;
+            }
             case FIB_SI_EXTENSION_PROGRAMME_SERVICE_LABEL: {
               uint16_t service_reference = (uint16_t)(data[2] & 0x0f) << 8 | (uint8_t) data[3];
               memcpy(label, &data[4], 16);
               GR_LOG_DEBUG(d_logger,
-                           format("[programme service label] (reference %d): %s ") % service_reference % label);
+                           format("[programme service label] (reference %d): %s") % service_reference % label);
+              // write service labels from services to json
+              if(d_service_labels_written_trigger < 0){
+                d_service_labels_written_trigger = (int)service_reference;
+              }else {
+                std::stringstream ss;
+                ss << d_service_labels_current << ",{" << "\"label\":\"" << label << "\",\"reference\":" << (int)service_reference << "}\0";
+                d_service_labels_current = ss.str();
+                if ((int) service_reference == d_service_labels_written_trigger) {
+                  std::stringstream ss_json;
+                  ss_json << d_service_labels_current << "]" << "\0";
+                  d_service_labels_current = "\0";
+                  d_json_service_labels = ss_json.str();
+                  d_json_service_labels[0] = '[';
+                  d_service_labels_written_trigger = -1;
+                }
+              }
               break;
             }
             case FIB_SI_EXTENSION_SERVICE_COMP_LABEL:
@@ -256,13 +315,14 @@ namespace gr {
               break;
             case FIB_SI_EXTENSION_DATA_SERVICE_LABEL:
               memcpy(label, &data[5], 16);
-              GR_LOG_DEBUG(d_logger, format("[data service label]: %s ") % label);
+              GR_LOG_DEBUG(d_logger, format("[data service label]: %s") % label);
               break;
             default:
-              GR_LOG_DEBUG(d_logger, format("[unknown extension (%d) ") % (int) extension);
+              GR_LOG_DEBUG(d_logger, format("[unknown extension (%d)") % (int) extension);
               break;
           }
           break;
+        }
         case FIB_FIG_TYPE_FIDC:
           GR_LOG_DEBUG(d_logger, "FIG type 5");
           extension = (uint8_t)(data[1] & 0x07);

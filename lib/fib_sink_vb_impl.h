@@ -34,13 +34,37 @@ namespace gr {
       int process_fib(const char *fib);
 
       int process_fig(uint8_t type, const char *data, uint8_t length);
-      std::string d_json;
+
+      std::string d_json_ensemble_info;
+      // service info
+      std::string d_json_service_info;
+      std::string d_service_info_current;
+      int d_service_info_written_trigger;
+      // service labels
+      std::string d_json_service_labels;
+      std::string d_service_labels_current;
+      int d_service_labels_written_trigger;
+      // service subch
+      std::string d_json_subch_info;
+      std::string d_subch_info_current;
+      int d_subch_info_written_trigger;
+
+
 
     public:
       fib_sink_vb_impl();
 
-      virtual std::string get_mci()
-      { return d_json; }
+      virtual std::string get_ensemble_info()
+      { return "{\"SWR_BW_N\":{\"country_ID\":1}}"; }
+
+      virtual std::string get_service_info()
+      { return d_json_service_info;}
+
+      virtual std::string get_service_labels()
+      { return d_json_service_labels;}
+
+      virtual std::string get_subch_info()
+      { return d_json_subch_info;}
 
       int work(int noutput_items,
                gr_vector_const_void_star &input_items,

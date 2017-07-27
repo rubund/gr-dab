@@ -142,5 +142,14 @@ class fic_decode(gr.hier_block2):
             #self.connect(self.conv_decode, blocks.file_sink(gr.sizeof_char * self.dp.energy_dispersal_fic_vector_length, "debug/fic_energy_dispersal_undone.dat"))
             self.connect(self.pack, blocks.file_sink(gr.sizeof_char, "debug/fic_energy_undone.dat"))
 
-    def get_mci(self):
-        return self.fibsink.get_mci()
+    def get_ensemble_info(self):
+        return self.fibsink.get_ensemble_info()
+
+    def get_service_info(self):
+        return self.fibsink.get_service_info()
+
+    def get_service_labels(self):
+        return self.fibsink.get_service_labels()
+
+    def get_subch_info(self):
+        return self.fibsink.get_subch_info()

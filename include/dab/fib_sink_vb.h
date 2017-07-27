@@ -49,7 +49,10 @@ namespace gr {
        */
       static sptr make();
 
-      virtual std::string get_mci() = 0;
+      virtual std::string get_ensemble_info() = 0;
+      virtual std::string get_service_info() = 0;
+      virtual std::string get_service_labels() = 0;
+      virtual std::string get_subch_info() = 0;
     };
 
   } // namespace dab

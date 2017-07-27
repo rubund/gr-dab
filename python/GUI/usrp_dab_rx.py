@@ -30,10 +30,8 @@ import sys, time, threading, math
 
 
 class usrp_dab_rx(gr.top_block):
-    def __init__(self, frequency, bit_rate, address, size, protection):
+    def __init__(self, frequency, bit_rate, address, size, protection, use_usrp, path):
         gr.top_block.__init__(self)
-
-
 
         # set logger level to WARN (no DEBUG logs)
         log = gr.logger("log")
@@ -41,11 +39,16 @@ class usrp_dab_rx(gr.top_block):
 
         self.dab_mode = 1
         self.verbose = False
-
-        self.src = uhd.usrp_source("", uhd.io_type.COMPLEX_FLOAT32, 1)
         self.sample_rate = 2e6
-        self.src.set_samp_rate(self.sample_rate)
-        self.src.set_antenna("TX/RX")
+
+        if 1:
+            self.src = uhd.usrp_source("", uhd.io_type.COMPLEX_FLOAT32, 1)
+            self.src.set_samp_rate(self.sample_rate)
+            self.src.set_antenna("TX/RX")
+        #else:
+            #self.src = blocks.file_sink_make(gr.sizeof_gr_complex, str(path))
+
+
 
         # set paramters to default mode
         self.softbits = True
@@ -95,8 +98,17 @@ class usrp_dab_rx(gr.top_block):
         self.rx_gain = float(g.start() + g.stop()) / 2
         self.src.set_gain(self.rx_gain)
 
-    def get_mci(self):
-        return self.fic_dec.get_mci()
+    def get_ensemble_info(self):
+        return self.fic_dec.get_ensemble_info()
+
+    def get_service_info(self):
+        return self.fic_dec.get_service_info()
+
+    def get_service_labels(self):
+        return self.fic_dec.get_service_labels()
+
+    def get_subch_info(self):
+        return self.fic_dec.get_subch_info()
 
     def update_ui_function(self):
         while self.run_ui_update_thread:
