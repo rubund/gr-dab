@@ -30,7 +30,7 @@ import sys, time, threading, math
 
 
 class usrp_dab_rx(gr.top_block):
-    def __init__(self, frequency, bit_rate, address, size, protection, use_usrp, path):
+    def __init__(self, frequency, bit_rate, address, size, protection, use_usrp, src_path, record_audio = False, sink_path = "None"):
         gr.top_block.__init__(self)
 
         # set logger level to WARN (no DEBUG logs)
@@ -40,15 +40,18 @@ class usrp_dab_rx(gr.top_block):
         self.dab_mode = 1
         self.verbose = False
         self.sample_rate = 2e6
+        self.use_usrp = use_usrp
+        self.src_path = src_path
+        self.record_audio = record_audio
+        self.sink_path = sink_path
 
-        if 1:
+        if self.use_usrp:
             self.src = uhd.usrp_source("", uhd.io_type.COMPLEX_FLOAT32, 1)
             self.src.set_samp_rate(self.sample_rate)
             self.src.set_antenna("TX/RX")
-        #else:
-            #self.src = blocks.file_sink_make(gr.sizeof_gr_complex, str(path))
-
-
+        else:
+            print "using file source"
+            self.src = blocks.file_source_make(gr.sizeof_gr_complex, self.src_path)
 
         # set paramters to default mode
         self.softbits = True
@@ -77,7 +80,8 @@ class usrp_dab_rx(gr.top_block):
         self.dabplus = dab.dabplus_audio_decoder_ff(self.dab_params, bit_rate, address, size, protection, True)
         self.audio = audio.sink_make(32000)
 
-        # connect everything
+
+        # connect everything for usrp
         self.connect(self.src, self.demod, (self.fic_dec, 0))
         self.connect((self.demod, 1), (self.fic_dec, 1))
         self.connect((self.demod, 0), (self.dabplus, 0))
@@ -89,15 +93,22 @@ class usrp_dab_rx(gr.top_block):
         # right stereo channel
         self.connect((self.dabplus, 1), (self.audio, 1))
 
+        # connect file sink if selected
+        if self.record_audio:
+            self.sink = blocks.wavfile_sink_make("dab_audio.wav", 2, 32000)
+            self.connect((self.dabplus, 0), (self.sink, 0))
+            self.connect((self.dabplus, 1), (self.sink, 1))
+
         # tune frequency
-        self.set_freq(self.frequency)
+        if self.use_usrp:
+            self.set_freq(self.frequency)
+            # set gain
+            # if no gain was specified, use the mid-point in dB
+            g = self.src.get_gain_range()
+            self.rx_gain = float(g.start() + g.stop()) / 2
+            self.src.set_gain(self.rx_gain)
 
-        # set gain
-        # if no gain was specified, use the mid-point in dB
-        g = self.src.get_gain_range()
-        self.rx_gain = float(g.start() + g.stop()) / 2
-        self.src.set_gain(self.rx_gain)
-
+# getter
     def get_ensemble_info(self):
         return self.fic_dec.get_ensemble_info()
 
@@ -109,6 +120,10 @@ class usrp_dab_rx(gr.top_block):
 
     def get_subch_info(self):
         return self.fic_dec.get_subch_info()
+
+# setter
+    def set_volume(self, volume):
+        self.dabplus.set_volume(volume)
 
     def update_ui_function(self):
         while self.run_ui_update_thread:
@@ -124,7 +139,8 @@ class usrp_dab_rx(gr.top_block):
             if abs(diff) > self.rx_params.usrp_ffc_min_deviation:
                 self.frequency -= diff * self.rx_params.usrp_ffc_adapt_factor
                 print "--> updating fine frequency correction: " + str(self.frequency)
-                self.set_freq(self.frequency)
+                if self.use_usrp:
+                    self.set_freq(self.frequency)
             time.sleep(1. / self.rx_params.usrp_ffc_retune_frequency)
 
     def set_freq(self, freq):

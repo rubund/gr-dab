@@ -20,6 +20,7 @@ class receive_thread(QThread):
         self.protection = protection
         self.use_usrp = use_usrp
         self.path = path
+        self.record = False
 
     def __del__(self):
         self.wait()
@@ -31,7 +32,7 @@ class receive_thread(QThread):
     def run(self):
         print 'start reception'
         try:
-            self.rx = usrp_dab_rx.usrp_dab_rx(self.frequency, self.bit_rate, self.address, self.size, self.protection, self.use_usrp, self.path)
+            self.rx = usrp_dab_rx.usrp_dab_rx(self.frequency, self.bit_rate, self.address, self.size, self.protection, self.use_usrp, self.path, self.record)
             self.rx.start()
 
         except RuntimeError:
@@ -70,6 +71,12 @@ class receive_thread(QThread):
         json.dumps(self.subch_info)
         return self.subch_info
 
+    def set_volume(self, volume):
+        self.rx.set_volume(volume)
+
+    def set_record(self, record):
+        self.record = record
+
 
 
 
@@ -79,14 +86,22 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
         super(DABstep, self).__init__(parent)
         self.setupUi(self)
 
+        self.modes = {"rec": 0, "trans": 1, "dev": 2}
+        self.mode = self.modes["rec"]
+
         self.frequency = 208.064e6
         self.bit_rate = 112
         self.address = 0
         self.size = 84
         self.protection = 2
+        self.volume = 80
+        self.subch = -1
+        self.need_new_init = True
+
 
         self.file_path = "None"
         self.src_is_USRP = True
+
 
         # change of source by radio buttons
         self.rbtn_USRP.clicked.connect(self.src2USRP)
@@ -98,12 +113,41 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
         # update button updates services in table
         self.btn_update_info.clicked.connect(self.update_service_info)
         # a click on a cell of the service table let the text box show more info to the selected service
-        self.table_mci.cellClicked.connect(self.write_info)
+        self.table_mci.cellClicked.connect(self.selected_subch)
         # a click on the play button compiles receiver with new subch info and plays the audio
         self.btn_play.clicked.connect(self.play_audio)
+        # stop button click stops audio reception
+        self.btn_stop.clicked.connect(self.stop_reception)
+        # volume slider moved
+        self.slider_volume.valueChanged.connect(self.set_volume)
+        # record button
+        self.btn_record.clicked.connect(self.record_audio)
 
 
         self.btn_debug.clicked.connect(self.test)
+
+
+    def load_rec_mode(self):
+        self.btn_receive.setDefault(True)
+        self.btn_transmit.setDefault(False)
+        self.mode = self.modes["rec"]
+
+        # show all reception specific items
+        self.btn_update_info.show()
+        self.table_mci.show()
+        # hide all irrelevant items for reception mode
+        self.formLayout.hide()
+
+    def load_trans_mode(self):
+        self.btn_receive.setDefault(False)
+        self.btn_transmit.setDefault(True)
+        self.mode = self.modes["trans"]
+
+        # show all transmission specific items
+        self.formLayout.show()
+        # hide all irrelevant items for reception mode
+        self.btn_update_info.hide()
+        self.table_mci.hide()
 
     def src2USRP(self):
         self.btn_file_path.setEnabled(False)
@@ -121,9 +165,8 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
 
     def set_file_path(self):
         path = QtGui.QFileDialog.getOpenFileName(self, "Pick a file with recorded IQ samples")
-
         if path:  # if user didn't pick a directory don't continue
-            self.file_path = path
+            self.file_path = str(path)
             self.label_path.setText(path)
 
 
@@ -133,18 +176,50 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
         # create a new Thread for reception and start it
         self.my_receiver = receive_thread(self.frequency, self.bit_rate, self.address, self.size, self.protection, self.src_is_USRP, self.file_path)
         self.my_receiver.start()
+        print "finished initializing"
 
     def stop_reception(self):
         self.my_receiver.stop_reception()
         self.btn_stop.setEnabled(False)
         self.btn_play.setText("Play")
         self.btn_play.setEnabled(True)
+        self.slider_volume.setEnabled(False)
+        self.btn_record.setEnabled(True)
+        self.my_receiver.set_record(False)
 
     def play_audio(self):
-        subch_data = self.my_receiver.get_subch_info()
+        if not self.slider_volume.isEnabled():
+            # play button pressed
+            self.btn_play.setText("Mute")
+            self.btn_stop.setEnabled(True)
+            self.slider_volume.setEnabled(True)
+            self.slider_volume.setValue(self.volume)
+            self.set_volume()
+            if self.need_new_init:
+                self.my_receiver = receive_thread(self.frequency, self.bit_rate, self.address, self.size, self.protection, self.src_is_USRP, self.file_path)
+                self.my_receiver.start()
+        else:
+            # mute button pressed
+            self.btn_play.setText("Play")
+            self.volume = self.slider_volume.value()
+            self.slider_volume.setValue(0)
+            self.slider_volume.setEnabled(False)
+            self.set_volume()
+            self.need_new_init = False
+
+    def record_audio(self):
+        self.btn_record.setEnabled(False)
+        self.btn_play.setEnabled(False)
+        self.btn_stop.setEnabled(True)
         self.my_receiver = receive_thread(self.frequency, self.bit_rate, self.address, self.size, self.protection,
                                           self.src_is_USRP, self.file_path)
+        self.my_receiver.set_record(True)
         self.my_receiver.start()
+
+
+    def set_volume(self):
+        print self.slider_volume.value()/100
+        self.my_receiver.set_volume(float(self.slider_volume.value())/100)
 
     def update_service_info(self):
         # remove all old data first
@@ -165,10 +240,22 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
             # print type
             self.table_mci.setItem(n, 2, QtGui.QTableWidgetItem("primary" if key['primary'] == True else "secondary"))
 
-    def write_info(self):
+    def selected_subch(self):
 
         # enable play button
         self.btn_play.setEnabled(True)
+        self.btn_record.setEnabled(True)
+        if self.table_mci.currentRow() is self.subch:
+            self.need_new_init = False
+        else:
+            # new subch was selected
+            self.subch = self.table_mci.currentRow()
+            self.need_new_init = True
+            self.btn_play.setText("Play")
+            self.slider_volume.setEnabled(False)
+
+
+
 
         # clear text edit
         self.txt_info.clear()
