@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>655</width>
-    <height>816</height>
+    <height>1010</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,10 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QTabWidget" name="tabWidget">
+     <widget class="QTabWidget" name="mode_tabs">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="currentIndex">
        <number>1</number>
       </property>
@@ -309,25 +312,32 @@
               <item>
                <widget class="QRadioButton" name="radioButton_2">
                 <property name="text">
-                 <string>RadioButton</string>
+                 <string>File</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QLabel" name="label_23">
+               <widget class="QLabel" name="t_label_sink">
                 <property name="text">
                  <string>select path</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QToolButton" name="toolButton">
+               <widget class="QToolButton" name="t_btn_file_path">
                 <property name="text">
                  <string>...</string>
                 </property>
                </widget>
               </item>
              </layout>
+            </item>
+            <item>
+             <widget class="Line" name="line_4">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
             </item>
             <item>
              <layout class="QFormLayout" name="formLayout_2">
@@ -400,10 +410,73 @@
                </widget>
               </item>
               <item row="5" column="1">
-               <widget class="QSpinBox" name="spinBox_5"/>
+               <widget class="QSpinBox" name="t_spin_num_subch">
+                <property name="maximum">
+                 <number>7</number>
+                </property>
+                <property name="value">
+                 <number>1</number>
+                </property>
+               </widget>
               </item>
               <item row="6" column="0">
-               <widget class="QLabel" name="label_18">
+               <widget class="QLabel" name="label_23">
+                <property name="text">
+                 <string>Language</string>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="1">
+               <widget class="QLineEdit" name="lineEdit_7"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton">
+              <property name="text">
+               <string>Start Transmission</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="Line" name="line_3">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <item>
+             <widget class="QLabel" name="t_label_heading_service_comp">
+              <property name="font">
+               <font>
+                <pointsize>15</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>Service Components</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QFormLayout" name="formLayout_3">
+              <property name="fieldGrowthPolicy">
+               <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+              </property>
+              <item row="0" column="0">
+               <widget class="Line" name="line_2">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="t_label_comp1">
                 <property name="font">
                  <font>
                   <pointsize>13</pointsize>
@@ -416,32 +489,495 @@
                 </property>
                </widget>
               </item>
-              <item row="7" column="0">
-               <widget class="QLabel" name="label_19">
+              <item row="2" column="0">
+               <widget class="QLabel" name="t_label_rate1">
                 <property name="text">
                  <string>Data rate [kbit/s]</string>
                 </property>
                </widget>
               </item>
-              <item row="7" column="1">
-               <widget class="QSpinBox" name="spinBox_6"/>
+              <item row="2" column="1">
+               <widget class="QSpinBox" name="t_spin_rate1"/>
               </item>
-              <item row="8" column="0">
-               <widget class="QLabel" name="label_20">
+              <item row="3" column="0">
+               <widget class="QLabel" name="t_label_prot1">
                 <property name="text">
                  <string>Protection Mode</string>
                 </property>
                </widget>
               </item>
+              <item row="3" column="1">
+               <widget class="QSpinBox" name="t_spin_prot1"/>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="t_label_comp_src1">
+                <property name="text">
+                 <string>Audio Source</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
+               <widget class="QLabel" name="t_label_comp2">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>13</pointsize>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Component 2 </string>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="0">
+               <widget class="QLabel" name="t_label_rate2">
+                <property name="text">
+                 <string>Data rate [kbit/s]</string>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="1">
+               <widget class="QSpinBox" name="t_spin_rate2"/>
+              </item>
+              <item row="7" column="0">
+               <widget class="QLabel" name="t_label_prot2">
+                <property name="text">
+                 <string>Protection Mode</string>
+                </property>
+               </widget>
+              </item>
+              <item row="7" column="1">
+               <widget class="QSpinBox" name="t_spin_prot2"/>
+              </item>
+              <item row="9" column="0">
+               <widget class="QLabel" name="t_label_comp3">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>13</pointsize>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Component 3</string>
+                </property>
+               </widget>
+              </item>
+              <item row="10" column="0">
+               <widget class="QLabel" name="t_label_rate3">
+                <property name="text">
+                 <string>Data rate [kbit/s]</string>
+                </property>
+               </widget>
+              </item>
+              <item row="10" column="1">
+               <widget class="QSpinBox" name="t_spin_rate3"/>
+              </item>
+              <item row="11" column="0">
+               <widget class="QLabel" name="t_label_prot3">
+                <property name="text">
+                 <string>Protection Mode</string>
+                </property>
+               </widget>
+              </item>
+              <item row="11" column="1">
+               <widget class="QSpinBox" name="t_spin_prot3"/>
+              </item>
+              <item row="12" column="0">
+               <widget class="QLabel" name="t_label_comp_src3">
+                <property name="text">
+                 <string>Audio Source</string>
+                </property>
+               </widget>
+              </item>
+              <item row="13" column="0">
+               <widget class="QLabel" name="t_label_comp4">
+                <property name="font">
+                 <font>
+                  <pointsize>13</pointsize>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Component 4</string>
+                </property>
+               </widget>
+              </item>
+              <item row="14" column="0">
+               <widget class="QLabel" name="t_label_rate4">
+                <property name="text">
+                 <string>Data rate [kbit/s]</string>
+                </property>
+               </widget>
+              </item>
+              <item row="14" column="1">
+               <widget class="QSpinBox" name="t_spin_rate4"/>
+              </item>
+              <item row="15" column="0">
+               <widget class="QLabel" name="t_label_prot4">
+                <property name="text">
+                 <string>Protection Mode</string>
+                </property>
+               </widget>
+              </item>
+              <item row="15" column="1">
+               <widget class="QSpinBox" name="t_spin_prot4"/>
+              </item>
+              <item row="16" column="0">
+               <widget class="QLabel" name="t_label_comp_src4">
+                <property name="text">
+                 <string>Audio Source</string>
+                </property>
+               </widget>
+              </item>
+              <item row="17" column="0">
+               <widget class="QLabel" name="t_label_comp5">
+                <property name="font">
+                 <font>
+                  <pointsize>13</pointsize>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Component 5</string>
+                </property>
+               </widget>
+              </item>
+              <item row="18" column="0">
+               <widget class="QLabel" name="t_label_rate5">
+                <property name="text">
+                 <string>Data rate [kbit/s]</string>
+                </property>
+               </widget>
+              </item>
+              <item row="18" column="1">
+               <widget class="QSpinBox" name="t_spin_rate5"/>
+              </item>
+              <item row="19" column="0">
+               <widget class="QLabel" name="t_label_prot5">
+                <property name="text">
+                 <string>Protection Mode</string>
+                </property>
+               </widget>
+              </item>
+              <item row="19" column="1">
+               <widget class="QSpinBox" name="t_spin_prot5"/>
+              </item>
+              <item row="21" column="0">
+               <widget class="QLabel" name="t_label_comp6">
+                <property name="font">
+                 <font>
+                  <pointsize>13</pointsize>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Component 6</string>
+                </property>
+               </widget>
+              </item>
+              <item row="22" column="0">
+               <widget class="QLabel" name="t_label_rate6">
+                <property name="text">
+                 <string>Data rate [kbit/s]</string>
+                </property>
+               </widget>
+              </item>
+              <item row="22" column="1">
+               <widget class="QSpinBox" name="t_spin_rate6"/>
+              </item>
+              <item row="23" column="0">
+               <widget class="QLabel" name="t_label_prot6">
+                <property name="text">
+                 <string>Protection Mode</string>
+                </property>
+               </widget>
+              </item>
+              <item row="23" column="1">
+               <widget class="QSpinBox" name="t_spin_prot6"/>
+              </item>
+              <item row="25" column="0">
+               <widget class="QLabel" name="t_label_comp7">
+                <property name="font">
+                 <font>
+                  <pointsize>13</pointsize>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Component 7</string>
+                </property>
+               </widget>
+              </item>
+              <item row="26" column="0">
+               <widget class="QLabel" name="t_label_rate7">
+                <property name="text">
+                 <string>Data rate [kbit/s]</string>
+                </property>
+               </widget>
+              </item>
+              <item row="26" column="1">
+               <widget class="QSpinBox" name="t_spin_rate7"/>
+              </item>
+              <item row="27" column="0">
+               <widget class="QLabel" name="t_label_prot7">
+                <property name="text">
+                 <string>Protection Mode</string>
+                </property>
+               </widget>
+              </item>
+              <item row="27" column="1">
+               <widget class="QSpinBox" name="t_spin_prot7">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="20" column="0">
+               <widget class="QLabel" name="t_label_comp_src5">
+                <property name="text">
+                 <string>Audio Source</string>
+                </property>
+               </widget>
+              </item>
+              <item row="24" column="0">
+               <widget class="QLabel" name="t_label_comp_src6">
+                <property name="text">
+                 <string>Audio Source</string>
+                </property>
+               </widget>
+              </item>
+              <item row="28" column="0">
+               <widget class="QLabel" name="t_label_comp_src7">
+                <property name="text">
+                 <string>Audio Source</string>
+                </property>
+               </widget>
+              </item>
+              <item row="8" column="0">
+               <widget class="QLabel" name="t_label_comp_src2">
+                <property name="text">
+                 <string>Audio Source</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <layout class="QHBoxLayout" name="horizontalLayout_13">
+                <item>
+                 <widget class="QLabel" name="t_label_path_src1">
+                  <property name="text">
+                   <string>select audio</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="t_btn_path_src1">
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
               <item row="8" column="1">
-               <widget class="QSpinBox" name="spinBox_7"/>
+               <layout class="QHBoxLayout" name="horizontalLayout_14">
+                <item>
+                 <widget class="QLabel" name="t_label_path_src2">
+                  <property name="text">
+                   <string>select audio</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="t_btn_path_src2">
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="12" column="1">
+               <layout class="QHBoxLayout" name="horizontalLayout_15">
+                <item>
+                 <widget class="QLabel" name="t_label_path_src3">
+                  <property name="text">
+                   <string>select audio</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="t_btn_path_src3">
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="16" column="1">
+               <layout class="QHBoxLayout" name="horizontalLayout_16">
+                <item>
+                 <widget class="QLabel" name="t_label_path_src4">
+                  <property name="text">
+                   <string>select audio</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="t_btn_path_src4">
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="20" column="1">
+               <layout class="QHBoxLayout" name="horizontalLayout_17">
+                <item>
+                 <widget class="QLabel" name="t_label_path_src5">
+                  <property name="text">
+                   <string>select audio</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="t_btn_path_src5">
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="24" column="1">
+               <layout class="QHBoxLayout" name="horizontalLayout_18">
+                <item>
+                 <widget class="QLabel" name="t_label_path_src6">
+                  <property name="text">
+                   <string>select audio</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="t_btn_path_src6">
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="28" column="1">
+               <layout class="QHBoxLayout" name="horizontalLayout_19">
+                <item>
+                 <widget class="QLabel" name="t_label_path_src7">
+                  <property name="text">
+                   <string>select audio</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="t_btn_path_src7">
+                  <property name="text">
+                   <string>...</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="Line" name="line_5">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_20">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>Audio Player</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_20">
+              <item>
+               <widget class="QLabel" name="label_18">
+                <property name="text">
+                 <string>Listen to component</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="spinBox"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_11">
+              <item>
+               <widget class="QPushButton" name="t_btn_play">
+                <property name="text">
+                 <string>Play</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="t_btn_stop">
+                <property name="text">
+                 <string>Stop</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="t_btn_record">
+                <property name="text">
+                 <string>Record</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_12">
+              <item>
+               <widget class="QLabel" name="label_19">
+                <property name="text">
+                 <string>Volume</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSlider" name="t_slider_volume">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
               </item>
              </layout>
             </item>
            </layout>
-          </item>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_4"/>
           </item>
          </layout>
         </item>

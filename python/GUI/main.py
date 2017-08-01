@@ -102,6 +102,12 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
         self.file_path = "None"
         self.src_is_USRP = True
 
+        # tab change
+        self.mode_tabs.currentChanged.connect(self.change_tab)
+
+        ######################################################################
+        #TAB RECEPTION
+        ######################################################################
 
         # change of source by radio buttons
         self.rbtn_USRP.clicked.connect(self.src2USRP)
@@ -126,6 +132,69 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
 
         self.btn_debug.clicked.connect(self.test)
 
+        ######################################################################
+        # TAB TRANSMISSION
+        ######################################################################
+        # create dict for service components
+        self.components = [
+            {"label": self.t_label_comp1, "data_rate_label": self.t_label_rate1, "data_rate": self.t_spin_rate1,
+             "protection_label": self.t_label_prot1, "protection": self.t_spin_prot1, "enabled":True, "src_label":self.t_label_comp_src1, "src_path_disp":self.t_label_path_src1, "src_btn":self.t_btn_path_src1},
+            {"label": self.t_label_comp2, "data_rate_label": self.t_label_rate2, "data_rate": self.t_spin_rate2,
+             "protection_label": self.t_label_prot2, "protection": self.t_spin_prot2, "enabled":False, "src_label":self.t_label_comp_src2, "src_path_disp":self.t_label_path_src2, "src_btn":self.t_btn_path_src2},
+            {"label": self.t_label_comp3, "data_rate_label": self.t_label_rate3, "data_rate": self.t_spin_rate3,
+             "protection_label": self.t_label_prot3, "protection": self.t_spin_prot3, "enabled":False, "src_label":self.t_label_comp_src3, "src_path_disp":self.t_label_path_src3, "src_btn":self.t_btn_path_src3},
+            {"label": self.t_label_comp4, "data_rate_label": self.t_label_rate4, "data_rate": self.t_spin_rate4,
+             "protection_label": self.t_label_prot4, "protection": self.t_spin_prot4, "enabled":False, "src_label":self.t_label_comp_src4, "src_path_disp":self.t_label_path_src4, "src_btn":self.t_btn_path_src4},
+            {"label": self.t_label_comp5, "data_rate_label": self.t_label_rate5, "data_rate": self.t_spin_rate5,
+             "protection_label": self.t_label_prot5, "protection": self.t_spin_prot5, "enabled":False, "src_label":self.t_label_comp_src5, "src_path_disp":self.t_label_path_src5, "src_btn":self.t_btn_path_src5},
+            {"label": self.t_label_comp6, "data_rate_label": self.t_label_rate6, "data_rate": self.t_spin_rate6,
+             "protection_label": self.t_label_prot6, "protection": self.t_spin_prot6, "enabled":False, "src_label":self.t_label_comp_src6, "src_path_disp":self.t_label_path_src6, "src_btn":self.t_btn_path_src6},
+            {"label": self.t_label_comp7, "data_rate_label": self.t_label_rate7, "data_rate": self.t_spin_rate7,
+             "protection_label": self.t_label_prot7, "protection": self.t_spin_prot7, "enabled":False, "src_label":self.t_label_comp_src7, "src_path_disp":self.t_label_path_src7, "src_btn":self.t_btn_path_src7}]
+        self.update_service_components()
+        # update dict "components" and display of service components if spinbox "number of channels" is changed
+        self.t_spin_num_subch.valueChanged.connect(self.change_num_subch)
+
+    def change_tab(self):
+        if self.mode_tabs.currentWidget() is self.tab_transmission:
+            print "changed to transmission mode"
+            self.update_service_components()
+
+        elif self.mode_tabs.currentWidget() is self.tab_reception:
+            print "changed to reception mode"
+        else:
+            print "changed to unknown tab"
+
+    def change_num_subch(self):
+        num_subch = self.t_spin_num_subch.value()
+        if 0 <= num_subch <= 7:
+            for n in range(0,7):
+                if n < num_subch:
+                    self.components[n]["enabled"] = True
+                else:
+                    self.components[n]["enabled"] = False
+        self.update_service_components()
+
+    def update_service_components(self):
+            for component in self.components:
+                if component["enabled"] is False:
+                    component["label"].hide()
+                    component["data_rate_label"].hide()
+                    component["data_rate"].hide()
+                    component["protection_label"].hide()
+                    component["protection"].hide()
+                    component["src_label"].hide()
+                    component["src_path_disp"].hide()
+                    component["src_btn"].hide()
+                else:
+                    component["label"].show()
+                    component["data_rate_label"].show()
+                    component["data_rate"].show()
+                    component["protection_label"].show()
+                    component["protection"].show()
+                    component["src_label"].show()
+                    component["src_path_disp"].show()
+                    component["src_btn"].show()
 
     def load_rec_mode(self):
         self.btn_receive.setDefault(True)

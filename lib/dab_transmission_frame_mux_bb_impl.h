@@ -39,10 +39,10 @@ namespace gr {
       int d_transmission_mode;
       int d_num_subch;
       std::vector<unsigned int> d_subch_size;
-      const static unsigned int d_fib_len = 32; // length of a fib in bytes
+      const static unsigned int d_fib_len = 32*3; // length of a fib in bytes (*3 because bit rate = 1/3)
       const static unsigned int d_cif_len = 6912; // length of a cif in bytes
       const static unsigned int d_cu_len = 8; // length of a capacity unit in bytes
-      unsigned int d_vlen_out, d_num_cifs, d_num_fibs, d_subch_total_len;
+      unsigned int d_vlen_out, d_num_cifs, d_num_fibs, d_subch_total_size;
       unsigned int d_fic_len;
 
       unsigned char d_prbs[d_cif_len];
