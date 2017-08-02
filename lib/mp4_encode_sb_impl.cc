@@ -277,6 +277,7 @@ namespace gr {
 
       nconsumed = 0;
       nproduced = 0;
+
       do {
         // copy frame to buffer
         if (d_channels == 1){
