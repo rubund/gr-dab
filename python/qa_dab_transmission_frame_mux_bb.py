@@ -43,7 +43,7 @@ class qa_dab_transmission_frame_mux_bb (gr_unittest.TestCase):
             self.fib_src = dab.fib_source_b_make(1, 1, 'Galaxy_News', 'Wasteland_Radio', 'Country_Mix01', 0x09, [2], [14])
             self.fib_pack = blocks.unpacked_to_packed_bb_make(1, gr.GR_MSB_FIRST)
             self.subch_src01 = blocks.file_source_make(gr.sizeof_char, "debug/rs_encoded.dat", True)
-            self.subch_src02 = blocks.file_source_make(gr.sizeof_char, "debug/rs_encoded.dat", True)
+            self.subch_src02 = blocks.file_source_make(gr.sizeof_char, "debug/rs_encoded_2.dat", True)
 
             # encoder
             self.fib_enc = dab.fic_encode(self.dp)
