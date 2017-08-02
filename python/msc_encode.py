@@ -72,6 +72,8 @@ class msc_encode(gr.hier_block2):
             self.assembled_msc_puncturing_sequence = self.puncturing_L1[self.protect] * 4 * self.dp.puncturing_vectors[
                 self.puncturing_PI1[self.protect]] + self.puncturing_L2[self.protect] * 4 * self.dp.puncturing_vectors[
                 self.puncturing_PI2[self.protect]] + self.dp.puncturing_tail_vector
+            print "punctured codeword length: " + str(self.msc_punctured_codeword_length)
+            print "puncturing_sequence_length: " + str(len(self.assembled_msc_puncturing_sequence))
             self.msc_conv_codeword_length = 4 * self.msc_I + 24  # 4*I + 24 ()
         # exception in table
         else:
@@ -106,5 +108,3 @@ class msc_encode(gr.hier_block2):
                      self.unpacked_to_packed_encoded,
                      self)
 
-        # connect prbs
-        self.connect(self.prbs_src, (self.add_mod_2, 1))

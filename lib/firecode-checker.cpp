@@ -95,3 +95,4 @@ bool firecode_checker::check(const uint8_t *x)
   return state == 0;
 }
 
+

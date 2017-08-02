@@ -22,6 +22,7 @@
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
 import dab
+from gnuradio import audio
 import os
 
 class qa_mp4_encode_sb (gr_unittest.TestCase):
@@ -32,23 +33,30 @@ class qa_mp4_encode_sb (gr_unittest.TestCase):
     def tearDown (self):
         self.tb = None
 
-# loopback test - manual check if encoded AAC frames are recognized and extracted properly of the decoder
-# optional qa test: play generated (encoded and decoded) PCM files with PCM player
+# loopback test - manual check if encoded AAC frames are recognized and extracted properly of the decoder and audio is played correctly
     def test_001_t(self):
         if os.path.exists("debug/PCM_left.dat") and os.path.exists("debug/PCM_right.dat"):
-            self.src_left = blocks.file_source_make(gr.sizeof_short, "debug/PCM_left.dat")
-            self.src_right = blocks.file_source_make(gr.sizeof_short, "debug/PCM_right.dat")
+            self.src_left = blocks.file_source_make(gr.sizeof_float, "debug/PCM_left.dat")
+            self.src_right = blocks.file_source_make(gr.sizeof_float, "debug/PCM_right.dat")
+            self.f2s_1 = blocks.float_to_short_make(1, 32767)
+            self.f2s_2 = blocks.float_to_short_make(1, 32767)
             self.mp4_encode = dab.mp4_encode_sb_make(14, 2, 32000, 1)
-            self.file_sink = blocks.file_sink_make(gr.sizeof_char, "debug/mp4_encoded.dat")
             self.mp4_decode = dab.mp4_decode_bs_make(14)
-            self.file_sink_left = blocks.file_sink_make(gr.sizeof_short, "debug/PCM_left_gen.dat")
-            self.file_sink_right = blocks.file_sink_make(gr.sizeof_short, "debug/PCM_right_gen.dat")
-            self.tb.connect(self.src_left, (self.mp4_encode, 0), self.file_sink)
-            self.tb.connect(self.src_right, (self.mp4_encode, 1))
-            self.tb.connect(self.mp4_encode, self.mp4_decode, self.file_sink_left)
-            self.tb.connect((self.mp4_decode, 1), self.file_sink_right)
+            self.s2f_1 = blocks.short_to_float_make(1, 32767)
+            self.s2f_2 = blocks.short_to_float_make(1, 32767)
+            self.audio = audio.sink_make(32000)
+
+            self.tb.connect(self.src_left, self.f2s_1, (self.mp4_encode, 0))
+            self.tb.connect(self.src_right, self.f2s_2, (self.mp4_encode, 1))
+            self.tb.connect(self.mp4_encode, self.mp4_decode, self.s2f_1, (self.audio, 0))
+            self.tb.connect((self.mp4_decode, 1), self.s2f_2, (self.audio, 1))
             self.tb.run ()
             # check data
+        else:
+            log = gr.logger("log")
+            log.debug("debug file not found - skipped test")
+            log.set_level("WARN")
+    pass
 
 
 

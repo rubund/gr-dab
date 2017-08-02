@@ -175,7 +175,7 @@ namespace gr {
       // each input stream.
       consume(0, noutput_items / d_vlen_out * d_fic_len);
       for (int j = 0; j < d_num_subch; ++j) {
-        consume(j + 1, noutput_items / d_vlen_out * d_subch_size[j] * d_cu_len);
+        consume(j + 1, noutput_items / d_vlen_out * d_subch_size[j] * d_cu_len * d_num_cifs);
       }
 
       // Tell runtime system how many output items we produced.

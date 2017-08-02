@@ -180,8 +180,8 @@ class msc_decode(gr.hier_block2):
             self.connect(self.select_subch, self.sink_select_subch)
 
             #sub channel time_deinterleaved
-            self.sink_subch_time_deinterleaved = blocks.file_sink_make(gr.sizeof_float, "debug/subch_time_deinterleaved.dat")
-            self.connect(self.time_deinterleaver, self.sink_subch_time_deinterleaved)
+            #self.sink_subch_time_deinterleaved = blocks.file_sink_make(gr.sizeof_float, "debug/subch_time_deinterleaved.dat")
+            #self.connect(self.time_deinterleaver, self.sink_subch_time_deinterleaved)
 
             #sub channel unpunctured
             self.sink_subch_unpunctured = blocks.file_sink_make(gr.sizeof_float, "debug/subch_unpunctured.dat")
