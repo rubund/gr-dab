@@ -3,11 +3,28 @@
   <key>dab_fib_source_b</key>
   <category>DAB</category>
   <import>import dab</import>
-  <make>dab.fib_source_b($transmission_mode, $num_subch, $ensemble_label, $programme_service_label, $service_comp_label, $service_comp_lang, $protection_mode, $data_rate_n)</make>
-  <param>
-    <name>Transmission mode</name>
-    <key>transmission_mode</key>
+  <make>dab.fib_source_b($dab_mode, $num_subch, $ensemble_label, $programme_service_label, $service_comp_label, $service_comp_lang, $protection_mode, $data_rate_n)</make>
+   <param>
+    <name>DAB Mode</name>
+    <key>dab_mode</key>
+    <value>1</value>
     <type>int</type>
+    <option>
+    	<name>Mode 1</name>
+    	<key>1</key>
+    </option>
+    <option>
+    	<name>Mode 2</name>
+    	<key>2</key>
+    </option>
+    <option>
+    	<name>Mode 3</name>
+    	<key>3</key>
+    </option>
+    <option>
+    	<name>Mode 4</name>
+    	<key>4</key>
+    </option>
   </param>
   <param>
     <name>Number sub-channels</name>

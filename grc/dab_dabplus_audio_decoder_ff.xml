@@ -1,14 +1,37 @@
 <?xml version="1.0"?>
 <block>
-  <name>DAB: DAB+ Audio Decoder</name>
+  <name>DAB: DAB+ Decoder</name>
   <key>dab_dabplus_audio_decoder_ff</key>
   <category>DAB</category>
   <import>import dab</import>
-  <make>dab.dabplus_audio_decoder_ff($dab_params, $bit_rate, $address, $subch_size, $protection, $output_float, $verbose, $debug)</make>
+  <make>dab.dabplus_audio_decoder_ff(dab.parameters.dab_parameters(mode=$dab_mode, sample_rate=$samp_rate, verbose=False), $bit_rate, $address, $subch_size, $protection, $output_float)</make>
+   <param>
+    <name>DAB Mode</name>
+    <key>dab_mode</key>
+    <value>1</value>
+    <type>int</type>
+    <option>
+    	<name>Mode 1</name>
+    	<key>1</key>
+    </option>
+    <option>
+    	<name>Mode 2</name>
+    	<key>2</key>
+    </option>
+    <option>
+    	<name>Mode 3</name>
+    	<key>3</key>
+    </option>
+    <option>
+    	<name>Mode 4</name>
+    	<key>4</key>
+    </option>
+  </param>
   <param>
-    <name>DAB parameter</name>
-    <key>dab_params</key>
-    <type>raw</type>
+    <name>Sampling Rate</name>
+    <key>samp_rate</key>
+    <value>samp_rate</value>
+    <type>int</type>
   </param>
   <param>
     <name>Bit rate</name>
@@ -16,17 +39,22 @@
     <type>int</type>
   </param>
   <param>
-    <name>Subchannel address</name>
+    <name>Address</name>
     <key>address</key>
     <type>int</type>
   </param>
   <param>
-    <name>Subchannel size</name>
-    <key>size</key>
+    <name>Sub-channel Size</name>
+    <key>subch_size</key>
     <type>int</type>
   </param>
   <param>
-    <name>Protection mode</name>
+    <name>Output_float</name>
+    <key>output_float</key>
+    <type>bool</type>
+  </param>
+  <param>
+    <name>Protection Mode</name>
     <key>protection</key>
     <type>int</type>
     <option>
@@ -46,76 +74,21 @@
     	<key>3</key>
     </option>
   </param>
-  <param>
-    <name>Output type</name>
-    <key>output_float</key>
-    <type>bool</type>
-    <option>
-    	<name>Float</name>
-    	<key>True</key>
-    </option>
-    <option>
-    	<name>16 bit signed int</name>
-    	<key>False</key>
-    </option>
-  </param>
-  <param>
-    <name>Verbose</name>
-    <key>verbose</key>
-    <type>bool</type>
-    <option>
-    	<name>True</name>
-    	<key>True</key>
-    </option>
-    <option>
-    	<name>False</name>
-    	<key>False</key>
-    </option>
-  </param>
-  <param>
-    <name>Debug</name>
-    <key>debug</key>
-    <type>bool</type>
-    <option>
-    	<name>True</name>
-    	<key>True</key>
-    </option>
-    <option>
-    	<name>False</name>
-    	<key>False</key>
-    </option>
-  </param>
   <sink>
-    <name>data</name>
-    <type>float</type>
+    <name>dat</name>
+    <type>complex</type>
+    <vlen>1536</vlen> <!-- TODO adapt to mode -->
   </sink>
   <sink>
-    <name>trigger</name>
+    <name>sync</name>
     <type>byte</type>
   </sink>
-  <if>
-    <condition> $output_float = True</condition>
-    <statements>
-      <source>
-        <name>pcm_left</name>
-        <type>float</type>
-      </source>
-      <source>
-        <name>pcm_right</name>
-        <type>float</type>
-      </source>
-    </statements>
-  </if>
-  <else>
-    <statements>
-      <source>
-        <name>pcm_left</name>
-        <type>short</type>
-      </source>
-      <source>
-        <name>pcm_right</name>
-        <type>short</type>
-      </source>
-    </statements>
-  </else>
+  <source>
+    <name>audio_left</name>
+    <type>float</type>
+  </source>
+  <source>
+    <name>audio_right</name>
+    <type>float</type>
+  </source>
 </block>

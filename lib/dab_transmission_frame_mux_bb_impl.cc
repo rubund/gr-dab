@@ -165,8 +165,7 @@ namespace gr {
         //memcpy(out + i*d_vlen_out + d_num_fibs*d_fib_len + d_subch_total_size*d_cu_len, d_prbs + d_subch_total_size*d_cu_len*8, (d_vlen_out - d_num_fibs*d_fib_len - d_subch_total_size*d_cu_len)*8);
         for (int j = d_subch_total_size * d_cu_len; j < d_cif_len; ++j) {
           for (int k = 0; k < d_num_cifs; ++k) {
-            //out[i * d_vlen_out + d_fic_len + k * d_cif_len + j] = d_prbs[j];
-            out[i * d_vlen_out + d_fic_len + k * d_cif_len + j] = 03;
+            out[i * d_vlen_out + d_fic_len + k * d_cif_len + j] = d_prbs[j];
           }
         }
       }
