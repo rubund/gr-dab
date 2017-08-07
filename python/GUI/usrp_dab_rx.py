@@ -121,6 +121,9 @@ class usrp_dab_rx(gr.top_block):
     def get_subch_info(self):
         return self.fic_dec.get_subch_info()
 
+    def get_programme_type(self):
+        return self.fic_dec.get_programme_type()
+
 # setter
     def set_volume(self, volume):
         self.dabplus.set_volume(volume)

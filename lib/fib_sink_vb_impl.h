@@ -48,6 +48,10 @@ namespace gr {
       std::string d_json_subch_info;
       std::string d_subch_info_current;
       int d_subch_info_written_trigger;
+      // programme type
+      std::string d_json_programme_type;
+      std::string d_programme_type_current;
+      int d_programme_type_written_trigger;
 
 
 
@@ -55,7 +59,7 @@ namespace gr {
       fib_sink_vb_impl();
 
       virtual std::string get_ensemble_info()
-      { return "{\"SWR_BW_N\":{\"country_ID\":1}}"; }
+      { return d_json_ensemble_info; }
 
       virtual std::string get_service_info()
       { return d_json_service_info;}
@@ -65,6 +69,9 @@ namespace gr {
 
       virtual std::string get_subch_info()
       { return d_json_subch_info;}
+
+      virtual std::string get_programme_type()
+      { return d_json_programme_type;}
 
       int work(int noutput_items,
                gr_vector_const_void_star &input_items,

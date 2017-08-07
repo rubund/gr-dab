@@ -24,7 +24,7 @@
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_reception">
        <attribute name="title">
@@ -76,7 +76,7 @@
               <item>
                <widget class="QLabel" name="label_frequency">
                 <property name="text">
-                 <string>frequency</string>
+                 <string>Frequency</string>
                 </property>
                </widget>
               </item>
@@ -374,7 +374,7 @@
               <item>
                <widget class="QLabel" name="t_label_frequency">
                 <property name="text">
-                 <string>frequency</string>
+                 <string>Frequency</string>
                 </property>
                </widget>
               </item>
@@ -1267,7 +1267,17 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="spinBox"/>
+               <widget class="QSpinBox" name="t_spin_listen_to_component">
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <number>1</number>
+                </property>
+                <property name="value">
+                 <number>1</number>
+                </property>
+               </widget>
               </item>
              </layout>
             </item>
@@ -1275,6 +1285,9 @@
              <layout class="QHBoxLayout" name="horizontalLayout_11">
               <item>
                <widget class="QPushButton" name="t_btn_play">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>Play</string>
                 </property>
@@ -1282,6 +1295,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="t_btn_stop">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>Stop</string>
                 </property>
@@ -1289,6 +1305,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="t_btn_record">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>Record</string>
                 </property>
@@ -1300,6 +1319,9 @@
              <layout class="QHBoxLayout" name="horizontalLayout_12">
               <item>
                <widget class="QLabel" name="label_19">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>Volume</string>
                 </property>
@@ -1307,6 +1329,15 @@
               </item>
               <item>
                <widget class="QSlider" name="t_slider_volume">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="maximum">
+                 <number>100</number>
+                </property>
+                <property name="value">
+                 <number>80</number>
+                </property>
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
                 </property>

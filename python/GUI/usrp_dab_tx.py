@@ -26,11 +26,11 @@ receive DAB with USRP
 from gnuradio import gr, uhd, blocks
 from gnuradio import audio
 import dab
-import sys, time, threading, math
+import numpy as np
 
 
 class usrp_dab_tx(gr.top_block):
-    def __init__(self,  frequency, num_subch, ensemble_label, service_label, language, protections, data_rates_n, src_paths, use_usrp, sink_path = "dab_iq_generated.dat"):
+    def __init__(self,  frequency, num_subch, ensemble_label, service_label, language, protections, data_rates_n, src_paths, selected_audio, use_usrp, sink_path = "dab_iq_generated.dat"):
         gr.top_block.__init__(self)
 
         # set logger level to WARN (no DEBUG logs)
@@ -49,10 +49,12 @@ class usrp_dab_tx(gr.top_block):
         self.language = language
         self.protections = protections
         self.data_rates_n = data_rates_n
-        self.subch_sizes = 6 * data_rates_n
+        self.subch_sizes = np.multiply(self.data_rates_n, 6)
         self.src_paths = src_paths
         self.use_usrp = use_usrp
         self.sink_path = sink_path
+        self.selected_audio = selected_audio
+        self.volume = 80
 
         ########################
         # FIC
@@ -66,25 +68,31 @@ class usrp_dab_tx(gr.top_block):
         # MSC
         ########################
         self.msc_sources = [None] * self.num_subch
-        self.f2s_left_converters = [blocks.float_to_short_make(1, 32767)] * self.num_subch
-        self.f2s_right_converters = [blocks.float_to_short_make(1, 32767)] * self.num_subch
+        self.f2s_left_converters = [None] * self.num_subch
+        self.f2s_right_converters = [None] * self.num_subch
         self.mp4_encoders = [None] * self.num_subch
         self.rs_encoders = [None] * self.num_subch
         self.msc_encoders = [None] * self.num_subch
         for i in range(0, self.num_subch):
             # source
-            self.msc_sources[i] = blocks.wavfile_source_make(self.src_paths[i])
+            self.msc_sources[i] = blocks.wavfile_source_make(self.src_paths[i], True)
+            # float to short
+            self.f2s_left_converters[i] = blocks.float_to_short_make(1, 32767)
+            self.f2s_right_converters[i] = blocks.float_to_short_make(1, 32767)
             # mp4 encoder and Reed-Solomon encoder
             self.mp4_encoders[i] = dab.mp4_encode_sb_make(self.data_rates_n[i], 2, 32000, 1)
             self.rs_encoders[i] = dab.reed_solomon_encode_bb_make(self.data_rates_n[i])
             # encoder
             self.msc_encoders[i] = dab.msc_encode(self.dp, self.data_rates_n[i], self.protections[i])
 
+        print "msc sources: "
+        print self.msc_sources
         ########################
         # MUX
         ########################
         self.mux = dab.dab_transmission_frame_mux_bb_make(self.dab_mode, self.num_subch, self.subch_sizes)
-        self.trigsrc = blocks.vector_source_b([1] + [0] * (self.dp.symbols_per_frame - 1), True)
+        #self.mux = dab.dab_transmission_frame_mux_bb_make(1, 1, [84, 84])
+        self.trigsrc = blocks.vector_source_b([1] + [0] * 74, True)
 
         ########################
         # Modulator
@@ -102,6 +110,10 @@ class usrp_dab_tx(gr.top_block):
             self.sink.set_center_freq(self.frequency)
         else:
             self.sink = blocks.file_sink_make(gr.sizeof_gr_complex, "dab_iq_generated.dat")
+        # audio sink
+        self.audio = audio.sink_make(32000)
+        self.gain_left = blocks.multiply_const_ff_make(1, 1)
+        self.gain_right = blocks.multiply_const_ff_make(1, 1)
 
         ########################
         # Connections
@@ -113,8 +125,14 @@ class usrp_dab_tx(gr.top_block):
         self.connect((self.mux, 0), self.s2v_mod, (self.mod, 0))
         self.connect(self.trigsrc, (self.mod, 1))
         self.connect(self.mod, self.sink)
+        self.connect((self.msc_sources[self.selected_audio-1], 0), self.gain_left, (self.audio, 0))
+        self.connect((self.msc_sources[self.selected_audio - 1], 1), self.gain_right, (self.audio, 1))
 
     def transmit(self):
         tx = usrp_dab_tx()
         tx.run()
+
+    def set_volume(self, volume):
+        self.gain_left.set_k(volume)
+        self.gain_right.set_k(volume)
 

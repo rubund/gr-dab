@@ -56,6 +56,7 @@ namespace gr {
       d_service_info_written_trigger = -1;
       d_service_labels_written_trigger = -1;
       d_subch_info_written_trigger = -1;
+      d_programme_type_written_trigger = -1;
     }
 
     int
@@ -97,6 +98,7 @@ namespace gr {
 
           switch (extension) {
             case FIB_MCI_EXTENSION_ENSEMBLE_INFO: {
+              uint8_t country_ID = (uint8_t)((data[2] & 0xf0) >> 4);
               uint16_t ensemble_reference = (uint16_t)(data[2] & 0x0f) << 8 | (uint8_t) data[3];
               uint8_t change_flag = (uint8_t)((data[4] & 0xc0) >> 6);
               uint8_t occurrence_change = data[6];
@@ -108,7 +110,8 @@ namespace gr {
               if (alarm_flag == 1) GR_LOG_DEBUG(d_logger, ", [ALARM MESSAGE ACCESSIBLE] ");
               uint16_t CIF_counter = (uint16_t)((data[4] & 0x1f) * 250 + (data[5]));
               GR_LOG_DEBUG(d_logger,
-                           format("ensemble info: reference %d, CIF counter = %d") % ensemble_reference % CIF_counter);
+                           format("ensemble info: reference %d, country ID %d, CIF counter = %d") % ensemble_reference %
+                           (int) country_ID % CIF_counter);
               break;
             }
             case FIB_MCI_EXTENSION_SUBCHANNEL_ORGA: {
@@ -117,7 +120,7 @@ namespace gr {
               do {
                 uint8_t subchID = (uint8_t)((data[2 + subch_counter] & 0xfc) >> 2);
                 uint16_t start_address = (uint16_t)((data[2 + subch_counter] & 0x03) << 8) |
-                                        (uint8_t)(data[3 + subch_counter]);
+                                         (uint8_t)(data[3 + subch_counter]);
                 uint8_t sl_form = (uint8_t)(data[4] & 0x80);
                 if (sl_form == 0) {
                   uint8_t table_switch = (uint8_t)(data[4 + subch_counter] & 0x40);
@@ -138,11 +141,13 @@ namespace gr {
                   subch_counter += 4;
 
                   // write sub-channel info to json
-                  if(d_subch_info_written_trigger < 0){
-                    d_subch_info_written_trigger = (int)subchID;
-                  }else {
+                  if (d_subch_info_written_trigger < 0) {
+                    d_subch_info_written_trigger = (int) subchID;
+                  } else {
                     std::stringstream ss;
-                    ss << d_subch_info_current << ",{" << "\"ID\":" << (int)subchID << ",\"address\":" << (int)start_address << ",\"protection\":" << (int)protect_level << ",\"size\":" << (int)subch_size << "}\0";
+                    ss << d_subch_info_current << ",{" << "\"ID\":" << (int) subchID << ",\"address\":"
+                       << (int) start_address << ",\"protection\":" << (int) protect_level << ",\"size\":"
+                       << (int) subch_size << "}\0";
                     d_subch_info_current = ss.str();
                     if ((int) subchID == d_subch_info_written_trigger) {
                       std::stringstream ss_json;
@@ -179,12 +184,13 @@ namespace gr {
                                  format("(audio stream, type %d, subchID %d, primary %d)") % (int) comp_type %
                                  (int) subchID % (int) ps);
                     // write service info from specififc subchannel to json
-                    if(d_service_info_written_trigger < 0){
-                      d_service_info_written_trigger = (int)subchID;
-                    }else {
+                    if (d_service_info_written_trigger < 0) {
+                      d_service_info_written_trigger = (int) subchID;
+                    } else {
                       std::stringstream ss;
                       ss << d_service_info_current << ",{" << "\"reference\":" << (int) service_reference << ",\"ID\":"
-                         << (int) subchID << ",\"primary\":" << ((ps == 1) ? "true" : "false") << "}\0";
+                         << (int) subchID << ",\"primary\":" << ((ps == 1) ? "true" : "false") << ",\"DAB+\":"
+                         << (((int) comp_type == 63) ? "true" : "false") << "}\0";
                       d_service_info_current = ss.str();
                       if ((int) subchID == d_service_info_written_trigger) {
                         std::stringstream ss_json;
@@ -255,9 +261,34 @@ namespace gr {
             case FIB_SI_EXTENSION_PROGRAMME_NUMBER:
               GR_LOG_DEBUG(d_logger, "programme number");
               break;
-            case FIB_SI_EXTENSION_PROGRAMME_TYPE:
-              GR_LOG_DEBUG(d_logger, "programme type");
+            case FIB_SI_EXTENSION_PROGRAMME_TYPE: {
+              GR_LOG_DEBUG(d_logger, format("programme type, %d components") %((length-1)/6));
+              for(int i = 0; i < (length-1)/6; i++) {
+                uint8_t programme_type = (uint8_t)(data[2 + i*6 + 4] & 0x1f);
+                uint16_t service_reference = (uint16_t)(data[2 + i*6] & 0x0f) << 8 |
+                                             (uint8_t) data[2 + i*6 + 1];
+                GR_LOG_DEBUG(d_logger, format("reference %d, type: %d") %service_reference %(int)programme_type);
+
+                // write programme type to json
+                if (d_programme_type_written_trigger < 0) {
+                  d_programme_type_written_trigger = (int) service_reference;
+                } else {
+                  std::stringstream ss;
+                  ss << d_programme_type_current << ",{" << "\"reference\":" << (int) service_reference << ",\"programme_type\":"
+                     << (int) programme_type << "}\0";
+                  d_programme_type_current = ss.str();
+                  if ((int) service_reference == d_programme_type_written_trigger) {
+                    std::stringstream ss_json;
+                    ss_json << d_programme_type_current << "]" << "\0";
+                    d_programme_type_current = "\0";
+                    d_json_programme_type = ss_json.str();
+                    d_json_programme_type[0] = '[';
+                    d_programme_type_written_trigger = -1;
+                  }
+                }
+              }
               break;
+            }
             case FIB_SI_EXTENSION_ANNOUNCEMENT_SUPPORT:
               GR_LOG_DEBUG(d_logger, "announcement support");
               break;
@@ -279,10 +310,10 @@ namespace gr {
             case FIB_SI_EXTENSION_ENSEMBLE_LABEL: {
               uint8_t country_ID = (uint8_t)((data[2] & 0xf0) >> 4);
               memcpy(label, &data[4], 16);
-              GR_LOG_DEBUG(d_logger, format("[ensemble label](%d): %s") %(int)country_ID % label);
+              GR_LOG_DEBUG(d_logger, format("[ensemble label](%d): %s") % (int) country_ID % label);
               // write json for ensemble label and country ID
               std::stringstream ss;
-              ss << "{" << "\"" << label << "\":{" << "\"countr_ID\":" << (int)country_ID << "}}";
+              ss << "{" << "\"" << label << "\":{" << "\"country_ID\":" << (int) country_ID << "}}";
               d_json_ensemble_info = ss.str();
               break;
             }
@@ -292,11 +323,12 @@ namespace gr {
               GR_LOG_DEBUG(d_logger,
                            format("[programme service label] (reference %d): %s") % service_reference % label);
               // write service labels from services to json
-              if(d_service_labels_written_trigger < 0){
-                d_service_labels_written_trigger = (int)service_reference;
-              }else {
+              if (d_service_labels_written_trigger < 0) {
+                d_service_labels_written_trigger = (int) service_reference;
+              } else {
                 std::stringstream ss;
-                ss << d_service_labels_current << ",{" << "\"label\":\"" << label << "\",\"reference\":" << (int)service_reference << "}\0";
+                ss << d_service_labels_current << ",{" << "\"label\":\"" << label << "\",\"reference\":"
+                   << (int) service_reference << "}\0";
                 d_service_labels_current = ss.str();
                 if ((int) service_reference == d_service_labels_written_trigger) {
                   std::stringstream ss_json;
@@ -361,7 +393,6 @@ namespace gr {
         process_fib(in);
         in += 32;
       }
-
 
 
       return noutput_items;
