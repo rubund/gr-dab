@@ -24,7 +24,7 @@ receive DAB with USRP
 """
 
 from gnuradio import gr, uhd, blocks
-from gnuradio import audio
+from gnuradio import audio, digital
 import dab
 import sys, time, threading, math
 
@@ -73,6 +73,12 @@ class usrp_dab_rx(gr.top_block):
         # create OFDM demodulator block
         self.demod = dab.ofdm_demod(self.dab_params, self.rx_params, self.verbose)
 
+        # SNR measurement
+        self.v2s_snr = blocks.vector_to_stream_make(gr.sizeof_gr_complex, 1536)
+        self.snr_measurement = digital.mpsk_snr_est_cc_make(digital.SNR_EST_SIMPLE, 10000)
+        self.null_sink_snr = blocks.null_sink_make(gr.sizeof_gr_complex)
+
+
         # create FIC decoder
         self.fic_dec = dab.fic_decode(self.dab_params)
 
@@ -86,12 +92,14 @@ class usrp_dab_rx(gr.top_block):
         self.connect((self.demod, 1), (self.fic_dec, 1))
         self.connect((self.demod, 0), (self.dabplus, 0))
         self.connect((self.demod, 1), (self.dabplus, 1))
+        self.connect((self.demod, 0), self.v2s_snr, self.snr_measurement, self.null_sink_snr)
 
         # connect audio to sound card
         # left stereo channel
         self.connect((self.dabplus, 0), (self.audio, 0))
         # right stereo channel
         self.connect((self.dabplus, 1), (self.audio, 1))
+
 
         # connect file sink if selected
         if self.record_audio:
@@ -123,6 +131,12 @@ class usrp_dab_rx(gr.top_block):
 
     def get_programme_type(self):
         return self.fic_dec.get_programme_type()
+
+    def get_sample_rate(self):
+        return self.dabplus.get_sample_rate()
+
+    def get_snr(self):
+        return self.snr_measurement.snr()
 
 # setter
     def set_volume(self, volume):

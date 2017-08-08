@@ -153,3 +153,6 @@ class fic_decode(gr.hier_block2):
 
     def get_subch_info(self):
         return self.fibsink.get_subch_info()
+
+    def get_programme_type(self):
+        return self.fibsink.get_programme_type()

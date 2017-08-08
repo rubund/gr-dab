@@ -232,6 +232,43 @@
              </widget>
             </item>
             <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_23">
+              <item>
+               <widget class="QLabel" name="label_8">
+                <property name="text">
+                 <string>reception quality:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QProgressBar" name="bar_snr">
+                <property name="styleSheet">
+                 <string notr="true">tfadsf</string>
+                </property>
+                <property name="minimum">
+                 <number>-20</number>
+                </property>
+                <property name="maximum">
+                 <number>20</number>
+                </property>
+                <property name="value">
+                 <number>0</number>
+                </property>
+                <property name="format">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_dabplus">
+                <property name="text">
+                 <string>DAB</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
              <widget class="QPlainTextEdit" name="txt_info"/>
             </item>
             <item>
@@ -246,6 +283,13 @@
                </size>
               </property>
              </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_SNR">
+              <property name="text">
+               <string>SNR</string>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QPushButton" name="btn_init">

@@ -2,6 +2,7 @@
 
 from PyQt4 import QtGui
 from PyQt4.QtCore import QThread
+from PyQt4.QtCore import QTimer
 import sys
 import os
 import user_frontend
@@ -90,6 +91,12 @@ class receive_thread(QThread):
     def set_record(self, record):
         self.record = record
 
+    def get_sample_rate(self):
+        return self.rx.get_sample_rate()
+
+    def get_snr(self):
+        return self.rx.get_snr()
+
 
 #################################
 # TRANSMITTER THREAD
@@ -165,7 +172,9 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
 
         # table stretch
         #self.table_mci.horizontalHeade
-
+        # timer for update of SNR
+        self.snr_timer = QTimer()
+        self.snr_timer.timeout.connect(self.snr_update)
         # change of source by radio buttons
         self.rbtn_USRP.clicked.connect(self.src2USRP)
         self.rbtn_File.clicked.connect(self.src2File)
@@ -496,11 +505,25 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
     def init_receiver(self):
         # write center frequency from spin box value
         self.frequency = self.spinbox_frequency.value()
+        self.snr_timer.stop()
         # create a new Thread for reception and start it
         self.my_receiver = receive_thread(self.frequency, self.bit_rate, self.address, self.size, self.protection,
                                           self.src_is_USRP, self.file_path)
         self.my_receiver.start()
+        self.snr_timer.start(1000)
         print "finished initializing"
+
+    def snr_update(self):
+        self.label_SNR.setText(str(self.my_receiver.get_snr()))
+        SNR = int(self.my_receiver.get_snr())
+        self.bar_snr.setValue(SNR)
+        if SNR > 10:
+            self.setStyleSheet("""QProgressBar::chunk { background: "green"; }""")
+        elif 5 < SNR <= 10:
+            self.setStyleSheet("""QProgressBar::chunk { background: "yellow"; }""")
+        else:
+            self.setStyleSheet("""QProgressBar::chunk { background: "red"; }""")
+        print "color set to blue"
 
     def stop_reception(self):
         self.my_receiver.stop_reception()
@@ -510,6 +533,7 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
         self.slider_volume.setEnabled(False)
         self.btn_record.setEnabled(True)
         self.my_receiver.set_record(False)
+        self.snr_timer.stop()
 
     def play_audio(self):
         if not self.slider_volume.isEnabled():
@@ -520,6 +544,7 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
             self.slider_volume.setValue(self.volume)
             self.set_volume()
             if self.need_new_init:
+                self.snr_timer.stop()
                 self.my_receiver = receive_thread(self.frequency, self.bit_rate, self.address, self.size,
                                                   self.protection, self.src_is_USRP, self.file_path)
                 self.my_receiver.start()
@@ -531,6 +556,7 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
             self.slider_volume.setEnabled(False)
             self.set_volume()
             self.need_new_init = False
+        self.snr_timer.start(1000)
 
     def record_audio(self):
         self.btn_record.setEnabled(False)
@@ -540,6 +566,7 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
                                           self.src_is_USRP, self.file_path)
         self.my_receiver.set_record(True)
         self.my_receiver.start()
+        self.snr_timer.stop()
 
     def set_volume(self):
         print self.slider_volume.value() / 100
@@ -616,6 +643,7 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
 
         self.txt_info.insertPlainText("Type: " + ("primary" if service_data['primary'] == True else "secondary") + "\n")
         self.txt_info.insertPlainText("DAB version: " + ("DAB+" if service_data['DAB+'] == True else "DAB") + "\n")
+        self.label_dabplus.setText(("DAB+" if service_data['DAB+'] == True else "DAB "))
 
         # sub-channel info
         self.txt_info.insertPlainText("Programme Type: " + str(self.table.programme_types[int(programme_type['programme_type'])]) + "\n")
@@ -623,7 +651,10 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
             "Programme Language: " + str(self.table.languages[int(programme_type['language'])]) + "\n")
 
     def test(self):
-        type = self.my_receiver.get_programme_type()
+        self.bar_snr.setValue(19)
+
+
+        print "did test"
 
 class lookup_table:
     languages = [

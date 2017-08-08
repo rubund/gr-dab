@@ -42,6 +42,7 @@ namespace gr {
     private:
       int d_nsamples_produced;
       int d_bit_rate_n;
+      int d_sample_rate;
       int d_superframe_size;
       bool d_aacInitialized;
       int32_t baudRate;
@@ -83,6 +84,9 @@ namespace gr {
       mp4_decode_bs_impl(int bit_rate_n);
 
       ~mp4_decode_bs_impl();
+
+      virtual int get_sample_rate()
+      { return d_sample_rate; }
 
       // Where all the action really happens
       void forecast(int noutput_items, gr_vector_int &ninput_items_required);
