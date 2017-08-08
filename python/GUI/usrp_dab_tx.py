@@ -109,7 +109,7 @@ class usrp_dab_tx(gr.top_block):
             self.sink.set_antenna("TX/RX")
             self.sink.set_center_freq(self.frequency)
         else:
-            self.sink = blocks.file_sink_make(gr.sizeof_gr_complex, "dab_iq_generated.dat")
+            self.sink = blocks.file_sink_make(gr.sizeof_gr_complex, self.sink_path)
         # audio sink
         self.audio = audio.sink_make(32000)
         self.gain_left = blocks.multiply_const_ff_make(1, 1)

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>904</width>
-    <height>716</height>
+    <width>834</width>
+    <height>650</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,12 +19,56 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_21">
+      <item>
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:20pt; font-weight:600;&quot;&gt;DABstep&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_4">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
+    <item>
      <widget class="QTabWidget" name="mode_tabs">
       <property name="enabled">
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_reception">
        <attribute name="title">
@@ -152,22 +196,13 @@
              <layout class="QHBoxLayout" name="horizontalLayout_3"/>
             </item>
             <item>
-             <widget class="QPushButton" name="btn_init">
-              <property name="font">
-               <font>
-                <kerning>true</kerning>
-               </font>
-              </property>
-              <property name="text">
-               <string>init</string>
-              </property>
-              <property name="checkable">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
              <widget class="QTableWidget" name="table_mci">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <column>
                <property name="text">
                 <string>ID</string>
@@ -183,33 +218,6 @@
                 <string>Type</string>
                </property>
               </column>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_update_info">
-              <property name="text">
-               <string>update</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="verticalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_debug">
-              <property name="text">
-               <string>DEBUG</string>
-              </property>
              </widget>
             </item>
            </layout>
@@ -240,6 +248,28 @@
              </spacer>
             </item>
             <item>
+             <widget class="QPushButton" name="btn_init">
+              <property name="font">
+               <font>
+                <kerning>true</kerning>
+               </font>
+              </property>
+              <property name="text">
+               <string>set up receiver</string>
+              </property>
+              <property name="checkable">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_update_info">
+              <property name="text">
+               <string>scan ensemble</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QLabel" name="label_2">
               <property name="font">
                <font>
@@ -265,7 +295,10 @@
                  <bool>false</bool>
                 </property>
                 <property name="text">
-                 <string>Play</string>
+                 <string>  Play</string>
+                </property>
+                <property name="icon">
+                 <iconset theme="media-playback-start"/>
                 </property>
                </widget>
               </item>
@@ -275,7 +308,10 @@
                  <bool>false</bool>
                 </property>
                 <property name="text">
-                 <string>Stop</string>
+                 <string>  Stop</string>
+                </property>
+                <property name="icon">
+                 <iconset theme="media-playback-stop"/>
                 </property>
                </widget>
               </item>
@@ -285,7 +321,10 @@
                  <bool>false</bool>
                 </property>
                 <property name="text">
-                 <string>Record</string>
+                 <string>  Record</string>
+                </property>
+                <property name="icon">
+                 <iconset theme="media-record"/>
                 </property>
                </widget>
               </item>
@@ -407,12 +446,25 @@
                </widget>
               </item>
               <item>
+               <widget class="QLineEdit" name="t_edit_file_name">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>gen_iq_dab.dat</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QLabel" name="t_label_sink">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
                 <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
@@ -460,106 +512,6 @@
              </widget>
             </item>
             <item>
-             <layout class="QFormLayout" name="formLayout_2">
-              <property name="fieldGrowthPolicy">
-               <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-              </property>
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_12">
-                <property name="font">
-                 <font>
-                  <pointsize>13</pointsize>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Ensemble info</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_13">
-                <property name="text">
-                 <string>Label</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QLineEdit" name="t_edit_ensemble_label">
-                <property name="text">
-                 <string>Galaxy News</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_14">
-                <property name="text">
-                 <string>Country</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="label_15">
-                <property name="font">
-                 <font>
-                  <pointsize>13</pointsize>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Service</string>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="0">
-               <widget class="QLabel" name="label_16">
-                <property name="text">
-                 <string>Label</string>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="1">
-               <widget class="QLineEdit" name="t_edit_service_label">
-                <property name="text">
-                 <string>Wasteland Radio</string>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="0">
-               <widget class="QLabel" name="label_17">
-                <property name="text">
-                 <string>Number of channels</string>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="1">
-               <widget class="QSpinBox" name="t_spin_num_subch">
-                <property name="maximum">
-                 <number>7</number>
-                </property>
-                <property name="value">
-                 <number>1</number>
-                </property>
-               </widget>
-              </item>
-              <item row="6" column="0">
-               <widget class="QLabel" name="label_23">
-                <property name="text">
-                 <string>Language</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QSpinBox" name="t_spin_countryID"/>
-              </item>
-              <item row="6" column="1">
-               <widget class="QComboBox" name="t_combo_language"/>
-              </item>
-             </layout>
-            </item>
-            <item>
              <spacer name="verticalSpacer">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
@@ -573,24 +525,6 @@
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="t_btn_init">
-              <property name="text">
-               <string>init</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="Line" name="line_3">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_8">
-            <item>
              <widget class="QScrollArea" name="scrollArea">
               <property name="widgetResizable">
                <bool>true</bool>
@@ -599,8 +533,8 @@
                <property name="geometry">
                 <rect>
                  <x>0</x>
-                 <y>-443</y>
-                 <width>403</width>
+                 <y>0</y>
+                 <width>369</width>
                  <height>922</height>
                 </rect>
                </property>
@@ -648,6 +582,9 @@
                       <property name="maximum">
                        <number>999</number>
                       </property>
+                      <property name="value">
+                       <number>112</number>
+                      </property>
                      </widget>
                     </item>
                     <item row="8" column="0">
@@ -658,7 +595,11 @@
                      </widget>
                     </item>
                     <item row="8" column="1">
-                     <widget class="QSpinBox" name="t_spin_prot2"/>
+                     <widget class="QSpinBox" name="t_spin_prot2">
+                      <property name="value">
+                       <number>2</number>
+                      </property>
+                     </widget>
                     </item>
                     <item row="9" column="0">
                      <widget class="QLabel" name="t_label_comp_src2">
@@ -732,6 +673,9 @@
                       <property name="maximum">
                        <number>999</number>
                       </property>
+                      <property name="value">
+                       <number>112</number>
+                      </property>
                      </widget>
                     </item>
                     <item row="12" column="0">
@@ -742,7 +686,11 @@
                      </widget>
                     </item>
                     <item row="12" column="1">
-                     <widget class="QSpinBox" name="t_spin_prot3"/>
+                     <widget class="QSpinBox" name="t_spin_prot3">
+                      <property name="value">
+                       <number>2</number>
+                      </property>
+                     </widget>
                     </item>
                     <item row="13" column="0">
                      <widget class="QLabel" name="t_label_comp_src3">
@@ -813,6 +761,9 @@
                       <property name="maximum">
                        <number>999</number>
                       </property>
+                      <property name="value">
+                       <number>112</number>
+                      </property>
                      </widget>
                     </item>
                     <item row="16" column="0">
@@ -823,7 +774,11 @@
                      </widget>
                     </item>
                     <item row="16" column="1">
-                     <widget class="QSpinBox" name="t_spin_prot4"/>
+                     <widget class="QSpinBox" name="t_spin_prot4">
+                      <property name="value">
+                       <number>2</number>
+                      </property>
+                     </widget>
                     </item>
                     <item row="17" column="0">
                      <widget class="QLabel" name="t_label_comp_src4">
@@ -894,6 +849,9 @@
                       <property name="maximum">
                        <number>999</number>
                       </property>
+                      <property name="value">
+                       <number>112</number>
+                      </property>
                      </widget>
                     </item>
                     <item row="20" column="0">
@@ -904,7 +862,11 @@
                      </widget>
                     </item>
                     <item row="20" column="1">
-                     <widget class="QSpinBox" name="t_spin_prot5"/>
+                     <widget class="QSpinBox" name="t_spin_prot5">
+                      <property name="value">
+                       <number>2</number>
+                      </property>
+                     </widget>
                     </item>
                     <item row="21" column="0">
                      <widget class="QLabel" name="t_label_comp_src5">
@@ -975,6 +937,9 @@
                       <property name="maximum">
                        <number>999</number>
                       </property>
+                      <property name="value">
+                       <number>112</number>
+                      </property>
                      </widget>
                     </item>
                     <item row="24" column="0">
@@ -985,7 +950,11 @@
                      </widget>
                     </item>
                     <item row="24" column="1">
-                     <widget class="QSpinBox" name="t_spin_prot6"/>
+                     <widget class="QSpinBox" name="t_spin_prot6">
+                      <property name="value">
+                       <number>2</number>
+                      </property>
+                     </widget>
                     </item>
                     <item row="25" column="0">
                      <widget class="QLabel" name="t_label_comp_src6">
@@ -1056,6 +1025,9 @@
                       <property name="maximum">
                        <number>999</number>
                       </property>
+                      <property name="value">
+                       <number>112</number>
+                      </property>
                      </widget>
                     </item>
                     <item row="28" column="0">
@@ -1069,6 +1041,9 @@
                      <widget class="QSpinBox" name="t_spin_prot7">
                       <property name="enabled">
                        <bool>true</bool>
+                      </property>
+                      <property name="value">
+                       <number>2</number>
                       </property>
                      </widget>
                     </item>
@@ -1237,12 +1212,151 @@
               </widget>
              </widget>
             </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="Line" name="line_3">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_8">
             <item>
              <widget class="Line" name="line_5">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
              </widget>
+            </item>
+            <item>
+             <layout class="QFormLayout" name="formLayout_2">
+              <property name="fieldGrowthPolicy">
+               <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+              </property>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_12">
+                <property name="font">
+                 <font>
+                  <pointsize>13</pointsize>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Ensemble info</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_13">
+                <property name="text">
+                 <string>Label</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="t_edit_ensemble_label">
+                <property name="text">
+                 <string>Galaxy News</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_14">
+                <property name="text">
+                 <string>Country</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_15">
+                <property name="font">
+                 <font>
+                  <pointsize>13</pointsize>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Service</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_16">
+                <property name="text">
+                 <string>Label</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QLineEdit" name="t_edit_service_label">
+                <property name="text">
+                 <string>Wasteland Radio</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
+               <widget class="QLabel" name="label_17">
+                <property name="text">
+                 <string>Number of channels</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="QSpinBox" name="t_spin_num_subch">
+                <property name="maximum">
+                 <number>7</number>
+                </property>
+                <property name="value">
+                 <number>1</number>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="0">
+               <widget class="QLabel" name="label_23">
+                <property name="text">
+                 <string>Language</string>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="1">
+               <widget class="QComboBox" name="t_combo_language"/>
+              </item>
+              <item row="2" column="1">
+               <widget class="QComboBox" name="t_combo_country"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_22">
+              <item>
+               <widget class="QPushButton" name="t_btn_init">
+                <property name="text">
+                 <string>  set up transmitter</string>
+                </property>
+                <property name="icon">
+                 <iconset theme="audio-card"/>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_22">
+                <property name="text">
+                 <string>Status:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="t_label_status">
+                <property name="text">
+                 <string>not running</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
              <widget class="QLabel" name="label_20">
@@ -1289,7 +1403,10 @@
                  <bool>false</bool>
                 </property>
                 <property name="text">
-                 <string>Play</string>
+                 <string>  Play</string>
+                </property>
+                <property name="icon">
+                 <iconset theme="media-playback-start"/>
                 </property>
                </widget>
               </item>
@@ -1299,17 +1416,10 @@
                  <bool>false</bool>
                 </property>
                 <property name="text">
-                 <string>Stop</string>
+                 <string>  Stop</string>
                 </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="t_btn_record">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="text">
-                 <string>Record</string>
+                <property name="icon">
+                 <iconset theme="media-playback-stop"/>
                 </property>
                </widget>
               </item>
@@ -1354,9 +1464,9 @@
      </widget>
     </item>
     <item>
-     <widget class="QLabel" name="Heading">
+     <widget class="QPushButton" name="btn_debug">
       <property name="text">
-       <string>DABstep</string>
+       <string>DEBUG</string>
       </property>
      </widget>
     </item>

@@ -158,9 +158,13 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
         self.mode_tabs.currentChanged.connect(self.change_tab)
         self.table = lookup_table()
 
+
         ######################################################################
         # TAB RECEPTION
         ######################################################################
+
+        # table stretch
+        #self.table_mci.horizontalHeade
 
         # change of source by radio buttons
         self.rbtn_USRP.clicked.connect(self.src2USRP)
@@ -220,10 +224,14 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
              "protection_label": self.t_label_prot7, "protection": self.t_spin_prot7, "enabled": False,
              "src_label": self.t_label_comp_src7, "src_path_disp": self.t_label_path_src7,
              "src_btn": self.t_btn_path_src7, "src_path":"None"}]
+        # update service components initially to hide the service components 2-7
+        self.t_update_service_components()
         # provide suggestions for language combo box
         for i in range(0,len(self.table.languages)):
             self.t_combo_language.addItem(self.table.languages[i])
-        self.t_update_service_components()
+        # provide suggestions for country combo box
+        for i in range(0,len(self.table.country_ID_ECC_E0)):
+            self.t_combo_country.addItem(self.table.country_ID_ECC_E0[i])
         # update dict "components" and display of service components if spinbox "number of channels" is changed
         self.t_spin_num_subch.valueChanged.connect(self.t_change_num_subch)
         # write ensemble/service info when init is pressed
@@ -343,15 +351,16 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
                                               protection_array, data_rate_n_array,
                                               audio_paths,
                                               self.t_rbtn_USRP.isChecked(),
-                                              str(self.t_label_sink.text())+"/dab_iq_generated.dat",
+                                              str(self.t_label_sink.text())+ "/" +str(self.t_edit_file_name.text()),
                                               self.t_spin_listen_to_component.value())
             # enable play button
             self.t_btn_play.setEnabled(True)
+            self.t_label_status.setText("ready to transmit")
 
     def t_run_transmitter(self):
         self.t_btn_stop.setEnabled(True)
         self.t_slider_volume.setEnabled(True)
-        print "playing now"
+        self.t_label_status.setText("transmitting..")
         self.my_transmitter.start()
 
     def t_set_volume(self):
@@ -361,6 +370,7 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
         self.my_transmitter.stop_transmitter()
         self.t_btn_stop.setEnabled(False)
         self.t_slider_volume.setEnabled(False)
+        self.t_label_status.setText("not running")
 
     def t_set_file_path(self):
         path = QtGui.QFileDialog.getExistingDirectory(self, "Pick a folder for your file sink")
@@ -580,7 +590,9 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
         service_label = (item for item in self.my_receiver.get_service_labels() if
                          item['reference'] == int(reference)).next()
         subch_data = (item for item in self.my_receiver.get_subch_info() if item['ID'] == int(ID)).next()
-        programme_type = (item for item in self.my_receiver.get_programme_type() if item['reference'] == int(reference)).next()
+        #programme_type = (item for item in self.my_receiver.get_programme_type() if item['reference'] == int(reference)).next()
+        programme_type = next((item for item in self.my_receiver.get_programme_type() if item["reference"] == reference), {"programme_type":0,"language":0})
+
 
         # update sub-channel info for receiver
         self.address = int(subch_data['address'])
@@ -595,15 +607,20 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
         # ensemble info
         self.txt_info.insertPlainText("Ensemble: " + ensemble_data.keys()[0] + "\n")
         self.txt_info.insertPlainText(
-            "Country: " + str(ensemble_data.values()[0]['country_ID']) + "\n")  # TODO: lookup table for country IDs
+            "Country: " + str(self.table.country_ID_ECC_E0[int(ensemble_data.values()[0]['country_ID'])] + "\n"))  # TODO: lookup table for country IDs
 
         # service info
         self.txt_info.insertPlainText("Service: " + service_label['label'] + "\n")
+        self.txt_info.insertPlainText("Bit rate: " + str(subch_data['size']*8/6) + " kbit/s" + "\n")
+        self.txt_info.insertPlainText("Protection Level: " + self.table.protection_EEP_set_A[subch_data['protection']] + "\n")
+
         self.txt_info.insertPlainText("Type: " + ("primary" if service_data['primary'] == True else "secondary") + "\n")
         self.txt_info.insertPlainText("DAB version: " + ("DAB+" if service_data['DAB+'] == True else "DAB") + "\n")
 
         # sub-channel info
         self.txt_info.insertPlainText("Programme Type: " + str(self.table.programme_types[int(programme_type['programme_type'])]) + "\n")
+        self.txt_info.insertPlainText(
+            "Programme Language: " + str(self.table.languages[int(programme_type['language'])]) + "\n")
 
     def test(self):
         type = self.my_receiver.get_programme_type()
@@ -688,6 +705,30 @@ class lookup_table:
         "Documentary",
         "None",
         "None"
+    ]
+    country_ID_ECC_E0 = [
+        "None",
+        "Germany",
+        "Algeria",
+        "Andorra",
+        "Israel",
+        "Italy",
+        "Belgium",
+        "Russian Federation",
+        "Azores (Portugal)",
+        "Albania",
+        "Austria",
+        "Hungary",
+        "Malta",
+        "Germany",
+        "Canaries (Spain)",
+        "Egypt"
+    ]
+    protection_EEP_set_A = [
+        "1-A",
+        "2-A",
+        "3-A",
+        "4-A"
     ]
 
 def main():
