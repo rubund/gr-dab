@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>834</width>
-    <height>650</height>
+    <width>890</width>
+    <height>585</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -147,6 +147,12 @@
              <layout class="QHBoxLayout" name="horizontalLayout_6">
               <item>
                <widget class="QRadioButton" name="rbtn_File">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="text">
                  <string>File</string>
                 </property>
@@ -203,6 +209,15 @@
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
+              <attribute name="horizontalHeaderCascadingSectionResizes">
+               <bool>false</bool>
+              </attribute>
+              <attribute name="horizontalHeaderDefaultSectionSize">
+               <number>100</number>
+              </attribute>
+              <attribute name="horizontalHeaderStretchLastSection">
+               <bool>true</bool>
+              </attribute>
               <column>
                <property name="text">
                 <string>ID</string>
@@ -215,6 +230,11 @@
               </column>
               <column>
                <property name="text">
+                <string>Mode</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
                 <string>Type</string>
                </property>
               </column>
@@ -223,23 +243,120 @@
            </layout>
           </item>
           <item>
+           <widget class="Line" name="line_8">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
            <layout class="QVBoxLayout" name="verticalLayout_7">
             <item>
-             <widget class="Line" name="line">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
+             <layout class="QHBoxLayout" name="horizontalLayout_27">
+              <property name="sizeConstraint">
+               <enum>QLayout::SetDefaultConstraint</enum>
               </property>
-             </widget>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_23">
               <item>
-               <widget class="QLabel" name="label_8">
+               <widget class="QLabel" name="label_ensemble">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>17</pointsize>
+                 </font>
+                </property>
                 <property name="text">
-                 <string>reception quality:</string>
+                 <string>ENSEMBLE</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
                 </property>
                </widget>
               </item>
+              <item>
+               <layout class="QVBoxLayout" name="verticalLayout_10">
+                <property name="sizeConstraint">
+                 <enum>QLayout::SetDefaultConstraint</enum>
+                </property>
+                <item>
+                 <spacer name="verticalSpacer_5">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_28">
+                  <property name="sizeConstraint">
+                   <enum>QLayout::SetDefaultConstraint</enum>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_26">
+                    <property name="text">
+                     <string>services:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLCDNumber" name="lcd_number_num_subch">
+                    <property name="enabled">
+                     <bool>true</bool>
+                    </property>
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="numDigits">
+                     <number>2</number>
+                    </property>
+                    <property name="segmentStyle">
+                     <enum>QLCDNumber::Flat</enum>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_country">
+                  <property name="text">
+                   <string>Country</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_4">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_23">
               <item>
                <widget class="QProgressBar" name="bar_snr">
                 <property name="styleSheet">
@@ -252,7 +369,7 @@
                  <number>20</number>
                 </property>
                 <property name="value">
-                 <number>0</number>
+                 <number>-20</number>
                 </property>
                 <property name="format">
                  <string/>
@@ -260,21 +377,88 @@
                </widget>
               </item>
               <item>
-               <widget class="QLabel" name="label_dabplus">
+               <widget class="QLabel" name="label_snr">
                 <property name="text">
-                 <string>DAB</string>
+                 <string>SNR: no reception</string>
                 </property>
                </widget>
               </item>
              </layout>
             </item>
             <item>
-             <widget class="QPlainTextEdit" name="txt_info"/>
+             <widget class="Line" name="line_6">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_24">
+              <item>
+               <widget class="QLabel" name="label_service">
+                <property name="font">
+                 <font>
+                  <pointsize>24</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>SERVICE</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_25">
+              <item>
+               <widget class="QLabel" name="label_dabplus">
+                <property name="text">
+                 <string>DAB</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_bit_rate">
+                <property name="text">
+                 <string>bit rate</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_primary">
+                <property name="text">
+                 <string>primary</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="Line" name="line_7">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
             </item>
             <item>
              <spacer name="verticalSpacer_3">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Expanding</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -283,13 +467,6 @@
                </size>
               </property>
              </spacer>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_SNR">
-              <property name="text">
-               <string>SNR</string>
-              </property>
-             </widget>
             </item>
             <item>
              <widget class="QPushButton" name="btn_init">
@@ -310,6 +487,13 @@
              <widget class="QPushButton" name="btn_update_info">
               <property name="text">
                <string>scan ensemble</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="Line" name="line_9">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
               </property>
              </widget>
             </item>
@@ -342,7 +526,9 @@
                  <string>  Play</string>
                 </property>
                 <property name="icon">
-                 <iconset theme="media-playback-start"/>
+                 <iconset theme="media-playback-start">
+                  <normaloff/>
+                 </iconset>
                 </property>
                </widget>
               </item>
@@ -355,7 +541,9 @@
                  <string>  Stop</string>
                 </property>
                 <property name="icon">
-                 <iconset theme="media-playback-stop"/>
+                 <iconset theme="media-playback-stop">
+                  <normaloff/>
+                 </iconset>
                 </property>
                </widget>
               </item>
@@ -368,7 +556,9 @@
                  <string>  Record</string>
                 </property>
                 <property name="icon">
-                 <iconset theme="media-record"/>
+                 <iconset theme="media-record">
+                  <normaloff/>
+                 </iconset>
                 </property>
                </widget>
               </item>
@@ -556,19 +746,6 @@
              </widget>
             </item>
             <item>
-             <spacer name="verticalSpacer">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
              <widget class="QScrollArea" name="scrollArea">
               <property name="widgetResizable">
                <bool>true</bool>
@@ -578,8 +755,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>369</width>
-                 <height>922</height>
+                 <width>392</width>
+                 <height>846</height>
                 </rect>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -1314,7 +1491,7 @@
                 </property>
                </widget>
               </item>
-              <item row="3" column="0">
+              <item row="4" column="0">
                <widget class="QLabel" name="label_15">
                 <property name="font">
                  <font>
@@ -1328,28 +1505,28 @@
                 </property>
                </widget>
               </item>
-              <item row="4" column="0">
+              <item row="5" column="0">
                <widget class="QLabel" name="label_16">
                 <property name="text">
                  <string>Label</string>
                 </property>
                </widget>
               </item>
-              <item row="4" column="1">
+              <item row="5" column="1">
                <widget class="QLineEdit" name="t_edit_service_label">
                 <property name="text">
                  <string>Wasteland Radio</string>
                 </property>
                </widget>
               </item>
-              <item row="5" column="0">
+              <item row="6" column="0">
                <widget class="QLabel" name="label_17">
                 <property name="text">
                  <string>Number of channels</string>
                 </property>
                </widget>
               </item>
-              <item row="5" column="1">
+              <item row="6" column="1">
                <widget class="QSpinBox" name="t_spin_num_subch">
                 <property name="maximum">
                  <number>7</number>
@@ -1359,18 +1536,38 @@
                 </property>
                </widget>
               </item>
-              <item row="6" column="0">
+              <item row="7" column="0">
                <widget class="QLabel" name="label_23">
                 <property name="text">
                  <string>Language</string>
                 </property>
                </widget>
               </item>
-              <item row="6" column="1">
+              <item row="7" column="1">
                <widget class="QComboBox" name="t_combo_language"/>
               </item>
               <item row="2" column="1">
                <widget class="QComboBox" name="t_combo_country"/>
+              </item>
+              <item row="3" column="0">
+               <widget class="Line" name="line">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="8" column="1">
+               <spacer name="verticalSpacer_2">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
              </layout>
             </item>
@@ -1382,7 +1579,9 @@
                  <string>  set up transmitter</string>
                 </property>
                 <property name="icon">
-                 <iconset theme="audio-card"/>
+                 <iconset theme="audio-card">
+                  <normaloff/>
+                 </iconset>
                 </property>
                </widget>
               </item>
@@ -1401,6 +1600,13 @@
                </widget>
               </item>
              </layout>
+            </item>
+            <item>
+             <widget class="Line" name="line_10">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QLabel" name="label_20">
@@ -1450,7 +1656,9 @@
                  <string>  Play</string>
                 </property>
                 <property name="icon">
-                 <iconset theme="media-playback-start"/>
+                 <iconset theme="media-playback-start">
+                  <normaloff/>
+                 </iconset>
                 </property>
                </widget>
               </item>
@@ -1463,7 +1671,9 @@
                  <string>  Stop</string>
                 </property>
                 <property name="icon">
-                 <iconset theme="media-playback-stop"/>
+                 <iconset theme="media-playback-stop">
+                  <normaloff/>
+                 </iconset>
                 </property>
                </widget>
               </item>
