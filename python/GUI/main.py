@@ -10,98 +10,7 @@ import usrp_dab_rx
 import usrp_dab_tx
 import math
 import json
-
-
-#################################
-# RECEIVER THREAD
-#################################
-class receive_thread(QThread):
-    def __init__(self, frequency, bit_rate, address, size, protection, use_usrp, path):
-        QThread.__init__(self)
-
-        self.frequency = frequency
-        self.bit_rate = bit_rate
-        self.address = address
-        self.size = size
-        self.protection = protection
-        self.use_usrp = use_usrp
-        self.path = path
-        self.record = False
-
-    def __del__(self):
-        self.wait()
-
-    def stop_reception(self):
-        self.rx.stop()
-        self.rx.wait()
-
-    def run(self):
-        print 'start reception'
-        try:
-            self.rx = usrp_dab_rx.usrp_dab_rx(self.frequency, self.bit_rate, self.address, self.size, self.protection,
-                                              self.use_usrp, self.path, self.record)
-            self.rx.start()
-
-        except RuntimeError:
-            print 'error'
-
-    def get_status(self):
-        print hasattr(self, 'rx')
-        return hasattr(self, 'rx')
-
-    def get_ensemble_info(self):
-        # load string mci and convert it to dictionary
-        self.ensemble_info = json.loads(self.rx.get_ensemble_info())
-        #self.ensemble_info = json.loads("{\"SWR_BW_N\":{\"country_ID\":1}}")
-        json.dumps(self.ensemble_info)
-        return self.ensemble_info
-
-    def get_service_info(self):
-        # load string mci and convert it to dictionary
-        #print "service info:"
-        #print self.rx.get_service_info()
-        self.service_info = json.loads(self.rx.get_service_info())
-        # self.service_info = json.loads("[{\"reference\":736,\"ID\":2,\"primary\":true},{\"reference\":736,\"ID\":3,\"primary\":false},{\"reference\":234,\"ID\":5,\"primary\":true}]")
-        json.dumps(self.service_info)
-        return self.service_info
-
-    def get_service_labels(self):
-        #print "service labels:"
-        #print self.rx.get_service_labels()
-        self.service_labels = json.loads(self.rx.get_service_labels())
-        # self.service_labels = json.loads("[{\"label\":\"SWR1_BW         \",\"reference\":736},{\"label\":\"SWR2            \",\"reference\":234}]")
-        json.dumps(self.service_labels)
-        return self.service_labels
-
-    def get_subch_info(self):
-        #print "subchannel info"
-        #print self.rx.get_subch_info()
-        # load string mci and convert it to dictionary
-        self.subch_info = json.loads(self.rx.get_subch_info())
-        # self.subch_info = json.loads("[{\"ID\":2, \"address\":54, \"protect\":2,\"size\":84},{\"ID\":3, \"address\":54, \"protect\":2,\"size\":84},{\"ID\":5, \"address\":234, \"protect\":2,\"size\":84}]")
-        json.dumps(self.subch_info)
-        return self.subch_info
-
-    def get_programme_type(self):
-        #print "programme type"
-        #print self.rx.get_programme_type()
-        # load string mci and convert it to dictionary
-        self.programme_type = json.loads(self.rx.get_programme_type())
-        json.dumps(self.programme_type)
-        return self.programme_type
-
-    def set_volume(self, volume):
-        self.rx.set_volume(volume)
-
-    def set_record(self, record):
-        self.record = record
-
-    def get_sample_rate(self):
-        return self.rx.get_sample_rate()
-
-    def get_snr(self):
-        return self.rx.get_snr()
-
+import sip
 
 #################################
 # TRANSMITTER THREAD
@@ -145,15 +54,23 @@ class transmit_thread(QThread):
     def set_volume(self, volume):
         self.tx.set_volume(volume)
 
-
 class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
     def __init__(self, parent=None):
         super(DABstep, self).__init__(parent)
         self.setupUi(self)
 
+        # tab definitions
         self.modes = {"rec": 0, "trans": 1, "dev": 2}
         self.mode = self.modes["rec"]
+        self.mode_tabs.currentChanged.connect(self.change_tab)
 
+        # lookup table
+        self.table = lookup_table()
+
+        ######################################################################
+        # TAB RECEPTION (defining variables, signals and slots)
+        ######################################################################
+        # receiver variables
         self.frequency = 208.064e6
         self.bit_rate = 8
         self.address = 0
@@ -162,21 +79,11 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
         self.volume = 80
         self.subch = -1
         self.need_new_init = True
-
+        self.recorder = False
         self.file_path = "None"
         self.src_is_USRP = True
 
-        # tab change
-        self.mode_tabs.currentChanged.connect(self.change_tab)
-        self.table = lookup_table()
-
-
-        ######################################################################
-        # TAB RECEPTION
-        ######################################################################
-
-        # table stretch
-        # resize table columns to make it pretty
+        # table preparations
         header = self.table_mci.horizontalHeader()
         header.setResizeMode(0, QtGui.QHeaderView.ResizeToContents)
         header.setResizeMode(1, QtGui.QHeaderView.Stretch)
@@ -184,6 +91,7 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
         header.setResizeMode(3, QtGui.QHeaderView.ResizeToContents)
         header.setStretchLastSection(False)
         self.table_mci.verticalHeader().hide()
+
         # timer for update of SNR
         self.snr_timer = QTimer()
         self.snr_timer.timeout.connect(self.snr_update)
@@ -207,7 +115,6 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
         # record button
         self.btn_record.clicked.connect(self.record_audio)
 
-        self.btn_debug.clicked.connect(self.test)
 
         ######################################################################
         # TAB TRANSMISSION
@@ -286,6 +193,233 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
             print "changed to reception mode"
         else:
             print "changed to unknown tab"
+
+    ################################
+    # Receiver functions
+    ################################
+
+    def src2USRP(self):
+        # enable/disable buttons
+        self.btn_file_path.setEnabled(False)
+        self.label_path.setEnabled(False)
+        self.spinbox_frequency.setEnabled(True)
+        self.label_frequency.setEnabled(True)
+        self.src_is_USRP = True
+
+    def src2File(self):
+        # enable/disable buttons
+        self.btn_file_path.setEnabled(True)
+        self.label_path.setEnabled(True)
+        self.spinbox_frequency.setEnabled(False)
+        self.label_frequency.setEnabled(False)
+        self.src_is_USRP = False
+
+    def set_file_path(self):
+        path = QtGui.QFileDialog.getOpenFileName(self, "Pick a file with recorded IQ samples")
+        if path:  # if user didn't pick a directory don't continue
+            self.file_path = str(path)
+            self.label_path.setText(path)
+
+    def init_receiver(self):
+        # set status bar message
+        self.statusBar.showMessage("initializing receiver ...")
+        # stop any processes that access to an instance of usrp_dab_rx
+        self.snr_timer.stop()
+        # set up and start flowgraph
+        self.my_receiver = usrp_dab_rx.usrp_dab_rx(self.spinbox_frequency.value(), self.bit_rate, self.address, self.size, self.protection,
+                                          self.src_is_USRP, self.file_path, self.recorder)
+        self.my_receiver.start()
+        self.snr_timer.start(5000)
+
+    def update_service_info(self):
+        # set status bar message
+        self.statusBar.showMessage("scanning ensemble...", 1000)
+        # remove all old data from table at first
+        while (self.table_mci.rowCount() > 0):
+            self.table_mci.removeRow(0)
+
+        # get new data from fic_sink
+        service_data = self.get_service_info()
+        service_labels = self.get_service_labels()
+
+        # write new data to table
+        for n, key in enumerate(sorted(service_data, key=lambda service_data: service_data['ID'])):
+            # add a new row
+            self.table_mci.insertRow(n)
+            # print ID in first collumn
+            self.table_mci.setItem(n, 0, QtGui.QTableWidgetItem(str(key['ID'])))
+            # print reference (later label)
+            self.table_mci.setItem(n, 1, QtGui.QTableWidgetItem(next((item for item in service_labels if item["reference"] == key['reference']), {'label':"not found"})['label']))
+            # print type
+            self.table_mci.setItem(n, 3, QtGui.QTableWidgetItem("primary" if key['primary'] == True else "secondary"))
+            # print DAB Mode
+            self.table_mci.setItem(n, 2, QtGui.QTableWidgetItem(("DAB+" if key['DAB+'] == True else "DAB ")))
+
+        # set number of sub channels
+        self.num_subch = self.table_mci.rowCount()
+
+        # display ensemble info
+        ensemble_data = self.get_ensemble_info()
+        self.label_ensemble.setText(ensemble_data.keys()[0].strip())
+        self.label_country.setText(str(self.table.country_ID_ECC_E0[int(ensemble_data.values()[0]['country_ID'])]))
+        self.lcd_number_num_subch.display(self.num_subch)
+
+    def selected_subch(self):
+        # enable/disable buttons
+        self.btn_play.setEnabled(True)
+        self.btn_record.setEnabled(True)
+
+        # check if selected sub-channel is different to former selected sub-channel
+        if self.table_mci.currentRow() is self.subch:
+            self.need_new_init = False
+        else:
+            # new subch was selected
+            self.subch = self.table_mci.currentRow()
+            self.need_new_init = True
+            self.btn_play.setText("Play")
+            self.slider_volume.setEnabled(False)
+
+        # get selected sub-channel by its ID
+        ID = self.table_mci.item(self.table_mci.currentRow(), 0).text()
+        # find related service reference to ID
+        reference = next((item for item in self.get_service_info() if item['ID'] == int(ID)), {'reference':-1})['reference']
+        # get dicts to specific service and sub-channel
+        service_data = next((item for item in self.get_service_info() if item['ID'] == int(ID)), {"reference":-1, "ID": -1, "primary": True})
+        service_label = next((item for item in self.get_service_labels() if item['reference'] == int(reference)), {"reference": -1, "label":"not found"})
+        subch_data = next((item for item in self.get_subch_info() if item['ID'] == int(ID)), {"ID":-1, "address":0, "protection":0,"size":0})
+        #programme_type = next((item for item in self.get_programme_type() if item["reference"] == reference), {"programme_type":0,"language":0})
+
+        # update sub-channel info for receiver
+        self.address = int(subch_data['address'])
+        self.size = int(subch_data['size'])
+        self.protection = int(subch_data['protection'])
+        self.bit_rate = self.size * 8/6
+
+        # display info to selected sub-channel
+        # service info
+        self.label_service.setText(service_label['label'].strip())
+        self.label_bit_rate.setText(str(subch_data['size']*8/6) + " kbps")
+        # service component (=sub-channel) info
+        self.label_primary.setText(("primary" if service_data['primary'] == True else "secondary"))
+        self.label_dabplus.setText(("DAB+" if service_data['DAB+'] == True else "DAB"))
+
+    def snr_update(self):
+        print "update snr"
+        # display snr in progress bar if an instance of usrp_dab_rx is existing
+        if hasattr(self, 'my_receiver'):
+            SNR = self.my_receiver.get_snr()
+            if SNR > 10:
+                self.setStyleSheet("""QProgressBar::chunk { background: "green"; }""")
+                if SNR > 20:
+                    SNR = 20
+            elif 5 < SNR <= 10:
+                self.setStyleSheet("""QProgressBar::chunk { background: "yellow"; }""")
+            else:
+                self.setStyleSheet("""QProgressBar::chunk { background: "red"; }""")
+                if SNR < -20 or math.isnan(SNR):
+                    SNR = -20
+            self.bar_snr.setValue(SNR)
+            self.lcd_snr.display(SNR)
+            self.snr_timer.start(1000)
+        else:
+            self.bar_snr.setValue(-20)
+            self.label_snr.setText("SNR: no reception")
+            self.snr_timer.start(4000)
+
+    def play_audio(self):
+        if not self.slider_volume.isEnabled():
+            # play button pressed
+            self.btn_play.setText("Mute")
+            self.btn_stop.setEnabled(True)
+            self.slider_volume.setEnabled(True)
+            self.slider_volume.setValue(self.volume)
+            self.set_volume()
+            # if selected sub-channel is not the current sub-channel we have to reconfigure the receiver
+            if self.need_new_init:
+                self.snr_timer.stop()
+                self.my_receiver.stop()
+                self.my_receiver = usrp_dab_rx.usrp_dab_rx(self.frequency, self.bit_rate, self.address, self.size,
+                                                           self.protection,
+                                                           self.src_is_USRP, self.file_path, self.recorder)
+                self.my_receiver.start()
+                self.snr_timer.start(5000)
+        else:
+            # mute button pressed
+            self.btn_play.setText("Play")
+            self.volume = self.slider_volume.value()
+            self.slider_volume.setValue(0)
+            self.slider_volume.setEnabled(False)
+            self.set_volume()
+            self.need_new_init = False
+        self.snr_timer.start(1000)
+
+    def stop_reception(self):
+        # stop flowgraph
+        self.my_receiver.stop()
+        # enable/disable buttons
+        self.btn_stop.setEnabled(False)
+        self.btn_play.setText("Play")
+        self.btn_play.setEnabled(True)
+        self.slider_volume.setEnabled(False)
+        self.btn_record.setEnabled(True)
+        self.recorder = False
+        # stop snr updates because no flowgraph is running to measure snr
+        self.snr_timer.stop()
+
+    def record_audio(self):
+        # enable/disable buttons
+        self.btn_record.setEnabled(False)
+        self.btn_play.setEnabled(False)
+        self.btn_stop.setEnabled(True)
+        self.recorder = True
+        # start flowgraph
+        self.my_receiver = usrp_dab_rx.usrp_dab_rx(self.frequency, self.bit_rate, self.address, self.size,
+                                                   self.protection,
+                                                   self.src_is_USRP, self.file_path, self.recorder)
+        self.my_receiver.start()
+
+    def set_volume(self):
+        # map volume from [0:100] to [0:1]
+        self.my_receiver.set_volume(float(self.slider_volume.value()) / 100)
+
+    def get_ensemble_info(self):
+        # load string (json) with ensemble info and convert it to dictionary
+        # string structure example: "{\"SWR_BW_N\":{\"country_ID\":1}}"
+        self.ensemble_info = json.loads(self.my_receiver.get_ensemble_info())
+        json.dumps(self.ensemble_info)
+        return self.ensemble_info
+
+    def get_service_info(self):
+        # load string (json) with MCI and convert it to array of dictionaries
+        self.service_info = json.loads(self.my_receiver.get_service_info())
+        # string structure example: "[{\"reference\":736,\"ID\":2,\"primary\":true},{\"reference\":736,\"ID\":3,\"primary\":false},{\"reference\":234,\"ID\":5,\"primary\":true}]"
+        json.dumps(self.service_info)
+        return self.service_info
+
+    def get_service_labels(self):
+        # load string (json) with service labels and convert it to array of dictionaries
+        self.service_labels = json.loads(self.my_receiver.get_service_labels())
+        # string structure example: "[{\"label\":\"SWR1_BW         \",\"reference\":736},{\"label\":\"SWR2            \",\"reference\":234}]"
+        json.dumps(self.service_labels)
+        return self.service_labels
+
+    def get_subch_info(self):
+        # load string (json) with sub-channel info and convert it to array of dictionaries
+        self.subch_info = json.loads(self.my_receiver.get_subch_info())
+        # string structure example: "[{\"ID\":2, \"address\":54, \"protect\":2,\"size\":84},{\"ID\":3, \"address\":54, \"protect\":2,\"size\":84}]"
+        json.dumps(self.subch_info)
+        return self.subch_info
+
+    def get_programme_type(self):
+        # load string (json) with service information (programme type) and convert it to array of dictionaries
+        self.programme_type = json.loads(self.my_receiver.get_programme_type())
+        # string structure example: "[{\"reference\":736, \"programme_type\":13},{\"reference\":234, \"programme_type\":0}]"
+        json.dumps(self.programme_type)
+        return self.programme_type
+
+    def get_sample_rate(self):
+        # TODO: set rational resampler in flowgraoph with sample rate
+        return self.my_receiver.get_sample_rate()
 
     ################################
     # Transmitter functions
@@ -468,205 +602,7 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
             print "set audio sink"
 
 
-    ################################
-    # Receiver functions
-    ################################
 
-    def load_rec_mode(self):
-        self.btn_receive.setDefault(True)
-        self.btn_transmit.setDefault(False)
-        self.mode = self.modes["rec"]
-
-        # show all reception specific items
-        self.btn_update_info.show()
-        self.table_mci.show()
-        # hide all irrelevant items for reception mode
-        self.formLayout.hide()
-
-    def src2USRP(self):
-        self.btn_file_path.setEnabled(False)
-        self.label_path.setEnabled(False)
-        self.spinbox_frequency.setEnabled(True)
-        self.label_frequency.setEnabled(True)
-        self.src_is_USRP = True
-
-    def src2File(self):
-        self.btn_file_path.setEnabled(True)
-        self.label_path.setEnabled(True)
-        self.spinbox_frequency.setEnabled(False)
-        self.label_frequency.setEnabled(False)
-        self.src_is_USRP = False
-
-    def set_file_path(self):
-        path = QtGui.QFileDialog.getOpenFileName(self, "Pick a file with recorded IQ samples")
-        if path:  # if user didn't pick a directory don't continue
-            self.file_path = str(path)
-            self.label_path.setText(path)
-
-    def init_receiver(self):
-        print "initializing receiver ..."
-        self.snr_timer.stop()
-        # write center frequency from spin box value
-        self.frequency = self.spinbox_frequency.value()
-        #self.snr_timer.stop()
-        # create a new Thread for reception and start it
-        self.my_receiver = receive_thread(self.frequency, self.bit_rate, self.address, self.size, self.protection,
-                                          self.src_is_USRP, self.file_path)
-        self.my_receiver.start()
-        self.snr_timer.start(5000)
-
-
-    def snr_update(self):
-        print "timer abgelaufen"
-        # display snr in progress bar
-        if self.my_receiver.get_status():
-            SNR = self.my_receiver.get_snr()
-            if SNR > 10:
-                self.setStyleSheet("""QProgressBar::chunk { background: "green"; }""")
-                if SNR > 20:
-                    SNR = 20
-            elif 5 < SNR <= 10:
-                self.setStyleSheet("""QProgressBar::chunk { background: "yellow"; }""")
-            else:
-                self.setStyleSheet("""QProgressBar::chunk { background: "red"; }""")
-                if SNR < -20 or math.isnan(SNR):
-                    SNR = -20
-            self.bar_snr.setValue(SNR)
-            self.label_snr.setText("SNR: " + str(SNR) + " db")
-            self.snr_timer.start(1000)
-        else:
-            self.bar_snr.setValue(-20)
-            self.label_snr.setText("SNR: no reception")
-            self.snr_timer.start(4000)
-
-    def stop_reception(self):
-        self.my_receiver.stop_reception()
-        self.btn_stop.setEnabled(False)
-        self.btn_play.setText("Play")
-        self.btn_play.setEnabled(True)
-        self.slider_volume.setEnabled(False)
-        self.btn_record.setEnabled(True)
-        self.my_receiver.set_record(False)
-        #self.snr_timer.stop()
-
-    def play_audio(self):
-        if not self.slider_volume.isEnabled():
-            # play button pressed
-            self.btn_play.setText("Mute")
-            self.btn_stop.setEnabled(True)
-            self.slider_volume.setEnabled(True)
-            self.slider_volume.setValue(self.volume)
-            self.set_volume()
-            if self.need_new_init:
-                self.snr_timer.stop()
-                self.my_receiver.stop_reception()
-                self.my_receiver = receive_thread(self.frequency, self.bit_rate, self.address, self.size,
-                                                  self.protection, self.src_is_USRP, self.file_path)
-                self.my_receiver.start()
-                self.snr_timer.start(5000)
-        else:
-            # mute button pressed
-            self.btn_play.setText("Play")
-            self.volume = self.slider_volume.value()
-            self.slider_volume.setValue(0)
-            self.slider_volume.setEnabled(False)
-            self.set_volume()
-            self.need_new_init = False
-        #self.snr_timer.start(1000)
-
-    def record_audio(self):
-        self.btn_record.setEnabled(False)
-        self.btn_play.setEnabled(False)
-        self.btn_stop.setEnabled(True)
-        self.my_receiver = receive_thread(self.frequency, self.bit_rate, self.address, self.size, self.protection,
-                                          self.src_is_USRP, self.file_path)
-        self.my_receiver.set_record(True)
-        self.my_receiver.start()
-        #self.snr_timer.stop()
-
-    def set_volume(self):
-        print self.slider_volume.value() / 100
-        self.my_receiver.set_volume(float(self.slider_volume.value()) / 100)
-
-    def update_service_info(self):
-        # remove all old data first
-        while (self.table_mci.rowCount() > 0):
-            self.table_mci.removeRow(0)
-
-        # get new data from FIC
-        service_data = self.my_receiver.get_service_info()
-        service_labels = self.my_receiver.get_service_labels()
-
-        for n, key in enumerate(sorted(service_data, key=lambda service_data: service_data['ID'])):
-            # add a new row
-            self.table_mci.insertRow(n)
-            # print ID in first collumn
-            self.table_mci.setItem(n, 0, QtGui.QTableWidgetItem(str(key['ID'])))
-            # print reference (later label)
-            self.table_mci.setItem(n, 1, QtGui.QTableWidgetItem(next((item for item in service_labels if item["reference"] == key['reference']), {'label':"not found"})['label']))
-            # print type
-            self.table_mci.setItem(n, 3, QtGui.QTableWidgetItem("primary" if key['primary'] == True else "secondary"))
-            # print DAB Mode
-            self.table_mci.setItem(n, 2, QtGui.QTableWidgetItem(("DAB+" if key['DAB+'] == True else "DAB ")))
-
-        # set number of sub channels
-        self.num_subch = self.table_mci.rowCount()
-
-
-        # display ensemble info
-        ensemble_data = self.my_receiver.get_ensemble_info()
-        self.label_ensemble.setText(ensemble_data.keys()[0].strip())
-        self.label_country.setText(str(self.table.country_ID_ECC_E0[int(ensemble_data.values()[0]['country_ID'])]))
-        self.lcd_number_num_subch.display(self.num_subch)
-
-    def selected_subch(self):
-
-        # enable play button
-        self.btn_play.setEnabled(True)
-        self.btn_record.setEnabled(True)
-        if self.table_mci.currentRow() is self.subch:
-            self.need_new_init = False
-        else:
-            # new subch was selected
-            self.subch = self.table_mci.currentRow()
-            self.need_new_init = True
-            self.btn_play.setText("Play")
-            self.slider_volume.setEnabled(False)
-
-        # get selected sub-channel by its ID
-        ID = self.table_mci.item(self.table_mci.currentRow(), 0).text()
-        reference = next((item for item in self.my_receiver.get_service_info() if item['ID'] == int(ID)), {'reference':-1})['reference']
-        # get dicts to specific service and sub-channel
-        service_data = next((item for item in self.my_receiver.get_service_info() if item['ID'] == int(ID)), {"reference":-1, "ID": -1, "primary": True})
-        service_label = next((item for item in self.my_receiver.get_service_labels() if item['reference'] == int(reference)), {"reference": -1, "label":"not found"})
-        subch_data = next((item for item in self.my_receiver.get_subch_info() if item['ID'] == int(ID)), {"ID":-1, "address":0, "protection":0,"size":0})
-        programme_type = next((item for item in self.my_receiver.get_programme_type() if item["reference"] == reference), {"programme_type":0,"language":0})
-
-        # update sub-channel info for receiver
-        self.address = int(subch_data['address'])
-        print "set address to: " + str(subch_data['address'])
-        self.size = int(subch_data['size'])
-        print "set address to: " + str(subch_data['size'])
-        self.protection = int(subch_data['protection'])
-        print "set protection mode to: " + str(subch_data['protection'])
-        self.bit_rate = self.size * 8/6
-        print "set bit rate to: " + str(self.bit_rate)
-
-        # service info
-        self.label_service.setText(service_label['label'].strip())
-        self.label_bit_rate.setText(str(subch_data['size']*8/6) + " kbps")
-
-        self.label_primary.setText(("primary" if service_data['primary'] == True else "secondary"))
-        self.label_dabplus.setText(("DAB+" if service_data['DAB+'] == True else "DAB"))
-
-        # sub-channel info
-        #self.txt_info.insertPlainText("Programme Type: " + str(self.table.programme_types[int(programme_type['programme_type'])]) + "\n")
-        #self.txt_info.insertPlainText(
-        #    "Programme Language: " + str(self.table.languages[int(programme_type['language'])]) + "\n")
-
-    def test(self):
-        self.snr_update()
-        print "did test"
 
 class lookup_table:
     languages = [

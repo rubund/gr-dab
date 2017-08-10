@@ -20,22 +20,19 @@
 #
 
 """
-receive DAB with USRP
+receive DAB+ with USRP
 """
 
 from gnuradio import gr, uhd, blocks
 from gnuradio import audio, digital
+from gnuradio import qtgui
 import dab
-import sys, time, threading, math
+import time, math
 
 
 class usrp_dab_rx(gr.top_block):
     def __init__(self, frequency, bit_rate, address, size, protection, use_usrp, src_path, record_audio = False, sink_path = "None"):
         gr.top_block.__init__(self)
-
-        # set logger level to WARN (no DEBUG logs)
-        log = gr.logger("log")
-        log.set_level("WARN")
 
         self.dab_mode = 1
         self.verbose = False
@@ -45,13 +42,16 @@ class usrp_dab_rx(gr.top_block):
         self.record_audio = record_audio
         self.sink_path = sink_path
 
+        ########################
+        # source
+        ########################
         if self.use_usrp:
             self.src = uhd.usrp_source("", uhd.io_type.COMPLEX_FLOAT32, 1)
             self.src.set_samp_rate(self.sample_rate)
             self.src.set_antenna("TX/RX")
         else:
             print "using file source"
-            self.src = blocks.file_source_make(gr.sizeof_gr_complex, self.src_path)
+            self.src = blocks.file_source_make(gr.sizeof_gr_complex, self.src_path, True)
 
         # set paramters to default mode
         self.softbits = True
@@ -61,7 +61,6 @@ class usrp_dab_rx(gr.top_block):
         self.correct_ffe = True
         self.equalize_magnitude = True
         self.frequency = frequency
-
         self.dab_params = dab.parameters.dab_parameters(self.dab_mode, self.sample_rate, self.verbose)
         self.rx_params = dab.parameters.receiver_parameters(self.dab_mode, self.softbits,
                                                             self.filter_input,
@@ -70,44 +69,49 @@ class usrp_dab_rx(gr.top_block):
                                                             self.verbose, self.correct_ffe,
                                                             self.equalize_magnitude)
 
-        # create OFDM demodulator block
+        ########################
+        # OFDM demod
+        ########################
         self.demod = dab.ofdm_demod(self.dab_params, self.rx_params, self.verbose)
 
+        ########################
         # SNR measurement
+        ########################
         self.v2s_snr = blocks.vector_to_stream_make(gr.sizeof_gr_complex, 1536)
         self.snr_measurement = digital.mpsk_snr_est_cc_make(digital.SNR_EST_SIMPLE, 10000)
         self.null_sink_snr = blocks.null_sink_make(gr.sizeof_gr_complex)
 
-
-        # create FIC decoder
+        ########################
+        # FIC decoder
+        ########################
         self.fic_dec = dab.fic_decode(self.dab_params)
 
-        # create MSC decoder for audio reception
+        ########################
+        # MSC decoder and audio sink
+        ########################
         self.dabplus = dab.dabplus_audio_decoder_ff(self.dab_params, bit_rate, address, size, protection, True)
         self.audio = audio.sink_make(32000)
 
-
-        # connect everything for usrp
+        ########################
+        # Connections
+        ########################
         self.connect(self.src, self.demod, (self.fic_dec, 0))
         self.connect((self.demod, 1), (self.fic_dec, 1))
         self.connect((self.demod, 0), (self.dabplus, 0))
         self.connect((self.demod, 1), (self.dabplus, 1))
         self.connect((self.demod, 0), self.v2s_snr, self.snr_measurement, self.null_sink_snr)
-
         # connect audio to sound card
         # left stereo channel
         self.connect((self.dabplus, 0), (self.audio, 0))
         # right stereo channel
         self.connect((self.dabplus, 1), (self.audio, 1))
-
-
-        # connect file sink if selected
+        # connect file sink if recording is selected
         if self.record_audio:
             self.sink = blocks.wavfile_sink_make("dab_audio.wav", 2, 32000)
             self.connect((self.dabplus, 0), (self.sink, 0))
             self.connect((self.dabplus, 1), (self.sink, 1))
 
-        # tune frequency
+        # tune USRP frequency
         if self.use_usrp:
             self.set_freq(self.frequency)
             # set gain
@@ -116,7 +120,9 @@ class usrp_dab_rx(gr.top_block):
             self.rx_gain = float(g.start() + g.stop()) / 2
             self.src.set_gain(self.rx_gain)
 
-# getter
+########################
+# getter methods
+########################
     def get_ensemble_info(self):
         return self.fic_dec.get_ensemble_info()
 
@@ -138,30 +144,14 @@ class usrp_dab_rx(gr.top_block):
     def get_snr(self):
         return self.snr_measurement.snr()
 
-# setter
+########################
+# setter methods
+########################
     def set_volume(self, volume):
         self.dabplus.set_volume(volume)
 
-    def update_ui_function(self):
-        while self.run_ui_update_thread:
-            var = self.demod.probe_phase_var.level()
-            q = int(50 * (math.sqrt(var) / (math.pi / 4)))
-            print "--> Phase variance: " + str(var) + "\n"
-            print "--> Signal quality: " + '=' * (50 - q) + '>' + '-' * q + "\n"
-            time.sleep(0.3)
-
-    def correct_ffe(self):
-        while self.run_correct_ffe_thread:
-            diff = self.demod.sync.ffs_sample_and_average_arg.ffe_estimate()
-            if abs(diff) > self.rx_params.usrp_ffc_min_deviation:
-                self.frequency -= diff * self.rx_params.usrp_ffc_adapt_factor
-                print "--> updating fine frequency correction: " + str(self.frequency)
-                if self.use_usrp:
-                    self.set_freq(self.frequency)
-            time.sleep(1. / self.rx_params.usrp_ffc_retune_frequency)
-
     def set_freq(self, freq):
-        if self.src.set_center_freq(freq):  # src.tune(0, self.subdev, freq):
+        if self.src.set_center_freq(freq):
             if self.verbose:
                 print "--> retuned to " + str(freq) + " Hz"
             return True
