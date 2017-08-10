@@ -22,6 +22,7 @@
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
 from gnuradio import audio
+from gnuradio import fft
 import dab
 import os
 
@@ -62,7 +63,7 @@ class qa_dab_transmission_frame_mux_bb (gr_unittest.TestCase):
             self.soft_interleaver = dab.complex_to_interleaved_float_vcf_make(self.dp.num_carriers)
 
             # decode
-            self.fic_decoder = dab.fic_decode(self.dp, False, False)
+            self.fic_decoder = dab.fic_decode(self.dp)
             self.msc_dec = dab.dabplus_audio_decoder_ff(self.dp, 112, 0, 84, 2, True)
 
             # audio sink
@@ -81,6 +82,7 @@ class qa_dab_transmission_frame_mux_bb (gr_unittest.TestCase):
             self.tb.connect(self.trigger_src, (self.msc_dec, 1))
             self.tb.connect((self.msc_dec, 0), (self.audio, 0))
             self.tb.connect((self.msc_dec, 1), (self.audio, 1))
+
             self.tb.run ()
             pass
         else:

@@ -33,16 +33,11 @@ class usrp_dab_tx(gr.top_block):
     def __init__(self,  frequency, num_subch, ensemble_label, service_label, language, protections, data_rates_n, src_paths, selected_audio, use_usrp, sink_path = "dab_iq_generated.dat"):
         gr.top_block.__init__(self)
 
-        # set logger level to WARN (no DEBUG logs)
-        log = gr.logger("log")
-        log.set_level("WARN")
-
         self.dab_mode = 1
         self.frequency = frequency
         interp = 64
         self.sample_rate = 128e6 / interp
         self.dp = dab.parameters.dab_parameters(self.dab_mode, 2000000, False)
-
         self.num_subch = num_subch
         self.ensemble_label = ensemble_label
         self.service_label = service_label
@@ -85,8 +80,6 @@ class usrp_dab_tx(gr.top_block):
             # encoder
             self.msc_encoders[i] = dab.msc_encode(self.dp, self.data_rates_n[i], self.protections[i])
 
-        print "msc sources: "
-        print self.msc_sources
         ########################
         # MUX
         ########################

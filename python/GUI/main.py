@@ -4,55 +4,12 @@ from PyQt4 import QtGui
 from PyQt4.QtCore import QThread
 from PyQt4.QtCore import QTimer
 import sys
-import os
 import user_frontend
 import usrp_dab_rx
 import usrp_dab_tx
 import math
 import json
 import sip
-
-#################################
-# TRANSMITTER THREAD
-#################################
-class transmit_thread(QThread):
-    def __init__(self, frequency, num_subch, ensemble_label, service_label, language, protection, data_rate_n,
-                 src_paths, use_usrp, sink_path, selected_audio):
-        QThread.__init__(self)
-
-        self.frequency = frequency
-        self.num_subch = num_subch
-        self.ensemble_label = ensemble_label
-        self.service_label = service_label
-        self.language = language
-        self.protection = protection
-        self.data_rate_n = data_rate_n
-        self.src_paths = src_paths
-        self.use_usrp = use_usrp
-        self.sink_path = sink_path
-        self.selected_audio = selected_audio
-        print "initialized transmitter thread"
-
-    def __del__(self):
-        self.wait()
-
-    def stop_transmitter(self):
-        self.tx.stop()
-        self.tx.wait()
-
-    def run(self):
-        try:
-            self.tx = usrp_dab_tx.usrp_dab_tx(self.frequency, self.num_subch, self.ensemble_label, self.service_label,
-                                              self.language, self.protection, self.data_rate_n, self.src_paths, self.selected_audio,
-                                              self.use_usrp, self.sink_path)
-            print 'transmission flow graph set up'
-            self.tx.start()
-
-        except RuntimeError:
-            print 'flowgraph stopped due to runtime error'
-
-    def set_volume(self, volume):
-        self.tx.set_volume(volume)
 
 class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
     def __init__(self, parent=None):
@@ -65,7 +22,7 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
         self.mode_tabs.currentChanged.connect(self.change_tab)
 
         # lookup table
-        self.table = lookup_table()
+        self.table = lookup_tables()
 
         ######################################################################
         # TAB RECEPTION (defining variables, signals and slots)
@@ -115,9 +72,8 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
         # record button
         self.btn_record.clicked.connect(self.record_audio)
 
-
         ######################################################################
-        # TAB TRANSMISSION
+        # TAB TRANSMISSION (defining variables, signals and slots)
         ######################################################################
         # change of sink by radio buttons
         self.t_rbtn_USRP.clicked.connect(self.t_set_sink_USRP)
@@ -178,12 +134,12 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
         self.t_btn_path_src5.pressed.connect(self.t_set_subch_path5)
         self.t_btn_path_src6.pressed.connect(self.t_set_subch_path6)
         self.t_btn_path_src7.pressed.connect(self.t_set_subch_path7)
-        # select subch for audio player
-        self.t_spin_listen_to_component.valueChanged.connect(self.t_changed_audio_component)
         # set volume if volume slider is changed
         self.t_slider_volume.valueChanged.connect(self.t_set_volume)
 
-
+    ################################
+    # general functions
+    ################################
     def change_tab(self):
         if self.mode_tabs.currentWidget() is self.tab_transmission:
             print "changed to transmission mode"
@@ -223,6 +179,7 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
     def init_receiver(self):
         # set status bar message
         self.statusBar.showMessage("initializing receiver ...")
+        self.btn_update_info.setEnabled(True)
         # stop any processes that access to an instance of usrp_dab_rx
         self.snr_timer.stop()
         # set up and start flowgraph
@@ -332,6 +289,7 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
             self.btn_play.setText("Mute")
             self.btn_stop.setEnabled(True)
             self.slider_volume.setEnabled(True)
+            self.btn_update_info.setEnabled(True)
             self.slider_volume.setValue(self.volume)
             self.set_volume()
             # if selected sub-channel is not the current sub-channel we have to reconfigure the receiver
@@ -361,6 +319,7 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
         self.btn_play.setText("Play")
         self.btn_play.setEnabled(True)
         self.slider_volume.setEnabled(False)
+        self.btn_update_info.setEnabled(False)
         self.btn_record.setEnabled(True)
         self.recorder = False
         # stop snr updates because no flowgraph is running to measure snr
@@ -426,29 +385,40 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
     ################################
 
     def t_set_sink_USRP(self):
+        # enable/disable buttons
         self.t_btn_file_path.setEnabled(False)
         self.t_label_sink.setEnabled(False)
         self.t_spinbox_frequency.setEnabled(True)
         self.t_label_frequency.setEnabled(True)
 
     def t_set_sink_File(self):
+        # enable/disable buttons
         self.t_btn_file_path.setEnabled(True)
         self.t_label_sink.setEnabled(True)
         self.t_spinbox_frequency.setEnabled(False)
         self.t_label_frequency.setEnabled(False)
 
     def t_change_num_subch(self):
+        # get number of sub-channels from spin box
         num_subch = self.t_spin_num_subch.value()
+        # update info text under the component fill in forms
+        if num_subch is 7:
+            self.t_label_increase_num_subch_info.setText("7 is the maximum number of components")
+        else:
+            self.t_label_increase_num_subch_info.setText("increase \"Number of channels\" for more components")
+        # enable num_subch fill in forms for sub-channels
         if 0 <= num_subch <= 7:
             for n in range(0, 7):
                 if n < num_subch:
                     self.components[n]["enabled"] = True
                 else:
                     self.components[n]["enabled"] = False
+        # display changes
         self.t_update_service_components()
         self.t_spin_listen_to_component.setMaximum(num_subch)
 
     def t_update_service_components(self):
+        # display/hide components after the info in components (dict)
         for component in self.components:
             if component["enabled"] is False:
                 component["label"].hide()
@@ -470,7 +440,8 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
                 component["src_btn"].show()
 
     def t_init_transmitter(self):
-        print "init transmitter"
+        self.statusBar.showMessage("initializing transmitter...")
+        # boolean is set to True if info is missing to init the transmitter
         arguments_incomplete = False
         # produce array for protection and data_rate and src_paths
         protection_array = [None] * self.t_spin_num_subch.value()
@@ -487,27 +458,23 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
             else:
                 audio_paths[i] = self.components[i]["src_path"]
 
-        print protection_array
-        print data_rate_n_array
-        print audio_paths
-        print self.t_combo_language.currentIndex()
-
         # check if File path for sink is chosen if option enabled
         if self.t_rbtn_File.isChecked() and (str(self.t_label_sink.text()) == "select path"):
             self.t_label_sink.setStyleSheet('color: red')
             arguments_incomplete = True
 
         if arguments_incomplete is False:
-            self.my_transmitter = transmit_thread(self.t_spinbox_frequency.value(),
+            # init transmitter
+            self.my_transmitter = usrp_dab_tx.usrp_dab_tx(self.t_spinbox_frequency.value(),
                                               self.t_spin_num_subch.value(),
                                               str(self.t_edit_ensemble_label.text()),
                                               str(self.t_edit_service_label.text()),
                                               self.t_combo_language.currentIndex(),
                                               protection_array, data_rate_n_array,
                                               audio_paths,
+                                              self.t_spin_listen_to_component.value(),
                                               self.t_rbtn_USRP.isChecked(),
-                                              str(self.t_label_sink.text())+ "/" +str(self.t_edit_file_name.text()),
-                                              self.t_spin_listen_to_component.value())
+                                              str(self.t_label_sink.text())+ "/" +str(self.t_edit_file_name.text()))
             # enable play button
             self.t_btn_play.setEnabled(True)
             self.t_label_status.setText("ready to transmit")
@@ -516,16 +483,19 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
         self.t_btn_stop.setEnabled(True)
         self.t_slider_volume.setEnabled(True)
         self.t_label_status.setText("transmitting..")
+        self.statusBar.showMessage("transmitting..")
         self.my_transmitter.start()
 
     def t_set_volume(self):
         self.my_transmitter.set_volume(float(self.t_slider_volume.value())/100)
 
     def t_stop_transmitter(self):
-        self.my_transmitter.stop_transmitter()
+        # stop flowgraph
+        self.my_transmitter.stop()
         self.t_btn_stop.setEnabled(False)
         self.t_slider_volume.setEnabled(False)
         self.t_label_status.setText("not running")
+        self.statusBar.showMessage("not running")
 
     def t_set_file_path(self):
         path = QtGui.QFileDialog.getExistingDirectory(self, "Pick a folder for your file sink")
@@ -597,14 +567,8 @@ class DABstep(QtGui.QMainWindow, user_frontend.Ui_MainWindow):
             self.components[6]["src_path_disp"].setText(path)
         self.components[7]["src_path_disp"].setStyleSheet('color: black')
 
-    def t_changed_audio_component(self):
-        if hasattr(self, 'my_transmitter'):
-            print "set audio sink"
 
-
-
-
-class lookup_table:
+class lookup_tables:
     languages = [
         "unknown language",
         "Albanian",

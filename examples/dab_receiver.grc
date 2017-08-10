@@ -195,7 +195,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1072, 401)</value>
+      <value>(928, 401)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -242,7 +242,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1160, 297)</value>
+      <value>(1016, 297)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -285,7 +285,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(744, 188)</value>
+      <value>(672, 188)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -336,7 +336,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(976, 292)</value>
+      <value>(832, 292)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -399,7 +399,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(816, 370)</value>
+      <value>(672, 370)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -458,7 +458,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(784, 281)</value>
+      <value>(640, 281)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -517,7 +517,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(496, 264)</value>
+      <value>(352, 264)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -546,6 +546,57 @@
     <param>
       <key>soft_bits</key>
       <value>soft</value>
+    </param>
+  </block>
+  <block>
+    <key>digital_mpsk_snr_est_cc</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>alpha</key>
+      <value>0.001</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(840, 174)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>digital_mpsk_snr_est_cc_0</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>tag_nsamples</key>
+      <value>10000</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>0</value>
     </param>
   </block>
   <block>
@@ -606,7 +657,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(928, 181)</value>
+      <value>(1056, 181)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -1849,11 +1900,11 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>True</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(248, 271)</value>
+      <value>(104, 271)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2006,7 +2057,7 @@
   </block>
   <connection>
     <source_block_id>blocks_vector_to_stream_0</source_block_id>
-    <sink_block_id>qtgui_const_sink_x_1</sink_block_id>
+    <sink_block_id>digital_mpsk_snr_est_cc_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
@@ -2063,6 +2114,12 @@
     <sink_block_id>dab_fic_decode_0</sink_block_id>
     <source_key>1</source_key>
     <sink_key>1</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>digital_mpsk_snr_est_cc_0</source_block_id>
+    <sink_block_id>qtgui_const_sink_x_1</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
   </connection>
   <connection>
     <source_block_id>uhd_usrp_source_0</source_block_id>

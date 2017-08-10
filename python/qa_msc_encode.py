@@ -81,6 +81,7 @@ class qa_msc_encode(gr_unittest.TestCase):
             self.tb.connect(self.trigger_src, (self.msc_dec, 1))
             self.tb.connect((self.msc_dec, 0), (self.audio, 0))
             self.tb.connect((self.msc_dec, 1), (self.audio, 1))
+
             self.tb.run ()
             pass
         else:
