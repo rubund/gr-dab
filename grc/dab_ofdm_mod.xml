@@ -43,6 +43,7 @@
   <sink>
     <name>dat</name>
     <type>byte</type>
+    <vlen>384</vlen>
   </sink>
   <sink>
     <name>trigger</name>

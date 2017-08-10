@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <block>
-  <name>DAB: MSC encode</name>
+  <name>DAB: MSC encoder</name>
   <key>dab_msc_encode</key>
   <category>DAB</category>
   <import>import dab</import>
@@ -60,7 +60,7 @@
     </option>
   </param>
   <sink>
-    <name>in</name>
+    <name>mp4_audio</name>
     <type>byte</type>
   </sink>
   <source>

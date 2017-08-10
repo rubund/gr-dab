@@ -4,11 +4,28 @@
   <key>dab_dab_transmission_frame_mux_bb</key>
   <category>DAB</category>
   <import>import dab</import>
-  <make>dab.dab_transmission_frame_mux_bb($transmission_mode, $num_subch, $subch_size)</make>
-  <param>
-    <name>Transmission Mode</name>
-    <key>transmission_mode</key>
+  <make>dab.dab_transmission_frame_mux_bb($dab_mode, $num_subch, $subch_size)</make>
+   <param>
+    <name>DAB Mode</name>
+    <key>dab_mode</key>
+    <value>1</value>
     <type>int</type>
+    <option>
+    	<name>Mode 1</name>
+    	<key>1</key>
+    </option>
+    <option>
+    	<name>Mode 2</name>
+    	<key>2</key>
+    </option>
+    <option>
+    	<name>Mode 3</name>
+    	<key>3</key>
+    </option>
+    <option>
+    	<name>Mode 4</name>
+    	<key>4</key>
+    </option>
   </param>
   <param>
     <name>Number of sub-channels</name>
@@ -31,10 +48,6 @@
   </sink>
   <source>
     <name>data</name>
-    <type>byte</type>
-  </source>
-  <source>
-    <name>trigger</name>
     <type>byte</type>
   </source>
 </block>

@@ -21,7 +21,10 @@
 
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
+from gnuradio import audio
+from gnuradio import fft
 import dab
+import os
 
 class qa_dab_transmission_frame_mux_bb (gr_unittest.TestCase):
 
@@ -31,54 +34,61 @@ class qa_dab_transmission_frame_mux_bb (gr_unittest.TestCase):
     def tearDown (self):
         self.tb = None
 
-# manual test with validation of FIBs over fib sink
+# manual loopback test: input = DAB+ superframes (mp4 and Reed-Solomon encoded but not channel encoded), output = PCM audio to sound card
     def test_001_t (self):
-        self.dp = dab.parameters.dab_parameters(1, 208.064e6, True)
+        log = gr.logger("log")
+        if os.path.exists("debug/rs_encoded.dat") and os.path.exists("debug/rs_encoded.dat"):
+            self.dp = dab.parameters.dab_parameters(1, 208.064e6, True)
 
-        # sources
-        data01 = (0x01, 0x01)
-        data02 = (0x02, 0x02)
-        data03 = (0x03, 0x03)
-        self.fib_src = dab.fib_source_b_make(1,1,'Galaxy_News', 'Wasteland_Radio', 'Country_Mix01', 0x09, [0], [8])
-        self.fib_pack = blocks.unpacked_to_packed_bb_make(1, gr.GR_MSB_FIRST)
-        self.subch_src01 = blocks.vector_source_b(data01, True)
-        self.subch_src02 = blocks.vector_source_b(data02, True)
-        self.subch_src03 = blocks.vector_source_b(data03, True)
+            # sources
+            self.fib_src = dab.fib_source_b_make(1, 1, 'Galaxy_News', 'Wasteland_Radio', 'Country_Mix01', 0x09, [2], [14])
+            self.fib_pack = blocks.unpacked_to_packed_bb_make(1, gr.GR_MSB_FIRST)
+            self.subch_src01 = blocks.file_source_make(gr.sizeof_char, "debug/rs_encoded.dat", True)
+            self.subch_src02 = blocks.file_source_make(gr.sizeof_char, "debug/rs_encoded_2.dat", True)
 
-        # encoder
-        self.fib_enc = dab.fic_encode(self.dp)
-        self.msc_encoder = dab.msc_encode(self.dp, 15, 2)
-        self.null = blocks.null_source_make(gr.sizeof_char)
+            # encoder
+            self.fib_enc = dab.fic_encode(self.dp)
+            self.msc_encoder = dab.msc_encode(self.dp, 14, 2)
+            self.msc_encoder2 = dab.msc_encode(self.dp, 14, 2)
 
-        # multiplexer
-        self.mux = dab.dab_transmission_frame_mux_bb_make(1, 3, [90, 90, 90])
+            # multiplexer
+            self.mux = dab.dab_transmission_frame_mux_bb_make(1, 2, [84, 84])
 
-        # mapper
-        self.unpack = blocks.packed_to_unpacked_bb_make(1, gr.GR_MSB_FIRST)
-        self.map = dab.mapper_bc_make(self.dp.num_carriers)
+            # mapper
+            self.unpack = blocks.packed_to_unpacked_bb_make(1, gr.GR_MSB_FIRST)
+            self.map = dab.mapper_bc_make(self.dp.num_carriers)
 
-        # demapper
-        self.s2v = blocks.stream_to_vector_make(gr.sizeof_gr_complex, self.dp.num_carriers)
-        self.soft_interleaver = dab.complex_to_interleaved_float_vcf_make(self.dp.num_carriers)
+            # demapper
+            self.s2v = blocks.stream_to_vector_make(gr.sizeof_gr_complex, self.dp.num_carriers)
+            self.soft_interleaver = dab.complex_to_interleaved_float_vcf_make(self.dp.num_carriers)
 
-        # decode
-        self.fic_decoder = dab.fic_decode(self.dp)
+            # decode
+            self.fic_decoder = dab.fic_decode(self.dp)
+            self.msc_dec = dab.dabplus_audio_decoder_ff(self.dp, 112, 0, 84, 2, True)
 
-        # control stream
-        self.trigger_src = blocks.vector_source_b([1] + [0] * 74, True)
+            # audio sink
+            self.audio = audio.sink_make(32000)
 
-        self.tb.connect(self.fib_src, self.fib_enc, (self.mux, 0))
-        self.tb.connect(self.subch_src01, (self.mux, 1))
-        self.tb.connect(self.subch_src02, self.msc_encoder, (self.mux, 2))
-        self.tb.connect(self.subch_src03, (self.mux, 3))
-        self.tb.connect((self.mux, 0), self.unpack, self.map, self.s2v, self.soft_interleaver, self.fic_decoder)
-        self.tb.connect(self.trigger_src, blocks.head_make(gr.sizeof_char, 75*10), (self.fic_decoder, 1))
-        self.tb.run ()
-        pass
+            # control stream
+            self.trigger_src = blocks.vector_source_b([1] + [0] * 74, True)
 
+            # connect everything
+            self.tb.connect(self.fib_src, self.fib_enc, (self.mux, 0))
+            self.tb.connect(self.subch_src01, self.msc_encoder, (self.mux, 1))
+            self.tb.connect(self.subch_src02, self.msc_encoder2, (self.mux, 2))
+            self.tb.connect((self.mux, 0), self.unpack, self.map, self.s2v, self.soft_interleaver, (self.msc_dec, 0))
+            self.tb.connect(self.soft_interleaver, (self.fic_decoder, 0))
+            self.tb.connect(self.trigger_src, (self.fic_decoder, 1))
+            self.tb.connect(self.trigger_src, (self.msc_dec, 1))
+            self.tb.connect((self.msc_dec, 0), (self.audio, 0))
+            self.tb.connect((self.msc_dec, 1), (self.audio, 1))
 
-
-
+            self.tb.run ()
+            pass
+        else:
+            log.debug("debug file not found - skipped test")
+            log.set_level("WARN")
+            pass
 
 if __name__ == '__main__':
     gr_unittest.run(qa_dab_transmission_frame_mux_bb, "qa_dab_transmission_frame_mux_bb.xml")
