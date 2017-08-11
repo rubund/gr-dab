@@ -105,6 +105,6 @@ class msc_encode(gr.hier_block2):
                      self.v2s_time_interleave,
                      self.unpacked_to_packed_encoded,
                      self)
-
         # connect prbs
         self.connect(self.prbs_src, (self.add_mod_2, 1))
+

@@ -67,17 +67,19 @@ namespace gr {
         default:
           throw std::invalid_argument((boost::format("Transmission mode %d doesn't exist") % transmission_mode).str());
       }
-      if (subch_size.size() != num_subch)
+      if (subch_size.size() != num_subch) {
         GR_LOG_WARN(d_logger, "sizeof vector subch_size does not match with num_subch");
-      d_vlen_out = d_num_fibs * d_fib_len * 3 + d_num_cifs * d_cif_len;
-      d_fic_len = d_num_fibs * d_fib_len * 3; // fic code rate = 3
-      d_subch_total_len = 0;
+      }
+      d_vlen_out = d_num_fibs * d_fib_len + d_num_cifs * d_cif_len;
+      d_fic_len = d_num_fibs * d_fib_len;
+      d_subch_total_size = 0;
       for (int i = 0; i < num_subch; ++i) {
-        d_subch_total_len += subch_size[i];
+        d_subch_total_size += subch_size[i];
       }
-      if (d_subch_total_len * d_cu_len > d_cif_len) {
-        throw std::out_of_range((boost::format("subchannels are %d bytes too long for CIF") % (d_subch_total_len * d_cu_len - d_cif_len)).str());
+      if (d_subch_total_size * d_cu_len > d_cif_len) {
+        throw std::out_of_range((boost::format("subchannels are %d bytes too long for CIF") % (d_subch_total_size * d_cu_len - d_cif_len)).str());
       }
+      GR_LOG_DEBUG(d_logger, boost::format("MUX init with: fic_len = %d, subch_total_size = %d, vlen_out = %d")%d_fic_len %d_subch_total_size %d_vlen_out);
       set_output_multiple(d_vlen_out);
 
 
@@ -132,7 +134,7 @@ namespace gr {
     {
       unsigned char *out = (unsigned char *) output_items[0];
       unsigned char *triggerout = (unsigned char *) output_items[1];
-      const unsigned char *in;
+      //const unsigned char *in;
 
       // create control stream for ofdm with trigger at start of frame and set zero
       /*memset(triggerout, 0, noutput_items);
@@ -141,19 +143,18 @@ namespace gr {
       }*/
 
       // write FIBs
-      in = (const unsigned char *) input_items[0];
+      const unsigned char *in_fic = (const unsigned char *) input_items[0];
       for (int i = 0; i < noutput_items / d_vlen_out; ++i) {
-        memcpy(out + i * d_vlen_out, in + d_fic_len, d_fic_len);
-        in += d_fic_len;
+        memcpy(out + i * d_vlen_out, in_fic, d_fic_len);
+        in_fic += d_fic_len;
       }
       // write sub-channels
       unsigned int cu_index = 0;
       for (int j = 0; j < d_num_subch; ++j) {
-        in = (const unsigned char *) input_items[j + 1];
+        const unsigned char *in_msc = (const unsigned char *) input_items[j + 1];
         for (int i = 0; i < noutput_items / d_vlen_out; ++i) {
           for (int k = 0; k < d_num_cifs; ++k) {
-            memcpy(out + i * d_vlen_out + d_fic_len + k * d_cif_len + cu_index * d_cu_len,
-                   in + (i * d_num_cifs + k) * d_subch_size[j] * d_cu_len, d_subch_size[j] * d_cu_len);
+            memcpy(out + i * d_vlen_out + d_fic_len + k * d_cif_len + cu_index * d_cu_len, in_msc + (i * d_num_cifs + k) * d_subch_size[j] * d_cu_len, d_subch_size[j] * d_cu_len);
             //printf("input %d, item %d, cif %d, in_adress %d, in_val %d, out_adress %d\n", j, i, k, (i*d_num_cifs + k)*d_subch_size[j]*d_cu_len, in[(i*d_num_cifs + k)*d_subch_size[j]*d_cu_len], i*d_vlen_out + d_fic_len + k*d_cif_len + cu_index*d_cu_len);
           }
         }
@@ -161,8 +162,8 @@ namespace gr {
       }
       // fill remaining cus with padding
       for (int i = 0; i < noutput_items / d_vlen_out; ++i) {
-        //memcpy(out + i*d_vlen_out + d_num_fibs*d_fib_len + d_subch_total_len*d_cu_len, d_prbs + d_subch_total_len*d_cu_len*8, (d_vlen_out - d_num_fibs*d_fib_len - d_subch_total_len*d_cu_len)*8);
-        for (int j = d_subch_total_len * d_cu_len; j < d_cif_len; ++j) {
+        //memcpy(out + i*d_vlen_out + d_num_fibs*d_fib_len + d_subch_total_size*d_cu_len, d_prbs + d_subch_total_size*d_cu_len*8, (d_vlen_out - d_num_fibs*d_fib_len - d_subch_total_size*d_cu_len)*8);
+        for (int j = d_subch_total_size * d_cu_len; j < d_cif_len; ++j) {
           for (int k = 0; k < d_num_cifs; ++k) {
             out[i * d_vlen_out + d_fic_len + k * d_cif_len + j] = d_prbs[j];
           }
@@ -173,7 +174,7 @@ namespace gr {
       // each input stream.
       consume(0, noutput_items / d_vlen_out * d_fic_len);
       for (int j = 0; j < d_num_subch; ++j) {
-        consume(j + 1, noutput_items / d_vlen_out * d_subch_size[j] * d_cu_len);
+        consume(j + 1, noutput_items / d_vlen_out * d_subch_size[j] * d_cu_len * d_num_cifs);
       }
 
       // Tell runtime system how many output items we produced.

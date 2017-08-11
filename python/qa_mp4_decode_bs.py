@@ -21,6 +21,7 @@
 
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
+from gnuradio import audio
 import os
 import dab
 
@@ -32,16 +33,17 @@ class qa_mp4_decode_bs (gr_unittest.TestCase):
     def tearDown (self):
         self.tb = None
 
-# manula check, if header info makes sense and if AAC gives errors
+# manual check, if header info makes sense, and if audio is played, input = repaired (= Reed-Solomon decoded) DAB+ audio superframes
     def test_001_t (self):
         if os.path.exists("debug/reed_solomon_repaired.dat"):
-            #self.dab_params = dab.parameters.dab_parameters(1, 208.064e6, True)
             self.src = blocks.file_source_make(gr.sizeof_char, "debug/reed_solomon_repaired.dat")
             self.mp4 = dab.mp4_decode_bs_make(14)
-            self.file_sink_left = blocks.file_sink_make(gr.sizeof_short, "debug/PCM_left.dat")
-            self.file_sink_right = blocks.file_sink_make(gr.sizeof_short, "debug/PCM_right.dat")
-            self.tb.connect(self.src, (self.mp4, 0), self.file_sink_left)
-            self.tb.connect((self.mp4, 1), self.file_sink_right)
+            self.s2f_left = blocks.short_to_float_make(1, 32767)
+            self.s2f_right = blocks.short_to_float_make(1, 32767)
+            self.audio = audio.sink_make(32000)
+
+            self.tb.connect(self.src, (self.mp4, 0), self.s2f_left, (self.audio, 0))
+            self.tb.connect((self.mp4, 1), self.s2f_right, (self.audio, 1))
             self.tb.run()
         else:
             log = gr.logger("log")

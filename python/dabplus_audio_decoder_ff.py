@@ -20,6 +20,7 @@
 # 
 
 from gnuradio import gr, blocks
+from gnuradio import filter
 import dab
 
 class dabplus_audio_decoder_ff(gr.hier_block2):
@@ -81,12 +82,20 @@ class dabplus_audio_decoder_ff(gr.hier_block2):
             # map short samples to the range [-1,1] in floats
             self.s2f_left = blocks.short_to_float_make(1, 32767)
             self.s2f_right = blocks.short_to_float_make(1, 32767)
-
-            self.connect((self.mp4, 0), self.s2f_left, (self, 0))
-            self.connect((self.mp4, 1), self.s2f_right, (self, 1))
+            self.gain_left = blocks.multiply_const_ff(1, 1)
+            self.gain_right = blocks.multiply_const_ff(1, 1)
+            self.resample_left = filter.rational_resampler_base_fff_make(2, self.get_sample_rate()/16000, [1])
+            self.resample_right = filter.rational_resampler_base_fff_make(2, self.get_sample_rate()/16000, [1])
+            self.connect((self.mp4, 0), self.s2f_left, self.gain_left, self.resample_left, (self, 0))
+            self.connect((self.mp4, 1), self.s2f_right, self.gain_right, self.resample_right, (self, 1))
         else:
             # output signed 16 bit integers (directly from decoder)
             self.connect((self.mp4, 0), (self, 0))
             self.connect((self.mp4, 1), (self, 1))
 
+    def set_volume(self, volume):
+        self.gain_left.set_k(volume)
+        self.gain_right.set_k(volume)
 
+    def get_sample_rate(self):
+        return self.mp4.get_sample_rate()

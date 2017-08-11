@@ -65,6 +65,7 @@ namespace gr {
       set_output_multiple(960 * 4); //TODO: right? baudRate*0.12 for output of one superframe
       aacHandle = NeAACDecOpen();
       //memset(d_aac_frame, 0, 960);
+      d_sample_rate = 32000;
     }
 
     /*
@@ -212,6 +213,7 @@ namespace gr {
           (sample_rate != (long unsigned) baudRate)) {
         baudRate = sample_rate;
       }
+      d_sample_rate = sample_rate;
       GR_LOG_DEBUG(d_logger, format("bytes consumed %d") % (int) (hInfo.bytesconsumed));
       GR_LOG_DEBUG(d_logger,
                    format("sample_rate = %d, samples = %d, channels = %d, error = %d, sbr = %d") % sample_rate %

@@ -23,7 +23,7 @@
     </option>
   </param>
   <param>
-    <name>Sample Rate</name>
+    <name>Audio Sample Rate</name>
     <key>samp_rate</key>
     <type>int</type>
   </param>
@@ -42,8 +42,8 @@
   </param>
   <sink>
     <name>PCM</name>
-    <type>raw</type>
-    <nports>channels</nports>
+    <type>short</type>
+    <nports>$channels</nports>
   </sink>
   <source>
     <name>mp4</name>

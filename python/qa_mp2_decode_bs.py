@@ -21,6 +21,7 @@
 
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
+import os
 import dab
 
 class qa_mp2_decode_bs (gr_unittest.TestCase):
@@ -33,14 +34,19 @@ class qa_mp2_decode_bs (gr_unittest.TestCase):
 
 # test will be set up, when mp2 encoder is implemented
     def test_001_t (self):
-        self.src_mp2 = blocks.file_source_make(gr.sizeof_char, "debug/mp2_encoded.dat")
-        self.unpack = blocks.packed_to_unpacked_bb_make(1, gr.GR_MSB_FIRST)
-        self.mp2_decode = dab.mp2_decode_bs_make(14)
-        self.sink_left = blocks.file_sink_make(gr.sizeof_short, "debug/mp2_decoded_left.dat")
-        self.sink_right = blocks.file_sink_make(gr.sizeof_short, "debug/mp2_decoded_right.dat")
-        self.tb.connect(self.src_mp2, self.unpack, (self.mp2_decode, 0), self.sink_left)
-        self.tb.connect((self.mp2_decode, 1), self.sink_right)
-        self.tb.run()
+        if os.path.exists("debug/mp2_encoded.dat"):
+            self.src_mp2 = blocks.file_source_make(gr.sizeof_char, "debug/mp2_encoded.dat")
+            self.unpack = blocks.packed_to_unpacked_bb_make(1, gr.GR_MSB_FIRST)
+            self.mp2_decode = dab.mp2_decode_bs_make(14)
+            self.sink_left = blocks.file_sink_make(gr.sizeof_short, "debug/mp2_decoded_left.dat")
+            self.sink_right = blocks.file_sink_make(gr.sizeof_short, "debug/mp2_decoded_right.dat")
+            self.tb.connect(self.src_mp2, self.unpack, (self.mp2_decode, 0), self.sink_left)
+            self.tb.connect((self.mp2_decode, 1), self.sink_right)
+            self.tb.run()
+        else:
+            log = gr.logger("log")
+            log.debug("debug file not found - skipped test")
+            log.set_level("WARN")
         pass
 
 
