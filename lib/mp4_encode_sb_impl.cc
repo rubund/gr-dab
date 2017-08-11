@@ -132,7 +132,7 @@ namespace gr {
         if (channels == 2 && d_bit_rate_n <= 6) {
           *aot = AOT_DABPLUS_PS;
           GR_LOG_INFO(d_logger, "AOT set to AAC Parametric Stereo");
-        } else if ((channels == 1 && d_bit_rate_n <= 8) || d_bit_rate_n <= 10) {
+        } else if ((channels == 1 && d_bit_rate_n <= 8) || (channels == 2 && d_bit_rate_n <= 10)) {
           *aot = AOT_DABPLUS_SBR;
           GR_LOG_INFO(d_logger, "AOT set to AAC SBR (Spectral Band Replication)");
         } else {
