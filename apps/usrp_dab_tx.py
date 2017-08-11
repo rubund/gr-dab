@@ -47,7 +47,7 @@ class usrp_dab_tx(gr.top_block):
 		self.sample_rate = 128e6/interp
 		self.dab_params = dab.parameters.dab_parameters(mode=1, sample_rate=2000000, verbose=options.verbose)
 
-		self.src = blocks.file_source(gr.sizeof_char, self.filename)
+		self.src = blocks.file_source(gr.sizeof_char, "debug/generated_transmission_frame.dat")
 		self.trigsrc = blocks.vector_source_b([1]+[0]*(self.dab_params.symbols_per_frame-1),True)
 
 		self.s2v = blocks.stream_to_vector(gr.sizeof_char, 384)
@@ -60,12 +60,15 @@ class usrp_dab_tx(gr.top_block):
         	#self.sink.set_mux(usrp.determine_tx_mux_value(self.sink, options.tx_subdev_spec))
         	#self.subdev = usrp.selected_subdev(self.sink, options.tx_subdev_spec)
 		self.sink.set_antenna(options.antenna)
+		self.file_sink = blocks.file_sink_make(gr.sizeof_gr_complex, "debug/generated_iq_data.dat")
 
 		print "--> using sample rate: " + str(self.sample_rate)
 
 
 		self.connect(self.src, self.s2v, self.mod, self.sink)
 		self.connect(self.trigsrc, (self.mod,1))
+		self.connect(self.mod, self.file_sink)
+		self.connect(self.mod, self.sink)
 
 		# tune frequency
 		self.sink.set_center_freq(options.freq)

@@ -59,4 +59,3 @@ namespace gr {
 } // namespace gr
 
 #endif /* INCLUDED_DAB_FIRECODE_CHECK_BB_IMPL_H */
-

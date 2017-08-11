@@ -48,6 +48,12 @@ namespace gr {
        * creating new instances.
        */
       static sptr make();
+
+      virtual std::string get_ensemble_info() = 0;
+      virtual std::string get_service_info() = 0;
+      virtual std::string get_service_labels() = 0;
+      virtual std::string get_subch_info() = 0;
+      virtual std::string get_programme_type() = 0;
     };
 
   } // namespace dab

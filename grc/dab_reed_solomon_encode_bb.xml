@@ -1,6 +1,6 @@
 <block>
-  <name></name>
-  <key>DAB: Reed Solomon Encoder</key>
+  <name>DAB: Reed Solomon Encoder</name>
+  <key>reed_solomon_encode_bb</key>
   <category>DAB</category>
   <import>import dab</import>
   <make>dab.reed_solomon_encode_bb($bit_rate_n)</make>
