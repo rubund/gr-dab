@@ -22,7 +22,7 @@
 ########################################################################
 include(GrPlatform) #define LIB_SUFFIX
 
-include_directories(${Boost_INCLUDE_DIR} ${FDK-AAC_INCLUDE_DIRS} ${LIBTOOLAME-DAB_INCLUDE_DIR})
+include_directories(${Boost_INCLUDE_DIR} ${FDK-AAC-DAB_INCLUDE_DIRS} ${LIBTOOLAME-DAB_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIRS})
 list(APPEND dab_sources
     moving_sum_ff_impl.cc
@@ -93,7 +93,8 @@ list(APPEND dab_sources
     ${LIBTOOLAME-DAB_SOURCE_DIR}/psycho_n1.c
     ${LIBTOOLAME-DAB_SOURCE_DIR}/encode_new.c
     ${LIBTOOLAME-DAB_SOURCE_DIR}/portableio.c
-)
+    valve_ff_impl.cc
+    peak_detector_fb_impl.cc )
 
 
 set(dab_sources "${dab_sources}" PARENT_SCOPE)
@@ -103,7 +104,7 @@ if(NOT dab_sources)
 endif(NOT dab_sources)
 
 add_library(gnuradio-dab SHARED ${dab_sources})
-target_link_libraries(gnuradio-dab ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES} ${GNURADIO_FILTER_LIBRARIES} ${FAAD_LIBRARIES} ${FDK-AAC_LIBRARIES})
+target_link_libraries(gnuradio-dab ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES} ${GNURADIO_FILTER_LIBRARIES} ${FAAD_LIBRARIES} ${FDK-AAC-DAB_LIBRARIES})
 set_target_properties(gnuradio-dab PROPERTIES DEFINE_SYMBOL "gnuradio_dab_EXPORTS")
 
 if(APPLE)

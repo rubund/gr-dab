@@ -50,6 +50,8 @@
 #include "dab/reed_solomon_encode_bb.h"
 #include "dab/mp4_encode_sb.h"
 #include "dab/mp2_encode_sb.h"
+#include "dab/valve_ff.h"
+#include "dab/peak_detector_fb.h"
 %}
 
 
@@ -139,3 +141,8 @@ GR_SWIG_BLOCK_MAGIC2(dab, reed_solomon_encode_bb);
 GR_SWIG_BLOCK_MAGIC2(dab, mp4_encode_sb);
 %include "dab/mp2_encode_sb.h"
 GR_SWIG_BLOCK_MAGIC2(dab, mp2_encode_sb);
+
+%include "dab/valve_ff.h"
+GR_SWIG_BLOCK_MAGIC2(dab, valve_ff);
+%include "dab/peak_detector_fb.h"
+GR_SWIG_BLOCK_MAGIC2(dab, peak_detector_fb);

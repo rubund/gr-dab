@@ -24,7 +24,7 @@
 # andrmuel@ee.ethz.ch
 
 from gnuradio import gr, trellis, blocks
-import dab
+import dab_swig as dab
 from math import sqrt
 
 """
@@ -156,3 +156,6 @@ class fic_decode(gr.hier_block2):
 
     def get_programme_type(self):
         return self.fibsink.get_programme_type()
+
+    def get_crc_passed(self):
+        return self.fibsink.get_crc_passed()

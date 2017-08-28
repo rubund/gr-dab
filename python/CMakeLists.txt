@@ -23,7 +23,19 @@
 include(GrPython)
 if(NOT PYTHONINTERP_FOUND)
     return()
-endif()
+  endif()
+
+
+########################################################################
+# Insert ICON PATH macro Insert ICON PATH macro into constants.py
+########################################################################
+set(GR_PKG_DAB_DATA_DIR ${GR_PKG_DATA_DIR})
+set(GR_DAB_ICON_PATH ${CMAKE_INSTALL_PREFIX}/${GR_PKG_DATA_DIR})
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/constants.py.in
+    ${CMAKE_CURRENT_BINARY_DIR}/constants.py
+    ESCAPE_QUOTES
+    @ONLY)
 
 ########################################################################
 # Install python sources
@@ -41,6 +53,7 @@ GR_PYTHON_INSTALL(
     fic_encode.py
     msc_encode.py
     transmitter_c.py
+    ${CMAKE_CURRENT_BINARY_DIR}/constants.py
     dabplus_audio_decoder_ff.py DESTINATION ${GR_PYTHON_DIR}/dab
 )
 
@@ -72,3 +85,5 @@ GR_ADD_TEST(qa_reed_solomon_decode_bb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURC
 GR_ADD_TEST(qa_reed_solomon_encode_bb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_reed_solomon_encode_bb.py)
 GR_ADD_TEST(qa_mp4_encode_sb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_mp4_encode_sb.py)
 GR_ADD_TEST(qa_mp2_encode_sb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_mp2_encode_sb.py)
+GR_ADD_TEST(qa_valve_ff ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_valve_ff.py)
+GR_ADD_TEST(qa_peak_detector_fb ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_peak_detector_fb.py)
