@@ -22,6 +22,8 @@ Contents
 
 7: Known Bugs
 
+8: Documentation
+
 License
 -------
 Copyright (C) Andreas Müller, 2011, Moritz Luca Schmid, 2017
@@ -124,4 +126,10 @@ Known Bugs
 ----------
 
 * OFDM demodulator gets out of sync sometimes causing burst errors
+
+Documentation
+--------------
+
+You can build the Doxygen documentation of the c++ classes in lib/ with this command:
+    $ doxygen doxygen-config
 
