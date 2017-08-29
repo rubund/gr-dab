@@ -57,7 +57,11 @@ This repository is the result of the 2017 Google Summer of Code project "A DAB/D
 
 For more detailed information about the work done during GSoC, containing changes in code and new code, check out the [commit history](https://github.com/kit-cel/gr-dab/commits/master) of this repository. Weekly reports containing updates about the working progress, additional information, highlights and challenging pieces during GSoC can be found on my [GSoC blog](https://dabtransceiver.wordpress.com/).
 
-Summarizing, all set [milestones](https://dabtransceiver.wordpress.com/milestones/) for GSoC were fulfilled. All my code got merged into the master branch of this repository. This fork wont be merged back into the original repo because massive changes were done during GSoC and I am also planning to rewrite the synchronization of the OFDM reception which is basically the core of the original gr-dab. Besides that, there are many ideas of expanding and improving gr-dab in the future (see Ideas and Constraints below).
+Summarizing, all set
+[milestones](https://dabtransceiver.wordpress.com/milestones/) for GSoC were
+fulfilled. All my code got merged into the master branch of this repository.
+This fork will serve as upstream repository for further development of the OFDM
+receiver (especially with respect to synchronization), and other improvements.
 
 
 Installation
