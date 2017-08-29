@@ -12,9 +12,9 @@ Contents
 
 2: Installation
 
-3: Usage
+3: Features
 
-4: Features
+4: Usage
 
 5: Current Constraints
 
@@ -96,18 +96,22 @@ To build this module, run these commands:
  
 
 
-Usage
------
-
-* Receiving and Transmitting DAB/DAB+ broadcasts with the application "DABstep"
-* Receiving or Transmitting DAB/DAB+ with prepaired GNU Radio Companion flowgraph under examples
-* Receiving or Transmitting DAB/DAB+ by building your own GNU Radio flowgraph with provided gr-dab blocks
-
 Features
 --------
 
-* Transmits DAB+ Audio transmissions, metadata
-* Receives DAB+
+* Receiving and Transmitting DAB/DAB+ broadcasts with the graphical application "DABstep"
+* Receiving or Transmitting DAB/DAB+ with prepaired GNU Radio Companion flowgraph in examples/
+* Receiving or Transmitting DAB/DAB+ by building your own GNU Radio flowgraph with provided gr-dab blocks
+
+Usage
+-------
+
+* GUI
+  * execute "DABstep" over command line
+  * run python/GUI/main.py
+
+* Flowgraphs
+  * run the flowgraphs in examples/ with GNU Radio Companion
 
 Current Constraints
 ---------------------
