@@ -31,6 +31,8 @@ if(NOT CMAKE_BUILD_TYPE)
    message(STATUS "Build type not specified: defaulting to release.")
 endif(NOT CMAKE_BUILD_TYPE)
 set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "")
+SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++11" )
+SET( CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -std=c11" )
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
@@ -41,6 +43,17 @@ if(CMAKE_COMPILER_IS_GNUCXX AND NOT WIN32)
     #http://gcc.gnu.org/wiki/Visibility
     add_definitions(-fvisibility=hidden)
 endif()
+
+########################################################################
+# Find FAAD
+########################################################################
+find_package(Faad REQUIRED)
+if (NOT FAAD_FOUND )
+    message(FATAL_ERROR "please install libfaad")
+else()
+    message(STATUS "FAAD found")
+endif ()
+
 
 ########################################################################
 # Find boost
@@ -91,7 +104,7 @@ find_package(Doxygen)
 # caps such as FILTER or FFT) and change the version to the minimum
 # API compatible version required.
 set(GR_REQUIRED_COMPONENTS RUNTIME FILTER)
-find_package(Gnuradio "3.7.2" REQUIRED)
+find_package(Gnuradio "3.7.1" REQUIRED)
 
 if(NOT CPPUNIT_FOUND)
     message(FATAL_ERROR "CppUnit required to compile dab")
@@ -123,6 +136,7 @@ link_directories(
     ${Boost_LIBRARY_DIRS}
     ${CPPUNIT_LIBRARY_DIRS}
     ${GNURADIO_RUNTIME_LIBRARY_DIRS}
+    ${GNURADIO_FILTER_LIBRARY_DIRS}
 )
 
 # Set component parameters
@@ -148,6 +162,7 @@ add_subdirectory(include/dab)
 add_subdirectory(lib)
 add_subdirectory(swig)
 add_subdirectory(python)
+add_subdirectory(python/GUI)
 add_subdirectory(grc)
 add_subdirectory(apps)
 add_subdirectory(docs)

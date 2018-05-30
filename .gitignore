@@ -26,6 +26,15 @@
 /install-sh
 tags
 cscope.out
-.*.swp
-.*.pyc
+*.swp
+*.pyc
 *~
+build/
+python/debug/
+/lib/cmake-build-debug/
+lib/latex/
+lib/html/
+log_default.conf
+python/.unittests/
+.idea/
+examples/top_block.py

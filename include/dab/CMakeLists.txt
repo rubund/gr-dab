@@ -45,5 +45,23 @@ install(FILES
     ofdm_insert_pilot_vcc.h
     sum_phasor_trig_vcc.h
     ofdm_move_and_insert_zero.h
-    insert_null_symbol.h DESTINATION include/dab
+    insert_null_symbol.h
+    time_interleave_bb.h
+    time_deinterleave_ff.h
+    crc16_bb.h
+    fib_source_b.h
+    select_subch_vfvf.h
+    unpuncture_ff.h
+    prune.h
+    firecode_check_bb.h
+    puncture_bb.h
+    dab_transmission_frame_mux_bb.h
+    conv_encoder_bb.h
+    mapper_bc.h
+    mp2_decode_bs.h
+    mp4_decode_bs.h
+    reed_solomon_decode_bb.h
+    reed_solomon_encode_bb.h
+    valve_ff.h
+    peak_detector_fb.h DESTINATION include/dab
 )

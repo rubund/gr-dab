@@ -32,6 +32,24 @@
 #include "dab/sum_phasor_trig_vcc.h"
 #include "dab/ofdm_move_and_insert_zero.h"
 #include "dab/insert_null_symbol.h"
+#include "dab/time_interleave_bb.h"
+#include "dab/time_deinterleave_ff.h"
+#include "dab/crc16_bb.h"
+#include "dab/fib_source_b.h"
+#include "dab/select_subch_vfvf.h"
+#include "dab/unpuncture_ff.h"
+#include "dab/prune.h"
+#include "dab/firecode_check_bb.h"
+#include "dab/puncture_bb.h"
+#include "dab/dab_transmission_frame_mux_bb.h"
+#include "dab/conv_encoder_bb.h"
+#include "dab/mapper_bc.h"
+#include "dab/mp2_decode_bs.h"
+#include "dab/mp4_decode_bs.h"
+#include "dab/reed_solomon_decode_bb.h"
+#include "dab/reed_solomon_encode_bb.h"
+#include "dab/valve_ff.h"
+#include "dab/peak_detector_fb.h"
 %}
 
 
@@ -83,3 +101,43 @@ GR_SWIG_BLOCK_MAGIC2(dab, sum_phasor_trig_vcc);
 GR_SWIG_BLOCK_MAGIC2(dab, ofdm_move_and_insert_zero);
 %include "dab/insert_null_symbol.h"
 GR_SWIG_BLOCK_MAGIC2(dab, insert_null_symbol);
+%include "dab/time_interleave_bb.h"
+GR_SWIG_BLOCK_MAGIC2(dab, time_interleave_bb);
+%include "dab/time_deinterleave_ff.h"
+GR_SWIG_BLOCK_MAGIC2(dab, time_deinterleave_ff);
+%include "dab/crc16_bb.h"
+GR_SWIG_BLOCK_MAGIC2(dab, crc16_bb);
+%include "dab/fib_source_b.h"
+GR_SWIG_BLOCK_MAGIC2(dab, fib_source_b);
+%include "dab/select_subch_vfvf.h"
+GR_SWIG_BLOCK_MAGIC2(dab, select_subch_vfvf);
+%include "dab/unpuncture_ff.h"
+GR_SWIG_BLOCK_MAGIC2(dab, unpuncture_ff);
+%include "dab/prune.h"
+GR_SWIG_BLOCK_MAGIC2(dab, prune);
+%include "dab/firecode_check_bb.h"
+GR_SWIG_BLOCK_MAGIC2(dab, firecode_check_bb);
+%include "dab/puncture_bb.h"
+GR_SWIG_BLOCK_MAGIC2(dab, puncture_bb);
+%include "dab/dab_transmission_frame_mux_bb.h"
+GR_SWIG_BLOCK_MAGIC2(dab, dab_transmission_frame_mux_bb);
+%include "dab/conv_encoder_bb.h"
+GR_SWIG_BLOCK_MAGIC2(dab, conv_encoder_bb);
+%include "dab/mapper_bc.h"
+GR_SWIG_BLOCK_MAGIC2(dab, mapper_bc);
+
+%include "dab/mp2_decode_bs.h"
+GR_SWIG_BLOCK_MAGIC2(dab, mp2_decode_bs);
+
+%include "dab/mp4_decode_bs.h"
+GR_SWIG_BLOCK_MAGIC2(dab, mp4_decode_bs);
+%include "dab/reed_solomon_decode_bb.h"
+GR_SWIG_BLOCK_MAGIC2(dab, reed_solomon_decode_bb);
+%include "dab/reed_solomon_encode_bb.h"
+GR_SWIG_BLOCK_MAGIC2(dab, reed_solomon_encode_bb);
+
+
+%include "dab/valve_ff.h"
+GR_SWIG_BLOCK_MAGIC2(dab, valve_ff);
+%include "dab/peak_detector_fb.h"
+GR_SWIG_BLOCK_MAGIC2(dab, peak_detector_fb);

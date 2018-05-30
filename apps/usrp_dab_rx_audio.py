@@ -11,6 +11,7 @@ receive DAB with USRP
 """
 
 from gnuradio import gr, uhd, blocks
+from gnuradio import audio
 import dab
 from gnuradio.eng_option import eng_option
 from optparse import OptionParser
@@ -82,6 +83,17 @@ class usrp_dab_rx(gr.top_block):
 		self.fic_dec = dab.fic_decode(self.dab_params)
 		self.connect(self.src, self.demod, (self.fic_dec,0))
 		self.connect((self.demod,1), (self.fic_dec,1))
+
+		# add MSC chain
+		self.dabplus = dab.dabplus_audio_decoder_ff(self.dab_params, 112, 54, 84, 2, True)
+		self.audio = audio.sink_make(32000)
+		self.connect((self.demod, 0), (self.dabplus, 0))
+		self.connect((self.demod, 1), (self.dabplus, 1))
+		# left stereo channel
+		self.connect((self.dabplus, 0), (self.audio, 0))
+		# right stereo channel
+		self.connect((self.dabplus, 1), (self.audio, 1))		
+
 
 		# tune frequency
 		self.frequency = options.freq
