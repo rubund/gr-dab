@@ -72,27 +72,6 @@ list(APPEND dab_sources
     reed_solomon_encode_bb_impl.cc
     mp4_encode_sb_impl.cc
     mp2_encode_sb_impl.cc
-    ${LIBTOOLAME-DAB_SOURCE_DIR}/ath.c
-    ${LIBTOOLAME-DAB_SOURCE_DIR}/crc.c
-    ${LIBTOOLAME-DAB_SOURCE_DIR}/fft.c
-    ${LIBTOOLAME-DAB_SOURCE_DIR}/mem.c
-    ${LIBTOOLAME-DAB_SOURCE_DIR}/utils.c
-    ${LIBTOOLAME-DAB_SOURCE_DIR}/common.c
-    ${LIBTOOLAME-DAB_SOURCE_DIR}/encode.c
-    ${LIBTOOLAME-DAB_SOURCE_DIR}/tables.c
-    ${LIBTOOLAME-DAB_SOURCE_DIR}/subband.c
-    ${LIBTOOLAME-DAB_SOURCE_DIR}/toolame.c
-    ${LIBTOOLAME-DAB_SOURCE_DIR}/psycho_0.c
-    ${LIBTOOLAME-DAB_SOURCE_DIR}/psycho_1.c
-    ${LIBTOOLAME-DAB_SOURCE_DIR}/psycho_2.c
-    ${LIBTOOLAME-DAB_SOURCE_DIR}/psycho_3.c
-    ${LIBTOOLAME-DAB_SOURCE_DIR}/psycho_4.c
-    ${LIBTOOLAME-DAB_SOURCE_DIR}/availbits.c
-    ${LIBTOOLAME-DAB_SOURCE_DIR}/bitstream.c
-    ${LIBTOOLAME-DAB_SOURCE_DIR}/ieeefloat.c
-    ${LIBTOOLAME-DAB_SOURCE_DIR}/psycho_n1.c
-    ${LIBTOOLAME-DAB_SOURCE_DIR}/encode_new.c
-    ${LIBTOOLAME-DAB_SOURCE_DIR}/portableio.c
     valve_ff_impl.cc
     peak_detector_fb_impl.cc )
 
@@ -104,7 +83,7 @@ if(NOT dab_sources)
 endif(NOT dab_sources)
 
 add_library(gnuradio-dab SHARED ${dab_sources})
-target_link_libraries(gnuradio-dab ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES} ${GNURADIO_FILTER_LIBRARIES} ${FAAD_LIBRARIES} ${FDK-AAC-DAB_LIBRARIES})
+target_link_libraries(gnuradio-dab ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES} ${GNURADIO_FILTER_LIBRARIES} ${FAAD_LIBRARIES})
 set_target_properties(gnuradio-dab PROPERTIES DEFINE_SYMBOL "gnuradio_dab_EXPORTS")
 
 if(APPLE)

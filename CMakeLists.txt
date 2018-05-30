@@ -57,31 +57,31 @@ endif ()
 ########################################################################
 # Find FDK-AAC-DAB
 ########################################################################
-find_package(Fdk-aac-dab REQUIRED)
-if (NOT FDK-AAC-DAB_FOUND )
-    message(FATAL_ERROR "please install fdk-aac-dab:
-You'll find it in the eponymous subdirectory; build it using:
-
-    $ cd fdk-aac-dab
-    $ ./bootstrap
-    $ ./configure [--prefix ...] [--other options]
-    $ make
-    $ make install
-
-")
-else()
-    message(STATUS "FDK-AAC-DAB found")
-endif ()
+#find_package(Fdk-aac-dab REQUIRED)
+#if (NOT FDK-AAC-DAB_FOUND )
+#    message(FATAL_ERROR "please install fdk-aac-dab:
+#You'll find it in the eponymous subdirectory; build it using:
+#
+#    $ cd fdk-aac-dab
+#    $ ./bootstrap
+#    $ ./configure [--prefix ...] [--other options]
+#    $ make
+#    $ make install
+#
+#")
+#else()
+#    message(STATUS "FDK-AAC-DAB found")
+#endif ()
 
 ########################################################################
 # Find LIBTOOLAME-DAB
 ########################################################################
-find_package(Libtoolame-dab REQUIRED)
-if (NOT LIBTOOLAME-DAB_FOUND )
-    message(FATAL_ERROR "please make sure the libtoolame-dab source can be found")
-else()
-    message(STATUS "LIBTOOLAME-DAB found: ${LIBTOOLAME-DAB_SOURCE_DIR}")
-endif ()
+#find_package(Libtoolame-dab REQUIRED)
+#if (NOT LIBTOOLAME-DAB_FOUND )
+#    message(FATAL_ERROR "please make sure the libtoolame-dab source can be found")
+#else()
+#    message(STATUS "LIBTOOLAME-DAB found: ${LIBTOOLAME-DAB_SOURCE_DIR}")
+#endif ()
 
 
 ########################################################################
