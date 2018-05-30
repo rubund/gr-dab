@@ -70,8 +70,6 @@ list(APPEND dab_sources
     fec/encode_rs_char.c
     fec/init_rs_char.c
     reed_solomon_encode_bb_impl.cc
-    mp4_encode_sb_impl.cc
-    mp2_encode_sb_impl.cc
     valve_ff_impl.cc
     peak_detector_fb_impl.cc )
 
