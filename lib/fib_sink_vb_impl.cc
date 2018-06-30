@@ -137,7 +137,7 @@ namespace gr {
                   uint8_t protect_level = (uint8_t)((data[4 + subch_counter] & 0x0c) >> 2);
                   uint16_t subch_size = (uint16_t)((data[4 + subch_counter] & 0x03) << 8) |
                                         (uint8_t)(data[5 + subch_counter]);
-                  GR_LOG_INFO(d_logger,
+                  GR_LOG_DEBUG(d_logger,
                                format("subchID = %d , start address = %d, option %d, protect level %d, subch size %d") %
                                (int) subchID % (int) start_address % (int) option % (int) protect_level %
                                (int) subch_size);
@@ -183,7 +183,7 @@ namespace gr {
                   uint8_t subchID = (uint8_t)((data[service_counter + 5 + i * 2] & 0xfc) >> 2);
                   uint8_t ps = (uint8_t)((data[service_counter + 5 + i * 2 + 1] & 0x02) >> 1);
                   if (TMID == 0) {
-                    GR_LOG_INFO(d_logger,
+                    GR_LOG_DEBUG(d_logger,
                                  format("(audio stream, type %d, subchID %d, primary %d)") % (int) comp_type %
                                  (int) subchID % (int) ps);
                     // write service info from specififc subchannel to json
@@ -205,11 +205,11 @@ namespace gr {
                       }
                     }
                   } else if (TMID == 1) {
-                    GR_LOG_INFO(d_logger,
+                    GR_LOG_DEBUG(d_logger,
                                  format("(data stream, type %d, subchID %d, primary %d)") % (int) comp_type %
                                  (int) subchID % (int) ps);
                   } else if (TMID == 2) {
-                    GR_LOG_INFO(d_logger,
+                    GR_LOG_DEBUG(d_logger,
                                  format("(FIDC, type %d, subchID %d, primary %d)") % (int) comp_type % (int) subchID %
                                  (int) ps);
                   } else {
@@ -253,13 +253,13 @@ namespace gr {
               break;
             }
             case FIB_SI_EXTENSION_COUNTRY_LTO:
-              GR_LOG_INFO(d_logger, "country LTO");
+              GR_LOG_DEBUG(d_logger, "country LTO");
               break;
             case FIB_SI_EXTENSION_USER_APPLICATION_INFO:
               GR_LOG_DEBUG(d_logger, "user application info");
               break;
             case FIB_MCI_EXTENSION_SUBCHANNEL_PACKET_MODE_FEC:
-              GR_LOG_INFO(d_logger, "subchannel orga packet mode fec");
+              GR_LOG_DEBUG(d_logger, "subchannel orga packet mode fec");
               break;
             case FIB_SI_EXTENSION_PROGRAMME_NUMBER:
               GR_LOG_DEBUG(d_logger, "programme number");
