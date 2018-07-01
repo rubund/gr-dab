@@ -32,6 +32,7 @@ class diff_phasor_vcc_impl : public diff_phasor_vcc
   private:
 
     unsigned int d_length;
+    int d_add_item_tag_at;
 
   public:
     diff_phasor_vcc_impl(unsigned int length);

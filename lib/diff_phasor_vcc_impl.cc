@@ -50,6 +50,8 @@ diff_phasor_vcc_impl::diff_phasor_vcc_impl(unsigned int length)
   d_length(length)
 {
   set_history(2);
+  set_tag_propagation_policy(TPP_DONT);
+  d_add_item_tag_at = -1;
 }
 
 
@@ -61,7 +63,51 @@ diff_phasor_vcc_impl::work(int noutput_items,
   gr_complex const *in = (const gr_complex *) input_items[0];
   gr_complex *out = (gr_complex *) output_items[0];
 
+  std::vector<int> tag_positions;
+  int next_tag_position = -1;
+  int next_tag_position_index = -1;
+
+  if (d_add_item_tag_at >= 0) {
+      if (d_add_item_tag_at < noutput_items) {
+          add_item_tag(0, nitems_written(0) + d_add_item_tag_at, pmt::intern("first"), pmt::intern(""), pmt::intern("diff_phasor"));
+          d_add_item_tag_at = -1;
+      }
+      else {
+          d_add_item_tag_at = d_add_item_tag_at - noutput_items;
+      }
+  }
+
+  std::vector<tag_t> tags;
+  get_tags_in_range(tags, 0, nitems_read(0), nitems_read(0) + noutput_items, pmt::mp("first"));
+  for(int i=0;i<tags.size();i++) {
+      int current;
+      current = tags[i].offset - nitems_read(0);
+      tag_positions.push_back(current);
+      next_tag_position_index = 0;
+  }
+  if(next_tag_position_index >= 0) {
+      next_tag_position = tag_positions[next_tag_position_index];
+  }
+
   for(unsigned int i = 0; i < noutput_items*d_length; i++){
+
+    if (next_tag_position == i) { /* there was a trigger signal d_num_symbols-1 symbols before -> update equalizer */
+      if ((i + 2-1) < noutput_items)
+          add_item_tag(0, nitems_written(0) + i+2-1, pmt::intern("first"), pmt::intern(""), pmt::intern("diff_phasor"));
+      else {
+          d_add_item_tag_at = (i + 2-1) - noutput_items;
+      }
+
+      next_tag_position_index++;
+      if (next_tag_position_index == tag_positions.size()) {
+        next_tag_position_index = -1;
+        next_tag_position = -1;
+      }
+      else {
+        next_tag_position = tag_positions[next_tag_position_index];
+      }
+    }
+
     out[i] = in[i+d_length] * conj(in[i]);
   }
     
