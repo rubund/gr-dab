@@ -97,6 +97,7 @@ select_vectors_impl::general_work (int noutput_items,
 
     if (next_tag_position == n_consumed) { /* new frame starts */
       d_index=0;
+        printf("Seen tag in select_vector\n");
 
       next_tag_position_index++;
       if (next_tag_position_index == tag_positions.size()) {

@@ -95,6 +95,7 @@ repartition_vectors_impl::general_work (int noutput_items,
   while (d_synced==0 && ninput_items[0]>n_consumed && ninput_items[1]>n_consumed) {
     if (next_tag_position == n_consumed) {
       d_synced=1;
+      printf("Seen tag in repartition_vector\n");
 
       next_tag_position_index++;
       if (next_tag_position_index == tag_positions.size()) {
