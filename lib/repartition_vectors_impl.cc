@@ -123,7 +123,7 @@ repartition_vectors_impl::general_work (int noutput_items,
     }
 
     if (next_tag_position == n_consumed) {
-      add_item_tag(0, nitems_written(0) + n_produced, pmt::intern("first"), pmt::intern(""), pmt::intern("ofdm_sampler"));
+      add_item_tag(0, nitems_written(0) + n_produced, pmt::intern("first"), pmt::intern(""), pmt::intern("repartition_vector"));
 
       next_tag_position_index++;
       if (next_tag_position_index == tag_positions.size()) {
