@@ -402,7 +402,7 @@
     </param>
     <param>
       <key>delay</key>
-      <value>2552*8</value>
+      <value>2492*8</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -457,7 +457,7 @@
     </param>
     <param>
       <key>delay</key>
-      <value>2552*8</value>
+      <value>2492*8</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -465,7 +465,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(56, 892)</value>
+      <value>(32, 892)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1022,7 +1022,7 @@
     </param>
     <param>
       <key>length</key>
-      <value>2656</value>
+      <value>2594</value>
     </param>
   </block>
   <block>
@@ -1233,7 +1233,7 @@
     </param>
     <param>
       <key>fft_length</key>
-      <value>2048</value>
+      <value>2000</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -1265,7 +1265,7 @@
     </param>
     <param>
       <key>symbol_length</key>
-      <value>2552</value>
+      <value>2492</value>
     </param>
     <param>
       <key>alpha</key>
