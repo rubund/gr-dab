@@ -55,7 +55,7 @@ magnitude_equalizer_vcc_impl::magnitude_equalizer_vcc_impl(unsigned int vlen, un
     d_equalizer[i] = 1;
 
   set_history(d_num_symbols);
-  set_tag_propagation_policy(TPP_ONE_TO_ONE);
+  set_tag_propagation_policy(TPP_DONT);
 }
 
 magnitude_equalizer_vcc_impl::~magnitude_equalizer_vcc_impl(void)
@@ -114,6 +114,7 @@ magnitude_equalizer_vcc_impl::work(int noutput_items,
 
     if (next_tag_position == i) { /* there was a trigger signal d_num_symbols-1 symbols before -> update equalizer */
       update_equalizer(in);
+      add_item_tag(0, nitems_written(0) + i+d_num_symbols-1, pmt::intern("first"), pmt::intern(""), pmt::intern("magnitude_equalizer"));
 
       next_tag_position_index++;
       if (next_tag_position_index == tag_positions.size()) {
