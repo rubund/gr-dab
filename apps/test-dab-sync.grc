@@ -809,6 +809,14 @@
       <value>0</value>
     </param>
     <param>
+      <key>going_high_tag</key>
+      <value>"going_high"</value>
+    </param>
+    <param>
+      <key>going_low_tag</key>
+      <value>"going_low"</value>
+    </param>
+    <param>
       <key>id</key>
       <value>capture_tools_threshold_tag_other_stream_cc_0</value>
     </param>
@@ -828,6 +836,10 @@
       <key>low_thresh</key>
       <value>0.5</value>
     </param>
+    <param>
+      <key>vlen</key>
+      <value>1</value>
+    </param>
   </block>
   <block>
     <key>capture_tools_xrun_monitor_ff</key>
@@ -845,7 +857,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>2</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -884,7 +896,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>2</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
