@@ -56,6 +56,7 @@ magnitude_equalizer_vcc_impl::magnitude_equalizer_vcc_impl(unsigned int vlen, un
 
   set_history(d_num_symbols);
   set_tag_propagation_policy(TPP_DONT);
+  d_add_item_tag_at = -1;
 }
 
 magnitude_equalizer_vcc_impl::~magnitude_equalizer_vcc_impl(void)
@@ -98,6 +99,16 @@ magnitude_equalizer_vcc_impl::work(int noutput_items,
   int next_tag_position = -1;
   int next_tag_position_index = -1;
 
+  if (d_add_item_tag_at >= 0) {
+      if (d_add_item_tag_at < noutput_items) {
+          add_item_tag(0, nitems_written(0) + d_add_item_tag_at, pmt::intern("first"), pmt::intern(""), pmt::intern("magnitude_equalizer"));
+          d_add_item_tag_at = -1;
+      }
+      else {
+          d_add_item_tag_at = d_add_item_tag_at - noutput_items;
+      }
+  }
+
   std::vector<tag_t> tags;
   get_tags_in_range(tags, 0, nitems_read(0), nitems_read(0) + noutput_items, pmt::mp("first"));
   for(int i=0;i<tags.size();i++) {
@@ -114,7 +125,11 @@ magnitude_equalizer_vcc_impl::work(int noutput_items,
 
     if (next_tag_position == i) { /* there was a trigger signal d_num_symbols-1 symbols before -> update equalizer */
       update_equalizer(in);
-      add_item_tag(0, nitems_written(0) + i+d_num_symbols-1, pmt::intern("first"), pmt::intern(""), pmt::intern("magnitude_equalizer"));
+      if ((i + d_num_symbols-1) < noutput_items)
+          add_item_tag(0, nitems_written(0) + i+d_num_symbols-1, pmt::intern("first"), pmt::intern(""), pmt::intern("magnitude_equalizer"));
+      else {
+          d_add_item_tag_at = (i + d_num_symbols -1) - noutput_items;
+      }
 
       next_tag_position_index++;
       if (next_tag_position_index == tag_positions.size()) {
