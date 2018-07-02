@@ -125,7 +125,7 @@ ofdm_sampler_impl::general_work (int noutput_items,
 
         index++;
       }
-      if (trigger_now) 
+      if (trigger_now)
         d_state = STATE_CP;
       else
         break;
