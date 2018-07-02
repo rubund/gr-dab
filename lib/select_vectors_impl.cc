@@ -80,6 +80,8 @@ select_vectors_impl::general_work (int noutput_items,
   int next_tag_position = -1;
   int next_tag_position_index = -1;
 
+  // Get all stream tags with key "dab_sync", and make a vector of the positions.
+  // "next_tag_position" contains the position within "iptr where the next "dab_sync" stream tag is found
   std::vector<tag_t> tags;
   get_tags_in_range(tags, 0, nitems_read(0), nitems_read(0) + ninput_items[0], pmt::mp("first"));
   for(int i=0;i<tags.size();i++) {
@@ -91,12 +93,15 @@ select_vectors_impl::general_work (int noutput_items,
   if(next_tag_position_index >= 0) {
       next_tag_position = tag_positions[next_tag_position_index];
   }
+  //
 
 
   while (n_consumed < ninput_items[0] && n_consumed < ninput_items[1] && n_produced < noutput_items) {
 
     if (next_tag_position == n_consumed) { /* new frame starts */
+      // Action when stream tags is found:
       d_index=0;
+      //
 
       next_tag_position_index++;
       if (next_tag_position_index == tag_positions.size()) {
@@ -111,7 +116,7 @@ select_vectors_impl::general_work (int noutput_items,
     /* select this vector? */
     if (d_index >= d_num_skip && d_index < d_num_select + d_num_skip) {
       /* trigger signal */
-      if (d_index == d_num_skip)
+      if (d_index == d_num_skip) // Add stream tag to the output for the first symbol after 'd_num_skip'
         add_item_tag(0, nitems_written(0) + n_produced, pmt::intern("first"), pmt::intern(""), pmt::intern("select_vectors"));
       /* data */
       memcpy(optr, iptr, d_length*d_itemsize);

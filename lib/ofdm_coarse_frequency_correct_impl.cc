@@ -122,6 +122,7 @@ ofdm_coarse_frequency_correct_impl::work(int noutput_items,
   
   gr_complex *optr = (gr_complex *) output_items[0];
 
+  // This block is only handling one item at a time, so we only need to check one:
   std::vector<tag_t> tags;
   get_tags_in_range(tags, 0, nitems_read(0), nitems_read(0) + 1, pmt::mp("first"));
   bool tag_now = false;
@@ -131,7 +132,7 @@ ofdm_coarse_frequency_correct_impl::work(int noutput_items,
       if (current == 0) tag_now = true;
   }
 
-  if (tag_now) {
+  if (tag_now) { // Stream tag was found
     correlate_energy(iptr);
     d_delta_f = d_freq_offset+d_num_carriers/2-d_fft_length/2;
     // fprintf(stderr, "cfs: coarse freq. offset (subcarriers): %d\n", d_delta_f);

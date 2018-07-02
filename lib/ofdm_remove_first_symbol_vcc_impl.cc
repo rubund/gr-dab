@@ -79,6 +79,8 @@ ofdm_remove_first_symbol_vcc_impl::general_work (int noutput_items,
   int next_tag_position = -1;
   int next_tag_position_index = -1;
 
+  // Get all stream tags with key "first", and make a vector of the positions.
+  // "next_tag_position" contains the position within "iptr where the next "dab_sync" stream tag is found
   std::vector<tag_t> tags;
   get_tags_in_range(tags, 0, nitems_read(0), nitems_read(0) + ninput_items[0], pmt::mp("first"));
   for(int i=0;i<tags.size();i++) {
@@ -103,8 +105,10 @@ ofdm_remove_first_symbol_vcc_impl::general_work (int noutput_items,
         next_tag_position = tag_positions[next_tag_position_index];
       }
 
+      // Action when stream tags is found:
       d_start = 1;
       iptr += d_vlen;
+      //
     } else {
       if (d_start == 1)
           add_item_tag(0, nitems_written(0) + n_produced, pmt::intern("first"), pmt::intern(""), pmt::intern("ofdm_remove_first_symbol_vcc"));

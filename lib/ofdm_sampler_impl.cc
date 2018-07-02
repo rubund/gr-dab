@@ -81,6 +81,8 @@ ofdm_sampler_impl::general_work (int noutput_items,
   int next_tag_position = -1;
   int next_tag_position_index = -1;
 
+  // Get all stream tags with key "dab_sync", and make a vector of the positions.
+  // "next_tag_position" contains the position within "iptr where the next "dab_sync" stream tag is found
   std::vector<tag_t> tags;
   get_tags_in_range(tags, 0, nitems_read(0), nitems_read(0) + ninput_items[0], pmt::mp("dab_sync"));
   for(int i=0;i<tags.size();i++) {
@@ -115,8 +117,10 @@ ofdm_sampler_impl::general_work (int noutput_items,
           else {
             next_tag_position = tag_positions[next_tag_position_index];
           }
+          // Action when stream tags is found:
           trigger_now = true;
           break;
+          //
         }
 
         index++;
@@ -146,7 +150,7 @@ ofdm_sampler_impl::general_work (int noutput_items,
         index += d_fft_length;
         d_pos = 0;
         /* first symbol in frame? */
-        if (d_sym_nr==1)
+        if (d_sym_nr==1) // A stream tag called "first" is added for the first symbol in frame:
           add_item_tag(0, nitems_written(0) + out, pmt::intern("first"), pmt::intern(""), pmt::intern("ofdm_sampler"));
         out++;
         /* last symbol in frame? */
