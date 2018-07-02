@@ -89,7 +89,7 @@ ofdm_ffe_all_in_one_impl::work(int noutput_items,
   int next_tag_position_index = -1;
 
   std::vector<tag_t> tags;
-  get_tags_in_range(tags, 0, nitems_read(0), nitems_read(0) + noutput_items, pmt::mp("going_high"));
+  get_tags_in_range(tags, 0, nitems_read(0), nitems_read(0) + noutput_items, pmt::mp("dab_sync"));
   for(int i=0;i<tags.size();i++) {
       int current;
       current = tags[i].offset - nitems_read(0);
