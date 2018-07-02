@@ -122,13 +122,10 @@ class usrp_dab_rx(gr.top_block):
         self.connect(self.src, self.fft_plot)
         self.connect(self.src, self.waterfall_plot)
         self.connect(self.src, self.demod, (self.fic_dec, 0))
-        self.connect((self.demod, 1), (self.fic_dec, 1))
         if self.dabplus:
             self.connect((self.demod, 0), (self.dabplus, 0))
-            self.connect((self.demod, 1), (self.dabplus, 1))
         else:
             self.connect((self.demod, 0), (self.msc_dec, 0), self.unpack, self.mp2_dec)
-            self.connect((self.demod, 1), (self.msc_dec, 1))
             self.connect((self.mp2_dec, 0), self.s2f_left, self.gain_left)
             self.connect((self.mp2_dec, 1), self.s2f_right, self.gain_right)
         self.connect((self.demod, 0), self.v2s_snr, self.snr_measurement, self.constellation_plot)
