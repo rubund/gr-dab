@@ -13,8 +13,8 @@
   <param>
     <name>vlen</name>
     <key>vlen</key>
-    <type>int</type>
     <value>1</value>
+    <type>int</type>
   </param>
 
   <param>
