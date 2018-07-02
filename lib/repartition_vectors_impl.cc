@@ -50,6 +50,7 @@ repartition_vectors_impl::repartition_vectors_impl(size_t itemsize, unsigned int
 {
   assert(vlen_in * multiply == vlen_out * divide);
   set_output_multiple(divide);
+  set_tag_propagation_policy(TPP_DONT);
 }
 
 void 
