@@ -65,8 +65,7 @@ class ofdm_sync_dab2(gr.hier_block2):
 		self.ns_detect = dab.detect_null(dp.ns_length, debug)
 		self.connect(self.input, self.ns_detect)
 
-		self.to_float = blocks.char_to_float(1, 1.0/256)
-		self.add_stream_tag = capture_tools.threshold_tag_other_stream_cc(0.4, 0.6, 1)
+		self.add_stream_tag = dab.control_stream_to_tag_cc("dab_sync")
 		#
 		# fine frequency synchronisation
 		#
@@ -86,8 +85,7 @@ class ofdm_sync_dab2(gr.hier_block2):
 			self.ffs_mixer = blocks.multiply_cc()
 
 		# calculate fine frequency error
-		self.connect(self.ns_detect, self.to_float)
-		self.conenct(self.to_float, (self.add_stream_tag, 1))
+		self.conenct(self.ns_detect, (self.add_stream_tag, 1))
 		self.connect(self.input, (self.add_stream_tag, 0))
 		self.connect(self.add_stream_tag, self.ffe)
 
