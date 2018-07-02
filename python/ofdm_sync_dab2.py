@@ -85,7 +85,7 @@ class ofdm_sync_dab2(gr.hier_block2):
 			self.ffs_mixer = blocks.multiply_cc()
 
 		# calculate fine frequency error
-		self.conenct(self.ns_detect, (self.add_stream_tag, 1))
+		self.connect(self.ns_detect, (self.add_stream_tag, 1))
 		self.connect(self.input, (self.add_stream_tag, 0))
 		self.connect(self.add_stream_tag, self.ffe)
 
