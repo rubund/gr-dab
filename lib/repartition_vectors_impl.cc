@@ -80,6 +80,8 @@ repartition_vectors_impl::general_work (int noutput_items,
   int next_tag_position = -1;
   int next_tag_position_index = -1;
 
+  // Get all stream tags with key "first", and make a vector of the positions.
+  // "next_tag_position" contains the position within "iptr where the next "dab_sync" stream tag is found
   std::vector<tag_t> tags;
   get_tags_in_range(tags, 0, nitems_read(0), nitems_read(0) + ninput_items[0], pmt::mp("first"));
   for(int i=0;i<tags.size();i++) {
@@ -91,11 +93,14 @@ repartition_vectors_impl::general_work (int noutput_items,
   if(next_tag_position_index >= 0) {
       next_tag_position = tag_positions[next_tag_position_index];
   }
+  //
 
 
   while (d_synced==0 && ninput_items[0]>n_consumed && ninput_items[1]>n_consumed) {
     if (next_tag_position == n_consumed) {
+      // Action when stream tags is found:
       d_synced=1;
+      //
 
       next_tag_position_index++;
       if (next_tag_position_index == tag_positions.size()) {
@@ -116,7 +121,7 @@ repartition_vectors_impl::general_work (int noutput_items,
 
     /* complete new block or is there already a next trigger? */
     for (unsigned int i=1; i<d_multiply; i++) {
-      if (next_tag_position == n_consumed+i) {
+      if (next_tag_position == n_consumed+i) { // If stream tag is fund here, then return so that a new call to work is made.
         n_consumed += i;
         consume_each(n_consumed);
         return n_produced;

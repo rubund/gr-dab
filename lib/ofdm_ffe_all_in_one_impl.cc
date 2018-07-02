@@ -88,6 +88,8 @@ ofdm_ffe_all_in_one_impl::work(int noutput_items,
   int next_tag_position = -1;
   int next_tag_position_index = -1;
 
+  // Get all stream tags with key "dab_sync", and make a vector of the positions.
+  // "next_tag_position" contains the position within "iptr where the next "dab_sync" stream tag is found
   std::vector<tag_t> tags;
   get_tags_in_range(tags, 0, nitems_read(0), nitems_read(0) + noutput_items, pmt::mp("dab_sync"));
   for(int i=0;i<tags.size();i++) {
@@ -103,9 +105,11 @@ ofdm_ffe_all_in_one_impl::work(int noutput_items,
 
   for (int i=0; i<noutput_items; i++) {
     if (next_tag_position == i) { /* new frame starts */
+      // Action when stream tags is found:
       d_cur_symbol = 0;
       d_cur_sample = 0;
       d_ffs_error_sum = 0;
+      //
 
       next_tag_position_index++;
       if (next_tag_position_index == tag_positions.size()) {
