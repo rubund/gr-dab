@@ -73,10 +73,8 @@ ofdm_sampler_impl::general_work (int noutput_items,
 {
   /* partially adapted from gr_ofdm_sampler.cc */
   const gr_complex *iptr = (const gr_complex *) input_items[0];
-  //const char *trigger = (const char *) input_items[1];
   
   gr_complex *optr = (gr_complex *) output_items[0];
-  //char *outsig = (char *) output_items[1];
 
 
   std::vector<int> tag_positions;
