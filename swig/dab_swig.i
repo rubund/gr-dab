@@ -50,6 +50,7 @@
 #include "dab/reed_solomon_encode_bb.h"
 #include "dab/valve_ff.h"
 #include "dab/peak_detector_fb.h"
+#include "dab/control_stream_to_tag_cc.h"
 %}
 
 
@@ -141,3 +142,5 @@ GR_SWIG_BLOCK_MAGIC2(dab, reed_solomon_encode_bb);
 GR_SWIG_BLOCK_MAGIC2(dab, valve_ff);
 %include "dab/peak_detector_fb.h"
 GR_SWIG_BLOCK_MAGIC2(dab, peak_detector_fb);
+%include "dab/control_stream_to_tag_cc.h"
+GR_SWIG_BLOCK_MAGIC2(dab, control_stream_to_tag_cc);
