@@ -1,5 +1,5 @@
 <block>
-  <name>Frequency interleaver DAB</name>
+  <name>Frequency interleaver</name>
   <key>dab_frequency_interleaver_vcc</key>
   <category>[DAB]</category>
   <import>import dab</import>
