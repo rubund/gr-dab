@@ -45,7 +45,6 @@ install(FILES
     sum_phasor_trig_vcc.h
     ofdm_move_and_insert_zero.h
     insert_null_symbol.h
-    time_interleave_bb.h
     time_deinterleave_ff.h
     crc16_bb.h
     select_subch_vfvf.h
