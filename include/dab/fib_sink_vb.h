@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /* 
- * Copyright 2017Moritz Luca Schmid, Communications Engineering Lab (CEL) / Karlsruhe Institute of Technology (KIT).
+ * Copyright 2015 <+YOU OR YOUR COMPANY+>.
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
  */
 
 
-#ifndef INCLUDED_DAB_FIB_SOURCE_B_H
-#define INCLUDED_DAB_FIB_SOURCE_B_H
+#ifndef INCLUDED_DAB_FIB_SINK_VB_H
+#define INCLUDED_DAB_FIB_SINK_VB_H
 
 #include <dab/api.h>
 #include <gnuradio/sync_block.h>
@@ -28,26 +28,29 @@
 namespace gr {
   namespace dab {
 
-    /*! \brief source that produces Fast Information Blocks (FIBs) according to the DAB standard
+    /*!
+     * \brief <+description of block+>
+     * \ingroup dab
+     *
      */
-    class DAB_API fib_source_b : virtual public gr::sync_block
+    class DAB_API fib_sink_vb : virtual public gr::sync_block
     {
      public:
-      typedef boost::shared_ptr<fib_source_b> sptr;
+      typedef boost::shared_ptr<fib_sink_vb> sptr;
 
       /*!
-       * \brief Return a shared_ptr to a new instance of dab::fib_source_b.
+       * \brief Return a shared_ptr to a new instance of dab::fib_sink_vb.
        *
-       * To avoid accidental use of raw pointers, dab::fib_source_b's
+       * To avoid accidental use of raw pointers, dab::fib_sink_vb's
        * constructor is in a private implementation
-       * class. dab::fib_source_b::make is the public interface for
+       * class. dab::fib_sink_vb::make is the public interface for
        * creating new instances.
        */
-      static sptr make(int transmission_mode, int coutry_ID, int num_subch, std::string ensemble_label, std::string programme_service_labels, std::string service_comp_label, uint8_t service_comp_lang, const std::vector<uint8_t> &protection_mode, const std::vector<uint8_t> &data_rate_n, const std::vector<uint8_t> &dabplus);
+      static sptr make();
     };
 
   } // namespace dab
 } // namespace gr
 
-#endif /* INCLUDED_DAB_FIB_SOURCE_B_H */
+#endif /* INCLUDED_DAB_FIB_SINK_VB_H */
 

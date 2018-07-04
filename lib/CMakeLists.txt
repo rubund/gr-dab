@@ -39,6 +39,7 @@ list(APPEND dab_sources
     repartition_vectors_impl.cc
     unpuncture_vff_impl.cc
     prune_vectors_impl.cc
+    fib_sink_vb_impl.cc
     crc16.cc
     estimate_sample_rate_bf_impl.cc
     fractional_interpolator_triggered_update_cc_impl.cc

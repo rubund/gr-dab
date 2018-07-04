@@ -35,6 +35,7 @@ install(FILES
     select_vectors.h
     repartition_vectors.h
     unpuncture_vff.h
+    fib_sink_vb.h
     prune_vectors.h
     estimate_sample_rate_bf.h
     fractional_interpolator_triggered_update_cc.h
@@ -47,7 +48,6 @@ install(FILES
     time_interleave_bb.h
     time_deinterleave_ff.h
     crc16_bb.h
-    fib_source_b.h
     select_subch_vfvf.h
     unpuncture_ff.h
     prune.h
