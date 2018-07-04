@@ -39,7 +39,6 @@ list(APPEND dab_sources
     repartition_vectors_impl.cc
     unpuncture_vff_impl.cc
     prune_vectors_impl.cc
-    fib_sink_vb_impl.cc
     crc16.cc
     estimate_sample_rate_bf_impl.cc
     fractional_interpolator_triggered_update_cc_impl.cc
@@ -49,7 +48,6 @@ list(APPEND dab_sources
     sum_phasor_trig_vcc_impl.cc
     ofdm_move_and_insert_zero_impl.cc
     insert_null_symbol_impl.cc
-    time_interleave_bb_impl.cc
     time_deinterleave_ff_impl.cc
     crc16_bb_impl.cc
     select_subch_vfvf_impl.cc
