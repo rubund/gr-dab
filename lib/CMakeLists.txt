@@ -61,7 +61,6 @@ list(APPEND dab_sources
     mp4_decode_bs_impl.cc
     reed_solomon_decode_bb_impl.cc
     fec/decode_rs_char.c
-    fec/encode_rs_char.c
     fec/init_rs_char.c
     valve_ff_impl.cc
     peak_detector_fb_impl.cc )
