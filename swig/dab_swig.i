@@ -22,6 +22,7 @@
 #include "dab/repartition_vectors.h"
 #include "dab/unpuncture_vff.h"
 #include "dab/prune_vectors.h"
+#include "dab/fib_sink_vb.h"
 #include "dab/estimate_sample_rate_bf.h"
 #include "dab/fractional_interpolator_triggered_update_cc.h"
 #include "dab/magnitude_equalizer_vcc.h"
@@ -75,6 +76,8 @@ GR_SWIG_BLOCK_MAGIC2(dab, repartition_vectors);
 GR_SWIG_BLOCK_MAGIC2(dab, unpuncture_vff);
 %include "dab/prune_vectors.h"
 GR_SWIG_BLOCK_MAGIC2(dab, prune_vectors);
+%include "dab/fib_sink_vb.h"
+GR_SWIG_BLOCK_MAGIC2(dab, fib_sink_vb);
 %include "dab/estimate_sample_rate_bf.h"
 GR_SWIG_BLOCK_MAGIC2(dab, estimate_sample_rate_bf);
 %include "dab/fractional_interpolator_triggered_update_cc.h"
