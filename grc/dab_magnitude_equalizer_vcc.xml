@@ -6,34 +6,23 @@
   <import>import dab</import>
   <make>dab.magnitude_equalizer_vcc($vlen, $num_symbols)</make>
   <param>
-    <name>Length</name>
+    <name>Number of carriers</name>
     <key>vlen</key>
     <type>int</type>
   </param>
   <param>
-    <name>Number of carriers</name>
-    <key>num_carriers</key>
-    <type>int</type>
-  </param>
-  <param>
     <name>Symbols</name>
-    <key>symbols_for_magnitude_equalization</key>
+    <key>num_symbols</key>
     <type>int</type>
   </param>
   <sink>
     <name>in</name>
     <type>complex</type>
-  </sink>
-  <sink>
-    <name>trigger_in</name>
-    <type>byte</type>
+    <vlen>$vlen</vlen>
   </sink>
   <source>
     <name>out</name>
     <type>complex</type>
-  </source>
-  <source>
-    <name>trigger out</name>
-    <type>byte</type>
+    <vlen>$vlen</vlen>
   </source>
 </block>
