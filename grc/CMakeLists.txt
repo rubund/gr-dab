@@ -51,23 +51,15 @@ install(FILES
     dab_time_deinterleave_ff.xml
     dab_crc16_bb.xml
     dab_msc_decode.xml
-    dab_fib_source_b.xml
     dab_select_subch_vfvf.xml
     dab_unpuncture_ff.xml
     dab_prune.xml
     dab_firecode_check_bb.xml
-    dab_fic_encode.xml
     dab_puncture_bb.xml
-    dab_msc_encode.xml
-    dab_dab_transmission_frame_mux_bb.xml
-    dab_transmitter_c.xml
-    dab_conv_encoder_bb.xml
-    dab_mapper_bc.xml
     dab_mp2_decode_bs.xml
     dab_mp4_decode_bs.xml
     dab_reed_solomon_decode_bb.xml
     dab_dabplus_audio_decoder_ff.xml
-    dab_reed_solomon_encode_bb.xml
     dab_valve_ff.xml
     dab_peak_detector_fb.xml DESTINATION share/gnuradio/grc/blocks
 )
