@@ -14,7 +14,6 @@
 #include "dab/ofdm_coarse_frequency_correct.h"
 #include "dab/diff_phasor_vcc.h"
 #include "dab/ofdm_remove_first_symbol_vcc.h"
-#include "dab/frequency_interleaver_vcc.h"
 #include "dab/qpsk_demapper_vcb.h"
 #include "dab/complex_to_interleaved_float_vcf.h"
 #include "dab/modulo_ff.h"
@@ -23,7 +22,6 @@
 #include "dab/repartition_vectors.h"
 #include "dab/unpuncture_vff.h"
 #include "dab/prune_vectors.h"
-#include "dab/fib_sink_vb.h"
 #include "dab/estimate_sample_rate_bf.h"
 #include "dab/fractional_interpolator_triggered_update_cc.h"
 #include "dab/magnitude_equalizer_vcc.h"
@@ -41,13 +39,9 @@
 #include "dab/prune.h"
 #include "dab/firecode_check_bb.h"
 #include "dab/puncture_bb.h"
-#include "dab/dab_transmission_frame_mux_bb.h"
-#include "dab/conv_encoder_bb.h"
-#include "dab/mapper_bc.h"
 #include "dab/mp2_decode_bs.h"
 #include "dab/mp4_decode_bs.h"
 #include "dab/reed_solomon_decode_bb.h"
-#include "dab/reed_solomon_encode_bb.h"
 #include "dab/valve_ff.h"
 #include "dab/peak_detector_fb.h"
 %}
@@ -65,8 +59,6 @@ GR_SWIG_BLOCK_MAGIC2(dab, ofdm_coarse_frequency_correct);
 GR_SWIG_BLOCK_MAGIC2(dab, diff_phasor_vcc);
 %include "dab/ofdm_remove_first_symbol_vcc.h"
 GR_SWIG_BLOCK_MAGIC2(dab, ofdm_remove_first_symbol_vcc);
-%include "dab/frequency_interleaver_vcc.h"
-GR_SWIG_BLOCK_MAGIC2(dab, frequency_interleaver_vcc);
 %include "dab/qpsk_demapper_vcb.h"
 GR_SWIG_BLOCK_MAGIC2(dab, qpsk_demapper_vcb);
 %include "dab/complex_to_interleaved_float_vcf.h"
@@ -83,8 +75,6 @@ GR_SWIG_BLOCK_MAGIC2(dab, repartition_vectors);
 GR_SWIG_BLOCK_MAGIC2(dab, unpuncture_vff);
 %include "dab/prune_vectors.h"
 GR_SWIG_BLOCK_MAGIC2(dab, prune_vectors);
-%include "dab/fib_sink_vb.h"
-GR_SWIG_BLOCK_MAGIC2(dab, fib_sink_vb);
 %include "dab/estimate_sample_rate_bf.h"
 GR_SWIG_BLOCK_MAGIC2(dab, estimate_sample_rate_bf);
 %include "dab/fractional_interpolator_triggered_update_cc.h"
@@ -119,12 +109,6 @@ GR_SWIG_BLOCK_MAGIC2(dab, prune);
 GR_SWIG_BLOCK_MAGIC2(dab, firecode_check_bb);
 %include "dab/puncture_bb.h"
 GR_SWIG_BLOCK_MAGIC2(dab, puncture_bb);
-%include "dab/dab_transmission_frame_mux_bb.h"
-GR_SWIG_BLOCK_MAGIC2(dab, dab_transmission_frame_mux_bb);
-%include "dab/conv_encoder_bb.h"
-GR_SWIG_BLOCK_MAGIC2(dab, conv_encoder_bb);
-%include "dab/mapper_bc.h"
-GR_SWIG_BLOCK_MAGIC2(dab, mapper_bc);
 
 %include "dab/mp2_decode_bs.h"
 GR_SWIG_BLOCK_MAGIC2(dab, mp2_decode_bs);
@@ -133,8 +117,6 @@ GR_SWIG_BLOCK_MAGIC2(dab, mp2_decode_bs);
 GR_SWIG_BLOCK_MAGIC2(dab, mp4_decode_bs);
 %include "dab/reed_solomon_decode_bb.h"
 GR_SWIG_BLOCK_MAGIC2(dab, reed_solomon_decode_bb);
-%include "dab/reed_solomon_encode_bb.h"
-GR_SWIG_BLOCK_MAGIC2(dab, reed_solomon_encode_bb);
 
 
 %include "dab/valve_ff.h"
