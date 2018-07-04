@@ -28,7 +28,6 @@ install(FILES
     ofdm_coarse_frequency_correct.h
     diff_phasor_vcc.h
     ofdm_remove_first_symbol_vcc.h
-    frequency_interleaver_vcc.h
     qpsk_demapper_vcb.h
     complex_to_interleaved_float_vcf.h
     modulo_ff.h
@@ -37,7 +36,6 @@ install(FILES
     repartition_vectors.h
     unpuncture_vff.h
     prune_vectors.h
-    fib_sink_vb.h
     estimate_sample_rate_bf.h
     fractional_interpolator_triggered_update_cc.h
     magnitude_equalizer_vcc.h
@@ -55,13 +53,9 @@ install(FILES
     prune.h
     firecode_check_bb.h
     puncture_bb.h
-    dab_transmission_frame_mux_bb.h
-    conv_encoder_bb.h
-    mapper_bc.h
     mp2_decode_bs.h
     mp4_decode_bs.h
     reed_solomon_decode_bb.h
-    reed_solomon_encode_bb.h
     valve_ff.h
     peak_detector_fb.h DESTINATION include/dab
 )
