@@ -31,7 +31,6 @@ list(APPEND dab_sources
     ofdm_coarse_frequency_correct_impl.cc
     diff_phasor_vcc_impl.cc
     ofdm_remove_first_symbol_vcc_impl.cc
-    frequency_interleaver_vcc_impl.cc
     qpsk_demapper_vcb_impl.cc
     complex_to_interleaved_float_vcf_impl.cc
     modulo_ff_impl.cc
@@ -53,23 +52,18 @@ list(APPEND dab_sources
     time_interleave_bb_impl.cc
     time_deinterleave_ff_impl.cc
     crc16_bb_impl.cc
-    fib_source_b_impl.cc
     select_subch_vfvf_impl.cc
     unpuncture_ff_impl.cc
     prune_impl.cc
     firecode-checker.cpp
     firecode_check_bb_impl.cc
     puncture_bb_impl.cc
-    dab_transmission_frame_mux_bb_impl.cc
-    conv_encoder_bb_impl.cc
-    mapper_bc_impl.cc
     mp2_decode_bs_impl.cc
     mp4_decode_bs_impl.cc
     reed_solomon_decode_bb_impl.cc
     fec/decode_rs_char.c
     fec/encode_rs_char.c
     fec/init_rs_char.c
-    reed_solomon_encode_bb_impl.cc
     valve_ff_impl.cc
     peak_detector_fb_impl.cc )
 
