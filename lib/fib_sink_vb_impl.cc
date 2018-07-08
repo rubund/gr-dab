@@ -159,6 +159,13 @@ namespace gr {
                       d_json_subch_info = ss_json.str();
                       d_json_subch_info[0] = '[';
                       d_subch_info_written_trigger = -1;
+                    int my_conv_table[4] = { 128, 8, 6, 5};
+                    char protect_string[4][3] = {"A1", "A2", "A3", "A4"};
+                    if (protect_level <= 4) {
+                        int bit_rate = subch_size * 8 / (my_conv_table[protect_level]);
+                        char *protect_level_string = protect_string[protect_level];
+                        printf("{\"bit_rate\" : \"%d\", \"address\" : \"%d\", \"subch_size\" : \"%d\", \"protect_level\" : \"%s\"}\n", bit_rate, start_address, subch_size, protect_level_string);
+                    }
                     }
                   }
                 }
