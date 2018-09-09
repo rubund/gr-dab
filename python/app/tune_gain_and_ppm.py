@@ -53,6 +53,7 @@ class top_block(gr.top_block, Qt.QWidget):
         self.gain_rf = gain_rf = 50
         self.gain_if = gain_if = 20
         self.gain_bb = gain_bb = 20
+        self.variable_qtgui_push_button_0 = variable_qtgui_push_button_0 = 0
 
         ##################################################
         # Blocks
@@ -69,6 +70,14 @@ class top_block(gr.top_block, Qt.QWidget):
         self._gain_bb_range = Range(0, 100, 1, 20, 200)
         self._gain_bb_win = RangeWidget(self._gain_bb_range, self.set_gain_bb, 'Gain BB', "counter_slider", float)
         self.top_layout.addWidget(self._gain_bb_win)
+
+        _variable_qtgui_push_button_0_push_button = Qt.QPushButton("variable_qtgui_push_button_0")
+        self._variable_qtgui_push_button_0_choices = {'Pressed': 1, 'Released': 0}
+        _variable_qtgui_push_button_0_push_button.pressed.connect(lambda: self.set_variable_qtgui_push_button_0(self._variable_qtgui_push_button_0_choices['Pressed']))
+        _variable_qtgui_push_button_0_push_button.released.connect(lambda: self.set_variable_qtgui_push_button_0(self._variable_qtgui_push_button_0_choices['Released']))
+        self.top_layout.addWidget(_variable_qtgui_push_button_0_push_button)
+
+
         self.qtgui_freq_sink_x_0 = qtgui.freq_sink_c(
         	1024, #size
         	firdes.WIN_BLACKMAN_hARRIS, #wintype
@@ -236,6 +245,16 @@ class top_block(gr.top_block, Qt.QWidget):
     def set_gain_bb(self, gain_bb):
         self.gain_bb = gain_bb
         self.osmosdr_source_0.set_bb_gain(self.gain_bb, 0)
+
+    def get_variable_qtgui_push_button_0(self):
+        return self.variable_qtgui_push_button_0
+
+    def set_variable_qtgui_push_button_0(self, variable_qtgui_push_button_0):
+        self.variable_qtgui_push_button_0 = variable_qtgui_push_button_0
+        if variable_qtgui_push_button_0 == 1:
+            print(self.get_gain_rf())
+            print(self.get_gain_if())
+            print(self.get_gain_bb())
 
 
 
