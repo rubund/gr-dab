@@ -23,7 +23,7 @@ import time
 
 class top_block(gr.top_block, Qt.QWidget):
 
-    def __init__(self):
+    def __init__(self, frequency=220.352e6, rf_gain=25, if_gain=0, bb_gain=0, ppm=80):
         gr.top_block.__init__(self, "Top Block")
         Qt.QWidget.__init__(self)
         self.setWindowTitle("Top Block")
@@ -50,25 +50,25 @@ class top_block(gr.top_block, Qt.QWidget):
         # Variables
         ##################################################
         self.samp_rate = samp_rate = 2000000
-        self.ppm = ppm = 0
-        self.gain_rf = gain_rf = 50
-        self.gain_if = gain_if = 20
-        self.gain_bb = gain_bb = 20
+        self.ppm = ppm
+        self.gain_rf = gain_rf = rf_gain
+        self.gain_if = gain_if = if_gain
+        self.gain_bb = gain_bb = bb_gain
         self.variable_qtgui_push_button_0 = variable_qtgui_push_button_0 = 0
 
         ##################################################
         # Blocks
         ##################################################
-        self._ppm_range = Range(-200, 200, 1, 0, 200)
+        self._ppm_range = Range(-200, 200, 1, self.ppm, 200)
         self._ppm_win = RangeWidget(self._ppm_range, self.set_ppm, "ppm", "counter_slider", float)
         self.top_grid_layout.addWidget(self._ppm_win, 0,0,1,1)
-        self._gain_rf_range = Range(0, 100, 1, 50, 200)
+        self._gain_rf_range = Range(0, 100, 1, self.gain_rf, 200)
         self._gain_rf_win = RangeWidget(self._gain_rf_range, self.set_gain_rf, 'Gain RF', "counter_slider", float)
         self.top_grid_layout.addWidget(self._gain_rf_win, 1,0,1,1)
-        self._gain_if_range = Range(0, 100, 1, 20, 200)
+        self._gain_if_range = Range(0, 100, 1, self.gain_if, 200)
         self._gain_if_win = RangeWidget(self._gain_if_range, self.set_gain_if, 'Gain IF', "counter_slider", float)
         self.top_grid_layout.addWidget(self._gain_if_win, 2,0,1,1)
-        self._gain_bb_range = Range(0, 100, 1, 20, 200)
+        self._gain_bb_range = Range(0, 100, 1, self.gain_bb, 200)
         self._gain_bb_win = RangeWidget(self._gain_bb_range, self.set_gain_bb, 'Gain BB', "counter_slider", float)
         self.top_grid_layout.addWidget(self._gain_bb_win, 3,0,1,1)
 
@@ -222,37 +222,35 @@ class top_block(gr.top_block, Qt.QWidget):
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
         self.qtgui_freq_sink_x_0.set_frequency_range(0, self.samp_rate)
-        self.osmosdr_source_0.set_sample_rate(self.samp_rate)
+        self.rpc_mgr_server.request("set_sample_rate",[self.samp_rate])
 
     def get_ppm(self):
         return self.ppm
 
     def set_ppm(self, ppm):
         self.ppm = ppm
-        self.osmosdr_source_0.set_freq_corr(self.ppm, 0)
+        self.rpc_mgr_server.request("set_ppm",[self.ppm])
 
     def get_gain_rf(self):
         return self.gain_rf
 
     def set_gain_rf(self, gain_rf):
         self.gain_rf = gain_rf
-        #self.osmosdr_source_0.set_gain(self.gain_rf, 0)
-        #self.rpc_mgr_server.request("set_gain_rf",[gain_rf])
-        self.rpc_mgr_server.request("set_frequency",[100e6])
+        self.rpc_mgr_server.request("set_rf_gain",[gain_rf])
 
     def get_gain_if(self):
         return self.gain_if
 
     def set_gain_if(self, gain_if):
         self.gain_if = gain_if
-        self.osmosdr_source_0.set_if_gain(self.gain_if, 0)
+        self.rpc_mgr_server.request("set_if_gain",[gain_if])
 
     def get_gain_bb(self):
         return self.gain_bb
 
     def set_gain_bb(self, gain_bb):
         self.gain_bb = gain_bb
-        self.osmosdr_source_0.set_bb_gain(self.gain_bb, 0)
+        self.rpc_mgr_server.request("set_bb_gain",[gain_bb])
 
     def get_variable_qtgui_push_button_0(self):
         return self.variable_qtgui_push_button_0
@@ -289,17 +287,6 @@ def main(top_block_cls=top_block, options=None, frequency=220.352e6, rf_gain=25,
 
     tb = top_block_cls()
 
-    tb._gain_rf_win.d_widget.slider.setValue(rf_gain)
-    tb._gain_rf_win.d_widget.counter.setValue(rf_gain)
-
-    tb._gain_if_win.d_widget.slider.setValue(if_gain)
-    tb._gain_if_win.d_widget.counter.setValue(if_gain)
-
-    tb._gain_bb_win.d_widget.slider.setValue(bb_gain)
-    tb._gain_bb_win.d_widget.counter.setValue(bb_gain)
-
-    tb._ppm_win.d_widget.slider.setValue(ppm)
-    tb._ppm_win.d_widget.counter.setValue(ppm)
 
     tb.start()
     tb.show()
