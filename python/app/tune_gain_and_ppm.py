@@ -60,22 +60,22 @@ class top_block(gr.top_block, Qt.QWidget):
         ##################################################
         self._ppm_range = Range(-200, 200, 1, 0, 200)
         self._ppm_win = RangeWidget(self._ppm_range, self.set_ppm, "ppm", "counter_slider", float)
-        self.top_layout.addWidget(self._ppm_win)
+        self.top_grid_layout.addWidget(self._ppm_win, 0,0,1,1)
         self._gain_rf_range = Range(0, 100, 1, 50, 200)
         self._gain_rf_win = RangeWidget(self._gain_rf_range, self.set_gain_rf, 'Gain RF', "counter_slider", float)
-        self.top_layout.addWidget(self._gain_rf_win)
+        self.top_grid_layout.addWidget(self._gain_rf_win, 1,0,1,1)
         self._gain_if_range = Range(0, 100, 1, 20, 200)
         self._gain_if_win = RangeWidget(self._gain_if_range, self.set_gain_if, 'Gain IF', "counter_slider", float)
-        self.top_layout.addWidget(self._gain_if_win)
+        self.top_grid_layout.addWidget(self._gain_if_win, 2,0,1,1)
         self._gain_bb_range = Range(0, 100, 1, 20, 200)
         self._gain_bb_win = RangeWidget(self._gain_bb_range, self.set_gain_bb, 'Gain BB', "counter_slider", float)
-        self.top_layout.addWidget(self._gain_bb_win)
+        self.top_grid_layout.addWidget(self._gain_bb_win, 3,0,1,1)
 
         _variable_qtgui_push_button_0_push_button = Qt.QPushButton("Save adjustments to configuration file")
         self._variable_qtgui_push_button_0_choices = {'Pressed': 1, 'Released': 0}
         _variable_qtgui_push_button_0_push_button.pressed.connect(lambda: self.set_variable_qtgui_push_button_0(self._variable_qtgui_push_button_0_choices['Pressed']))
         _variable_qtgui_push_button_0_push_button.released.connect(lambda: self.set_variable_qtgui_push_button_0(self._variable_qtgui_push_button_0_choices['Released']))
-        self.top_layout.addWidget(_variable_qtgui_push_button_0_push_button)
+        self.top_grid_layout.addWidget(_variable_qtgui_push_button_0_push_button, 6,0,1,1)
 
 
         self.qtgui_freq_sink_x_0 = qtgui.freq_sink_c(
@@ -120,7 +120,7 @@ class top_block(gr.top_block, Qt.QWidget):
             self.qtgui_freq_sink_x_0.set_line_alpha(i, alphas[i])
         
         self._qtgui_freq_sink_x_0_win = sip.wrapinstance(self.qtgui_freq_sink_x_0.pyqwidget(), Qt.QWidget)
-        self.top_layout.addWidget(self._qtgui_freq_sink_x_0_win)
+        self.top_grid_layout.addWidget(self._qtgui_freq_sink_x_0_win, 0,1,5,1)
         self.qtgui_const_sink_x_1 = qtgui.const_sink_c(
         	1024, #size
         	"", #name
@@ -161,7 +161,7 @@ class top_block(gr.top_block, Qt.QWidget):
             self.qtgui_const_sink_x_1.set_line_alpha(i, alphas[i])
         
         self._qtgui_const_sink_x_1_win = sip.wrapinstance(self.qtgui_const_sink_x_1.pyqwidget(), Qt.QWidget)
-        self.top_layout.addWidget(self._qtgui_const_sink_x_1_win)
+        self.top_grid_layout.addWidget(self._qtgui_const_sink_x_1_win, 5,1,5,1)
         self.osmosdr_source_0 = osmosdr.source( args="numchan=" + str(1) + " " + '' )
         self.osmosdr_source_0.set_sample_rate(samp_rate)
         self.osmosdr_source_0.set_center_freq(220.352e6, 0)
