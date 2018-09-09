@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 
-def receive_dabplus(frequency=220.352e6, rf_gain=49, if_gain=20, bb_gain=20, ppm=80, audio_sample_rate=48000, dab_bit_rate=64, dab_address=304, dab_subch_size=64, dab_protect_level=1):
+def receive_dabplus(frequency=220.352e6, rf_gain=25, if_gain=0, bb_gain=0, ppm=80, audio_sample_rate=48000, dab_bit_rate=64, dab_address=304, dab_subch_size=64, dab_protect_level=1):
     from gnuradio import gr, blocks, audio
 
     import osmosdr
