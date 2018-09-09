@@ -23,7 +23,10 @@ class Configuration():
       
 
   def save(self):
-    os.makedirs(self.folder, exist_ok=True)
+    try:
+      os.makedirs(self.folder)
+    except OSError:
+      pass # If already exists
 
     with open(self.adjust_file_name, 'w') as ymlfile:
       yamlcontent = yaml.dump(self.adjust_config)

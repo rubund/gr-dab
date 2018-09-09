@@ -9,6 +9,8 @@ def receive_dabplus(frequency=220.352e6, rf_gain=25, if_gain=0, bb_gain=0, ppm=8
     samp_rate = samp_rate = 2000000
 
     print("Setting frequency: %0.3f MHz" % (frequency/1e6))
+    print("Setting RF gain to: %d" % rf_gain)
+    print("Setting Frequency error (ppm) to: %d" % ppm)
 
     osmosdr_source_0 = osmosdr.source( args="numchan=" + str(1) + " " + '' )
     osmosdr_source_0.set_sample_rate(samp_rate)
