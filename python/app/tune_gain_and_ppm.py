@@ -1,20 +1,5 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-##################################################
-# GNU Radio Python Flow Graph
-# Title: Top Block
-# Generated: Sun Sep  9 09:27:43 2018
-##################################################
-
-if __name__ == '__main__':
-    import ctypes
-    import sys
-    if sys.platform.startswith('linux'):
-        try:
-            x11 = ctypes.cdll.LoadLibrary('libX11.so')
-            x11.XInitThreads()
-        except:
-            print "Warning: failed to XInitThreads()"
 
 
 from PyQt4 import Qt
@@ -256,6 +241,16 @@ class top_block(gr.top_block, Qt.QWidget):
 
 def main(top_block_cls=top_block, options=None):
 
+    import ctypes
+    import sys
+    if sys.platform.startswith('linux'):
+        try:
+            x11 = ctypes.cdll.LoadLibrary('libX11.so')
+            x11.XInitThreads()
+        except:
+            print "Warning: failed to XInitThreads()"
+
+
     from distutils.version import StrictVersion
     if StrictVersion(Qt.qVersion()) >= StrictVersion("4.5.0"):
         style = gr.prefs().get_string('qtgui', 'style', 'raster')
@@ -273,5 +268,3 @@ def main(top_block_cls=top_block, options=None):
     qapp.exec_()
 
 
-if __name__ == '__main__':
-    main()
