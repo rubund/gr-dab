@@ -14,6 +14,9 @@ parser_receive.add_argument("-f","--freq", help="Frequency in MHz", type=float, 
 parser_info = subparsers.add_parser('info', help='Get channel details')
 parser_info.add_argument("-f","--freq", help="Frequency in MHz", type=float, default=220.352)
 
+parser_adjust = subparsers.add_parser('adjust', help='Find optimum gain and freq error ppm settings')
+parser_adjust.add_argument("-f","--freq", help="Frequency in MHz", type=float, default=220.352)
+
 def receive_handler(res):
   print("receive handler")
   grdab.app.receive_dabplus(frequency=(res.freq*1e6))
@@ -22,8 +25,14 @@ def info_handler(res):
   print("info handler")
   grdab.app.get_channels(frequency=(res.freq*1e6))
 
+def adjust_handler(res):
+  import grdab.app.tune_gain_and_ppm
+  print("will open GUI to adjust gain and ppm")
+  grdab.app.tune_gain_and_ppm.main()
+
 parser_receive.set_defaults(func=receive_handler)
 parser_info.set_defaults(func=info_handler)
+parser_adjust.set_defaults(func=adjust_handler)
 args = parser.parse_args()
 
 args.func(args)
