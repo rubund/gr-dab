@@ -56,6 +56,7 @@ class top_block(gr.top_block, Qt.QWidget):
         self.gain_bb = gain_bb = bb_gain
         self.variable_qtgui_push_button_0 = variable_qtgui_push_button_0 = 0
 
+
         ##################################################
         # Blocks
         ##################################################
@@ -180,6 +181,11 @@ class top_block(gr.top_block, Qt.QWidget):
         self.rpc_mgr_server = zeromq.rpc_manager()
         self.rpc_mgr_server.set_request_socket("tcp://127.0.0.1:10445")
  
+        self.set_ppm(self.ppm)
+        self.set_gain_rf(self.gain_rf)
+        self.set_gain_if(self.gain_if)
+        self.set_gain_bb(self.gain_bb)
+
           
         self.digital_mpsk_snr_est_cc_0 = digital.mpsk_snr_est_cc(0, 10000, 0.001)
         self.dab_ofdm_demod_0 = grdab.ofdm_demod(
