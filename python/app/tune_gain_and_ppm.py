@@ -291,7 +291,7 @@ def main(top_block_cls=top_block, options=None, frequency=220.352e6, rf_gain=25,
         Qt.QApplication.setGraphicsSystem(style)
     qapp = Qt.QApplication(sys.argv)
 
-    tb = top_block_cls()
+    tb = top_block_cls(frequency=frequency, rf_gain=rf_gain, if_gain=if_gain, bb_gain=bb_gain, ppm=ppm)
 
 
     tb.start()
