@@ -176,6 +176,10 @@ class top_block(gr.top_block, Qt.QWidget):
         #self.osmosdr_source_0.set_antenna('', 0)
         #self.osmosdr_source_0.set_bandwidth(0, 0)
         self.osmosdr_source_0 = zeromq.sub_source(gr.sizeof_gr_complex, 1, "tcp://127.0.0.1:10444", 100, False, -1)
+
+        self.rpc_mgr_server = zeromq.rpc_manager()
+        self.rpc_mgr_server.set_request_socket("tcp://127.0.0.1:10445")
+ 
           
         self.digital_mpsk_snr_est_cc_0 = digital.mpsk_snr_est_cc(0, 10000, 0.001)
         self.dab_ofdm_demod_0 = grdab.ofdm_demod(
@@ -232,7 +236,9 @@ class top_block(gr.top_block, Qt.QWidget):
 
     def set_gain_rf(self, gain_rf):
         self.gain_rf = gain_rf
-        self.osmosdr_source_0.set_gain(self.gain_rf, 0)
+        #self.osmosdr_source_0.set_gain(self.gain_rf, 0)
+        #self.rpc_mgr_server.request("set_gain_rf",[gain_rf])
+        self.rpc_mgr_server.request("set_frequency",[100e6])
 
     def get_gain_if(self):
         return self.gain_if
