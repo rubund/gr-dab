@@ -2,6 +2,7 @@
 
 def receive_dabplus(frequency=220.352e6, rf_gain=25, if_gain=0, bb_gain=0, ppm=80, audio_sample_rate=48000, dab_bit_rate=64, dab_address=304, dab_subch_size=64, dab_protect_level=1):
     from gnuradio import gr, blocks, audio
+    from gnuradio import zeromq
 
     import osmosdr
     import grdab
@@ -12,18 +13,19 @@ def receive_dabplus(frequency=220.352e6, rf_gain=25, if_gain=0, bb_gain=0, ppm=8
     print("Setting RF gain to: %d" % rf_gain)
     print("Setting Frequency error (ppm) to: %d" % ppm)
 
-    osmosdr_source_0 = osmosdr.source( args="numchan=" + str(1) + " " + '' )
-    osmosdr_source_0.set_sample_rate(samp_rate)
-    osmosdr_source_0.set_center_freq(frequency, 0)
-    osmosdr_source_0.set_freq_corr(ppm, 0)
-    osmosdr_source_0.set_dc_offset_mode(0, 0)
-    osmosdr_source_0.set_iq_balance_mode(0, 0)
-    osmosdr_source_0.set_gain_mode(False, 0)
-    osmosdr_source_0.set_gain(rf_gain, 0)
-    osmosdr_source_0.set_if_gain(if_gain, 0)
-    osmosdr_source_0.set_bb_gain(bb_gain, 0)
-    osmosdr_source_0.set_antenna('', 0)
-    osmosdr_source_0.set_bandwidth(0, 0)
+    #osmosdr_source_0 = osmosdr.source( args="numchan=" + str(1) + " " + '' )
+    #osmosdr_source_0.set_sample_rate(samp_rate)
+    #osmosdr_source_0.set_center_freq(frequency, 0)
+    #osmosdr_source_0.set_freq_corr(ppm, 0)
+    #osmosdr_source_0.set_dc_offset_mode(0, 0)
+    #osmosdr_source_0.set_iq_balance_mode(0, 0)
+    #osmosdr_source_0.set_gain_mode(False, 0)
+    #osmosdr_source_0.set_gain(rf_gain, 0)
+    #osmosdr_source_0.set_if_gain(if_gain, 0)
+    #osmosdr_source_0.set_bb_gain(bb_gain, 0)
+    #osmosdr_source_0.set_antenna('', 0)
+    #osmosdr_source_0.set_bandwidth(0, 0)
+    osmosdr_source_0 = zeromq.sub_source(gr.sizeof_gr_complex, 1, "tcp://127.0.0.1:10444", 100, False, -1)
 
     dab_ofdm_demod_0 = grdab.ofdm_demod(
               grdab.parameters.dab_parameters(

@@ -8,6 +8,7 @@ from gnuradio import digital
 from gnuradio import eng_notation
 from gnuradio import gr
 from gnuradio import qtgui
+from gnuradio import zeromq
 from gnuradio.eng_option import eng_option
 from gnuradio.filter import firdes
 from gnuradio.qtgui import Range, RangeWidget
@@ -162,18 +163,19 @@ class top_block(gr.top_block, Qt.QWidget):
         
         self._qtgui_const_sink_x_1_win = sip.wrapinstance(self.qtgui_const_sink_x_1.pyqwidget(), Qt.QWidget)
         self.top_grid_layout.addWidget(self._qtgui_const_sink_x_1_win, 5,1,5,1)
-        self.osmosdr_source_0 = osmosdr.source( args="numchan=" + str(1) + " " + '' )
-        self.osmosdr_source_0.set_sample_rate(samp_rate)
-        self.osmosdr_source_0.set_center_freq(220.352e6, 0)
-        self.osmosdr_source_0.set_freq_corr(ppm, 0)
-        self.osmosdr_source_0.set_dc_offset_mode(0, 0)
-        self.osmosdr_source_0.set_iq_balance_mode(0, 0)
-        self.osmosdr_source_0.set_gain_mode(False, 0)
-        self.osmosdr_source_0.set_gain(gain_rf, 0)
-        self.osmosdr_source_0.set_if_gain(gain_if, 0)
-        self.osmosdr_source_0.set_bb_gain(gain_bb, 0)
-        self.osmosdr_source_0.set_antenna('', 0)
-        self.osmosdr_source_0.set_bandwidth(0, 0)
+        #self.osmosdr_source_0 = osmosdr.source( args="numchan=" + str(1) + " " + '' )
+        #self.osmosdr_source_0.set_sample_rate(samp_rate)
+        #self.osmosdr_source_0.set_center_freq(220.352e6, 0)
+        #self.osmosdr_source_0.set_freq_corr(ppm, 0)
+        #self.osmosdr_source_0.set_dc_offset_mode(0, 0)
+        #self.osmosdr_source_0.set_iq_balance_mode(0, 0)
+        #self.osmosdr_source_0.set_gain_mode(False, 0)
+        #self.osmosdr_source_0.set_gain(gain_rf, 0)
+        #self.osmosdr_source_0.set_if_gain(gain_if, 0)
+        #self.osmosdr_source_0.set_bb_gain(gain_bb, 0)
+        #self.osmosdr_source_0.set_antenna('', 0)
+        #self.osmosdr_source_0.set_bandwidth(0, 0)
+        self.osmosdr_source_0 = zeromq.sub_source(gr.sizeof_gr_complex, 1, "tcp://127.0.0.1:10444", 100, False, -1)
           
         self.digital_mpsk_snr_est_cc_0 = digital.mpsk_snr_est_cc(0, 10000, 0.001)
         self.dab_ofdm_demod_0 = grdab.ofdm_demod(
