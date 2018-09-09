@@ -71,7 +71,7 @@ class top_block(gr.top_block, Qt.QWidget):
         self._gain_bb_win = RangeWidget(self._gain_bb_range, self.set_gain_bb, 'Gain BB', "counter_slider", float)
         self.top_layout.addWidget(self._gain_bb_win)
 
-        _variable_qtgui_push_button_0_push_button = Qt.QPushButton("variable_qtgui_push_button_0")
+        _variable_qtgui_push_button_0_push_button = Qt.QPushButton("Save adjustments to configuration file")
         self._variable_qtgui_push_button_0_choices = {'Pressed': 1, 'Released': 0}
         _variable_qtgui_push_button_0_push_button.pressed.connect(lambda: self.set_variable_qtgui_push_button_0(self._variable_qtgui_push_button_0_choices['Pressed']))
         _variable_qtgui_push_button_0_push_button.released.connect(lambda: self.set_variable_qtgui_push_button_0(self._variable_qtgui_push_button_0_choices['Released']))
