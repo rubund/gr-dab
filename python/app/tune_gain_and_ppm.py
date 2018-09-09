@@ -252,9 +252,12 @@ class top_block(gr.top_block, Qt.QWidget):
     def set_variable_qtgui_push_button_0(self, variable_qtgui_push_button_0):
         self.variable_qtgui_push_button_0 = variable_qtgui_push_button_0
         if variable_qtgui_push_button_0 == 1:
-            print(self.get_gain_rf())
-            print(self.get_gain_if())
-            print(self.get_gain_bb())
+          import grdab.app.config
+          import os
+          cfg_dir = "".join([os.getenv("HOME"),"/.grdab"])
+          cfg = grdab.app.config.Configuration(cfg_dir)
+          cfg.adjust_config = {"gain" : {"gain_rf" : self.get_gain_rf(), "gain_if" : self.get_gain_if(), "gain_bb" : self.get_gain_bb()}, "ppm" : self.get_ppm()}
+          cfg.save()
 
 
 
