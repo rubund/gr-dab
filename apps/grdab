@@ -46,7 +46,7 @@ def info_handler(res):
 def adjust_handler(res):
   import grdab.app.tune_gain_and_ppm
   print("will open GUI to adjust gain and ppm")
-  grdab.app.tune_gain_and_ppm.main()
+  grdab.app.tune_gain_and_ppm.main(rf_gain=rf_gain, if_gain=if_gain, bb_gain=bb_gain, ppm=ppm)
 
 parser_receive.set_defaults(func=receive_handler)
 parser_info.set_defaults(func=info_handler)

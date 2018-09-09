@@ -261,7 +261,7 @@ class top_block(gr.top_block, Qt.QWidget):
 
 
 
-def main(top_block_cls=top_block, options=None):
+def main(top_block_cls=top_block, options=None, frequency=220.352e6, rf_gain=25, if_gain=0, bb_gain=0, ppm=80):
 
     import ctypes
     import sys
@@ -280,6 +280,19 @@ def main(top_block_cls=top_block, options=None):
     qapp = Qt.QApplication(sys.argv)
 
     tb = top_block_cls()
+
+    tb._gain_rf_win.d_widget.slider.setValue(rf_gain)
+    tb._gain_rf_win.d_widget.counter.setValue(rf_gain)
+
+    tb._gain_if_win.d_widget.slider.setValue(if_gain)
+    tb._gain_if_win.d_widget.counter.setValue(if_gain)
+
+    tb._gain_bb_win.d_widget.slider.setValue(bb_gain)
+    tb._gain_bb_win.d_widget.counter.setValue(bb_gain)
+
+    tb._ppm_win.d_widget.slider.setValue(ppm)
+    tb._ppm_win.d_widget.counter.setValue(ppm)
+
     tb.start()
     tb.show()
 
