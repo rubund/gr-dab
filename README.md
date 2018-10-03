@@ -55,7 +55,7 @@ User guide for the utility **grdab**
 All SDRs supported by gr-osmosdr and which can tune to the DAB frequencies can be used with grdab. grdab currently only supports DAB+
 
 
-### "Calibration"
+#### "Calibration":
 
 When connecting a new radio, run:
 
@@ -73,7 +73,7 @@ This will bring up a GUI where you will see the frequency spectrum and the const
 
 Whenever connecting another SDR, you will have to repeat the adjustment procedure above.
 
-### Check available channels
+#### Check available channels:
 
 To see what channels are available on a chosen frequency, run:
 
@@ -81,7 +81,7 @@ To see what channels are available on a chosen frequency, run:
 grdab info -f <frequency_in_mhz>
 ```
 
-### Listen to DAB+
+#### Listen to DAB+:
 
 When you find a channel you can receive audio with:
 
