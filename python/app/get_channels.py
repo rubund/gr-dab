@@ -23,7 +23,7 @@ def get_channels(frequency=220.352e6):
     osmosdr_source_0.set_if_gain(20, 0)
     osmosdr_source_0.set_bb_gain(20, 0)
     osmosdr_source_0.set_antenna('', 0)
-    osmosdr_source_0.set_bandwidth(0, 0)
+    osmosdr_source_0.set_bandwidth(2000000, 0)
 
     dab_ofdm_demod_0 = grdab.ofdm_demod(
               grdab.parameters.dab_parameters(

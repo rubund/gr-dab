@@ -173,7 +173,7 @@ class top_block(gr.top_block, Qt.QWidget):
         self.osmosdr_source_0.set_if_gain(gain_if, 0)
         self.osmosdr_source_0.set_bb_gain(gain_bb, 0)
         self.osmosdr_source_0.set_antenna('', 0)
-        self.osmosdr_source_0.set_bandwidth(0, 0)
+        self.osmosdr_source_0.set_bandwidth(2000000, 0)
           
         self.digital_mpsk_snr_est_cc_0 = digital.mpsk_snr_est_cc(0, 10000, 0.001)
         self.dab_ofdm_demod_0 = grdab.ofdm_demod(
