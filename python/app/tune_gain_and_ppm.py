@@ -18,6 +18,7 @@ import osmosdr
 import sip
 import sys
 import time
+import grdab.channel_mapping
 
 
 
@@ -70,6 +71,12 @@ class top_block(gr.top_block, Qt.QWidget):
         self._gain_bb_range = Range(0, 100, 1, 20, 200)
         self._gain_bb_win = RangeWidget(self._gain_bb_range, self.set_gain_bb, 'Gain BB', "counter_slider", float)
         self.top_grid_layout.addWidget(self._gain_bb_win, 3,0,1,1)
+
+        nchannels = len(grdab.channel_mapping.table)
+        default_channel = 0
+        self._gain_bb_range = Range(0, nchannels-1, 1, default_channel, 200)
+        self._gain_bb_win = RangeWidget(self._gain_bb_range, self.set_gain_bb, 'Channel', "counter_slider", float)
+        self.top_grid_layout.addWidget(self._gain_bb_win, 4,0,1,1)
 
         _variable_qtgui_push_button_0_push_button = Qt.QPushButton("Save adjustments to configuration file")
         self._variable_qtgui_push_button_0_choices = {'Pressed': 1, 'Released': 0}
