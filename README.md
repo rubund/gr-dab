@@ -86,7 +86,7 @@ grdab info -f <frequency_in_mhz>
 When you find a channel you can receive audio with:
 
 ```
-grdab receive -f 227.360 --bit_rate 80 --address 204 --subch_size 60 --protect_level 2 --audiorate 480000
+grdab receive -f 227.360 --bit_rate 80 --address 204 --subch_size 60 --protect_level 2 --audiorate 48000
 ```
 
-Where you replace the different options with the output from *grdab info* for the desired channel.
+Where you replace the different options with the output from *grdab info* for the desired channel. You might have to experiment with a few values for *--audiorate* such as 44100 or 48000.
