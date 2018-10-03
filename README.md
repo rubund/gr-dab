@@ -49,3 +49,37 @@ To build the examples from the tarball run these commands:
 ```
 
 
+User guide for the utility **grdab**
+------------------------------------
+
+All SDRs supported by gr-osmosdr and which can tune to the DAB frequencies can be used with grdab. grdab currently only supports DAB+
+
+When connecting a new radio, run:
+
+```
+grdab adjust
+```
+
+This will bring up a GUI where you will see the frequency spectrum and the constellation diagram.
+
+1. Drag the channel selector to a valid DAB+ frequency in your area.
+2. Adjust the gain sliders such that frequency looks good.
+3. Adjust the ppm slider until the constellation diagram consists of 4 quite confined dots.
+4. Then click 'save configuration'
+5. Your SDR is now tuned.
+
+Whenever connecting another SDR, you will have to repeat the adjustment procedure above.
+
+To see what channels are available on a chosen frequency, run:
+
+```
+grdab info -f <frequency_in_mhz>
+```
+
+When you find a channel you can receive audio with:
+
+```
+grdab receive -f 227.360 --bit_rate 80 --address 204 --subch_size 60 --protect_level 2 --audiorate 480000
+```
+
+Where you replace the different options with the output from *grdab info*.
