@@ -51,7 +51,7 @@ To build gr-dab, run these commands:
 GNU Radio Companion
 -------------------
 
-After having installed gr-dab, you can play around with GNU radio blocks in GNU Radio Companion, or you can use the tool *grdab* to start receiving DAB+ audio using a software defined radio (SDR).
+After having installed gr-dab, you can play around with GNU radio blocks for gr-dab in GNU Radio Companion, or you can use the tool *grdab* to start receiving DAB+ audio using a software defined radio (SDR).
 
 
 User guide for the utility **grdab**
