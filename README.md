@@ -37,7 +37,7 @@ also depends on some GNU Radio prerequisites, such as Boost and
 cppunit. Additionally it depends on the FAAD2 library. (ubuntu: sudo apt-get
 install libfaad-dev, fedora: sudo dnf install faad2-devel)
 
-To build the examples from the tarball run these commands:
+To build gr-dab, run these commands:
 
 ```
   $ mkdir build
@@ -47,6 +47,11 @@ To build the examples from the tarball run these commands:
   $ sudo make install
   $ sudo ldconfig
 ```
+
+GNU Radio Companion
+-------------------
+
+After having installed gr-dab, you can play around with GNU radio blocks in GNU Radio Companion, or you can use the tool *grdab* to start receiving DAB+ audio using a software defined radio (SDR).
 
 
 User guide for the utility **grdab**
