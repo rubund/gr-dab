@@ -54,6 +54,7 @@ class top_block(gr.top_block, Qt.QWidget):
         self.gain_rf = gain_rf = 50
         self.gain_if = gain_if = 20
         self.gain_bb = gain_bb = 20
+        self.current_frequency = current_frequency = 220.352e6
         self.variable_qtgui_push_button_0 = variable_qtgui_push_button_0 = 0
 
         ##################################################
@@ -171,7 +172,7 @@ class top_block(gr.top_block, Qt.QWidget):
         self.top_grid_layout.addWidget(self._qtgui_const_sink_x_1_win, 5,1,5,1)
         self.osmosdr_source_0 = osmosdr.source( args="numchan=" + str(1) + " " + '' )
         self.osmosdr_source_0.set_sample_rate(samp_rate)
-        self.osmosdr_source_0.set_center_freq(220.352e6, 0)
+        self.osmosdr_source_0.set_center_freq(current_frequency, 0)
         self.osmosdr_source_0.set_freq_corr(ppm, 0)
         self.osmosdr_source_0.set_dc_offset_mode(0, 0)
         self.osmosdr_source_0.set_iq_balance_mode(0, 0)
@@ -249,6 +250,8 @@ class top_block(gr.top_block, Qt.QWidget):
     def set_channel(self, val):
         channel = grdab.channel_mapping.table[int(val)]
         print(channel['frequency'])
+        self.current_frequency = float(channel['frequency'])*1e6
+        self.osmosdr_source_0.set_center_freq(self.current_frequency, 0)
 
     def get_gain_bb(self):
         return self.gain_bb
