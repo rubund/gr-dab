@@ -60,7 +60,7 @@ class top_block(gr.top_block, Qt.QWidget):
         ##################################################
         # Blocks
         ##################################################
-        self._ppm_range = Range(-200, 200, 1, 0, 200)
+        self._ppm_range = Range(-1000, 1000, 1, 0, 200)
         self._ppm_win = RangeWidget(self._ppm_range, self.set_ppm, "ppm", "counter_slider", float)
         self.top_grid_layout.addWidget(self._ppm_win, 0,0,1,1)
         self._gain_rf_range = Range(0, 100, 1, 50, 200)
