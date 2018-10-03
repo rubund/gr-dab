@@ -57,7 +57,7 @@ After having installed gr-dab, you can play around with GNU radio blocks for gr-
 User guide for the utility **grdab**
 ------------------------------------
 
-All SDRs supported by gr-osmosdr and which can tune to the DAB frequencies can be used with grdab. grdab can currently only receive DAB+ audio.
+All SDRs supported by gr-osmosdr and which can tune to the DAB frequencies can be used with grdab. It has been verified to work with RTL-SDR, HackRF and USRP B200. grdab can currently only receive DAB+ audio.
 
 
 #### "Calibration":
