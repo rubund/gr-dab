@@ -74,9 +74,9 @@ class top_block(gr.top_block, Qt.QWidget):
 
         nchannels = len(grdab.channel_mapping.table)
         default_channel = 0
-        self._gain_bb_range = Range(0, nchannels-1, 1, default_channel, 200)
-        self._gain_bb_win = RangeWidget(self._gain_bb_range, self.set_gain_bb, 'Channel', "counter_slider", float)
-        self.top_grid_layout.addWidget(self._gain_bb_win, 4,0,1,1)
+        self._ch_select_range = Range(0, nchannels-1, 1, default_channel, 200)
+        self._ch_select_win = RangeWidget(self._ch_select_range, self.set_channel, 'Channel', "counter_slider", float)
+        self.top_grid_layout.addWidget(self._ch_select_win, 4,0,1,1)
 
         _variable_qtgui_push_button_0_push_button = Qt.QPushButton("Save adjustments to configuration file")
         self._variable_qtgui_push_button_0_choices = {'Pressed': 1, 'Released': 0}
@@ -245,6 +245,10 @@ class top_block(gr.top_block, Qt.QWidget):
     def set_gain_if(self, gain_if):
         self.gain_if = gain_if
         self.osmosdr_source_0.set_if_gain(self.gain_if, 0)
+
+    def set_channel(self, val):
+        channel = grdab.channel_mapping.table[int(val)]
+        print(channel['frequency'])
 
     def get_gain_bb(self):
         return self.gain_bb
