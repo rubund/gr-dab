@@ -74,7 +74,7 @@ class top_block(gr.top_block, Qt.QWidget):
         self.top_grid_layout.addWidget(self._gain_bb_win, 3,0,1,1)
 
         nchannels = len(grdab.channel_mapping.table)
-        default_channel = 0
+        default_channel = 26
         self._ch_select_range = Range(0, nchannels-1, 1, default_channel, 200)
         self._ch_select_win = RangeWidget(self._ch_select_range, self.set_channel, 'Channel', "counter_slider", float)
         self.top_grid_layout.addWidget(self._ch_select_win, 4,0,1,1)
@@ -252,6 +252,7 @@ class top_block(gr.top_block, Qt.QWidget):
         print(channel['frequency'])
         self.current_frequency = float(channel['frequency'])*1e6
         self.osmosdr_source_0.set_center_freq(self.current_frequency, 0)
+        self.qtgui_freq_sink_x_0.set_frequency_range(self.current_frequency, self.samp_rate)
 
     def get_gain_bb(self):
         return self.gain_bb
