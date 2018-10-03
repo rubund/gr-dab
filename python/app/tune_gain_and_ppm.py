@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-from PyQt4 import Qt
+from PyQt5 import Qt, QtCore
 from gnuradio import blocks
 from gnuradio import digital
 from gnuradio import eng_notation
@@ -12,6 +12,7 @@ from gnuradio.eng_option import eng_option
 from gnuradio.filter import firdes
 from gnuradio.qtgui import Range, RangeWidget
 from optparse import OptionParser
+from gnuradio import qtgui
 import grdab
 import osmosdr
 import sip
