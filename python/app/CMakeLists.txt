@@ -17,5 +17,7 @@ GR_PYTHON_INSTALL(
     config.py
     tune_gain_and_ppm.py
     adjustment_gui.py
+    adjust_gui_helpers.py
+    channel_mapping.py
     __init__.py DESTINATION ${GR_PYTHON_DIR}/grdab/app
 )
