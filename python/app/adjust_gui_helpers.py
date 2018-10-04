@@ -3,7 +3,9 @@
 import channel_mapping
 
 def get_number_of_channels():
-  return 10
+  return len(channel_mapping.table)
 
 def id_to_frequency(i):
-  return 100e6
+  frequency = float(channel_mapping.table[int(i)]['frequency'])*1e6
+  print(frequency)
+  return frequency

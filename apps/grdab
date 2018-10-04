@@ -82,7 +82,7 @@ def adjust_handler(res):
   class SubClass(grdab.app.adjustment_gui.top_block):
 
     def __init__(self):
-      super(SubClass, self).__init__(frequency_default=(res.freq*1e6), gain_rf_default=rf_gain, gain_if_default=if_gain, gain_bb_default=bb_gain, ppm_default=ppm)
+      super(SubClass, self).__init__(frequency_id_default=26, gain_rf_default=rf_gain, gain_if_default=if_gain, gain_bb_default=bb_gain, ppm_default=ppm)
 
     def set_variable_qtgui_push_button_0(self, val):
       self.variable_qtgui_push_button_0 = val
