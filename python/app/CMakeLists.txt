@@ -16,8 +16,8 @@ GR_PYTHON_INSTALL(
     receive_dabplus.py
     config.py
     tune_gain_and_ppm.py
-    adjustment_gui.py
     adjust_gui_helpers.py
     channel_mapping.py
+    ${CMAKE_BINARY_DIR}/python/app/adjustment_gui.py
     __init__.py DESTINATION ${GR_PYTHON_DIR}/grdab/app
 )
