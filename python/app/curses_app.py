@@ -7,7 +7,6 @@ import time
 #import queue
 import yaml
 
-print(dir(curses))
 
 channel_list_filename = "".join([os.getenv("HOME"),"/.grdab/channels.yaml"])
 
@@ -143,6 +142,102 @@ class KeyDetecThread(threading.Thread):
             k = self.stdscr.getch()
 
 def main():
+    frequency=220.352e6
+    rf_gain=25
+    if_gain=0
+    bb_gain=0
+    ppm=0
+    audio_sample_rate=48000
+    dab_bit_rate=64
+    dab_address=304
+    dab_subch_size=64
+    dab_protect_level=1
+    use_zeromq=True
+    from gnuradio import gr, blocks, audio
+    if use_zeromq:
+        from gnuradio import zeromq
+    else:
+        import osmosdr
+    import grdab
+    import time
+
+    samp_rate = samp_rate = 2000000
+
+    print("Setting frequency: %0.3f MHz" % (frequency/1e6))
+
+    if not use_zeromq:
+        osmosdr_source_0 = osmosdr.source( args="numchan=" + str(1) + " " + '' )
+        osmosdr_source_0.set_sample_rate(samp_rate)
+        osmosdr_source_0.set_center_freq(frequency, 0)
+        osmosdr_source_0.set_freq_corr(0, 0)
+        osmosdr_source_0.set_dc_offset_mode(0, 0)
+        osmosdr_source_0.set_iq_balance_mode(0, 0)
+        osmosdr_source_0.set_gain_mode(False, 0)
+        osmosdr_source_0.set_gain(rf_gain, 0)
+        osmosdr_source_0.set_if_gain(if_gain, 0)
+        osmosdr_source_0.set_bb_gain(bb_gain, 0)
+        osmosdr_source_0.set_antenna('', 0)
+        osmosdr_source_0.set_bandwidth(2000000, 0)
+    else:
+        zeromq_source = zeromq.sub_source(gr.sizeof_gr_complex, 1, "tcp://127.0.0.1:10444", 100, False, -1)
+        rpc_mgr_server = zeromq.rpc_manager()
+        rpc_mgr_server.set_request_socket("tcp://127.0.0.1:10445")
+        rpc_mgr_server.request("set_sample_rate",[samp_rate])
+        rpc_mgr_server.request("set_rf_gain",[rf_gain])
+        rpc_mgr_server.request("set_if_gain",[if_gain])
+        rpc_mgr_server.request("set_bb_gain",[bb_gain])
+        rpc_mgr_server.request("set_ppm",[0]) # Not using hardware correction since it behaves differently on different hardware
+        rpc_mgr_server.request("set_frequency",[frequency])
+        time.sleep(0.7)
+
+    sample_rate_correction_factor = 1 + float(ppm)*1e-6
+    dab_ofdm_demod_0 = grdab.ofdm_demod(
+              grdab.parameters.dab_parameters(
+                mode=1,
+                sample_rate=samp_rate,
+                verbose=False
+              ),
+              grdab.parameters.receiver_parameters(
+                mode=1,
+                softbits=True,
+                input_fft_filter=True,
+                autocorrect_sample_rate=False,
+                sample_rate_correction_factor=sample_rate_correction_factor,
+                always_include_resample=True,
+                verbose=False,
+                correct_ffe=True,
+                equalize_magnitude=True
+              )
+            )
+
+    dab_dabplus_audio_decoder_ff_0 = grdab.dabplus_audio_decoder_ff(grdab.parameters.dab_parameters(mode=1, sample_rate=samp_rate, verbose=False), dab_bit_rate, dab_address, dab_subch_size, dab_protect_level, True)
+
+    xrun_monitor = grdab.xrun_monitor_cc(100000)
+    f2c = blocks.float_to_complex()
+    c2f = blocks.complex_to_float()
+
+    audio_sink_0 = audio.sink(audio_sample_rate, '', True)
+
+
+    fg = gr.top_block()
+
+    if not use_zeromq:
+        src = osmosdr_source_0
+    else:
+        src = zeromq_source
+
+    fg.connect(src, dab_ofdm_demod_0, dab_dabplus_audio_decoder_ff_0)
+    fg.connect((dab_dabplus_audio_decoder_ff_0, 0), (f2c, 0))
+    fg.connect((dab_dabplus_audio_decoder_ff_0, 1), (f2c, 1))
+    fg.connect(f2c, xrun_monitor)
+    fg.connect(xrun_monitor, c2f)
+    fg.connect((c2f, 0), (audio_sink_0, 0))
+    fg.connect((c2f, 1), (audio_sink_0, 1))
+
+
+
+
+    fg.start()
     curses.wrapper(draw_menu)
 
 if __name__ == "__main__":
