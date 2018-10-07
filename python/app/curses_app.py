@@ -81,7 +81,7 @@ def draw_menu(stdscr):
         elif k == 10: # enter
             active = selected
 
-        if previous_active != active:
+        if k == 10:
             ch = channel_list[active]
             freq = float(ch['frequency'])*1e6
             if use_zeromq:
