@@ -96,6 +96,8 @@ def draw_menu(stdscr):
             fg.disconnect((dab_dabplus_audio_decoder_ff_0, 1), (f2c, 1))
             fg.disconnect((c2f, 0), (audio_sink_0, 0))
             fg.disconnect((c2f, 1), (audio_sink_0, 1))
+            del dab_dabplus_audio_decoder_ff_0
+            del audio_sink_0
             dab_dabplus_audio_decoder_ff_0 = new
             audio_sink_0 = newaudio
             fg.connect(src, dab_ofdm_demod_0, dab_dabplus_audio_decoder_ff_0)
