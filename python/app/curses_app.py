@@ -79,8 +79,9 @@ def draw_menu(stdscr):
 
         if previous_active != active:
 
-            new = grdab.dabplus_audio_decoder_ff(grdab.parameters.dab_parameters(mode=1, sample_rate=samp_rate, verbose=False), 64, 304, 64, 1, True)
-            newaudio = audio.sink(44100, '', True)
+            ch = channel_list[active]
+            new = grdab.dabplus_audio_decoder_ff(grdab.parameters.dab_parameters(mode=1, sample_rate=samp_rate, verbose=False), ch['bit_rate'], ch['address'], ch['subch_size'], ch['protect_level'], True)
+            newaudio = audio.sink(48000, '', True)
             fg.stop()
             fg.wait()
             xrun_monitor.stop_until_tag()
@@ -252,7 +253,8 @@ def main():
               )
             )
 
-    dab_dabplus_audio_decoder_ff_0 = grdab.dabplus_audio_decoder_ff(grdab.parameters.dab_parameters(mode=1, sample_rate=samp_rate, verbose=False), dab_bit_rate, dab_address, dab_subch_size, dab_protect_level, True)
+    ch = channel_list[0]
+    dab_dabplus_audio_decoder_ff_0 = grdab.dabplus_audio_decoder_ff(grdab.parameters.dab_parameters(mode=1, sample_rate=samp_rate, verbose=False), ch['bit_rate'], ch['address'], ch['subch_size'], ch['protect_level'], True)
 
     xrun_monitor = grdab.xrun_monitor_cc(100000)
     #xrun_monitor.set_report_fill(False)
