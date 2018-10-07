@@ -6,6 +6,8 @@ import threading
 import time
 #import queue
 import yaml
+from gnuradio import gr, blocks, audio
+import grdab
 
 
 channel_list_filename = "".join([os.getenv("HOME"),"/.grdab/channels.yaml"])
@@ -15,7 +17,18 @@ if os.path.isfile(channel_list_filename):
     with open(channel_list_filename, "r") as fp:
         channel_list = yaml.load(fp)
 
+samp_rate = samp_rate = 2000000
+
 def draw_menu(stdscr):
+    global src
+    global dab_dabplus_audio_decoder_ff_0
+    global dab_ofdm_demod_0
+    global c2f
+    global f2c
+    global audio_sink_0
+    global xrun_monitor
+    global fg
+
     k = 0
     cursor_x = 0
     cursor_y = 0
@@ -53,6 +66,8 @@ def draw_menu(stdscr):
         elif k == curses.KEY_LEFT:
             cursor_x = cursor_x - 1
 
+        previous_active = active
+
         if k == 259: # key up
             if selected > 0:
                 selected -= 1
@@ -61,6 +76,28 @@ def draw_menu(stdscr):
                 selected += 1
         elif k == 10: # enter
             active = selected
+
+        if previous_active != active:
+
+            new = grdab.dabplus_audio_decoder_ff(grdab.parameters.dab_parameters(mode=1, sample_rate=samp_rate, verbose=False), 64, 304, 64, 1, True)
+            newaudio = audio.sink(44100, '', True)
+            fg.stop()
+            fg.wait()
+            xrun_monitor.stop_until_tag()
+            fg.disconnect(src, dab_ofdm_demod_0, dab_dabplus_audio_decoder_ff_0)
+            fg.disconnect((dab_dabplus_audio_decoder_ff_0, 0), (f2c, 0))
+            fg.disconnect((dab_dabplus_audio_decoder_ff_0, 1), (f2c, 1))
+            fg.disconnect((c2f, 0), (audio_sink_0, 0))
+            fg.disconnect((c2f, 1), (audio_sink_0, 1))
+            dab_dabplus_audio_decoder_ff_0 = new
+            audio_sink_0 = newaudio
+            fg.connect(src, dab_ofdm_demod_0, dab_dabplus_audio_decoder_ff_0)
+            fg.connect((dab_dabplus_audio_decoder_ff_0, 0), (f2c, 0))
+            fg.connect((dab_dabplus_audio_decoder_ff_0, 1), (f2c, 1))
+            fg.connect((c2f, 0), (audio_sink_0, 0))
+            fg.connect((c2f, 1), (audio_sink_0, 1))
+            time.sleep(1)
+            fg.start()
 
         cursor_x = max(0, cursor_x)
         cursor_x = min(width-1, cursor_x)
@@ -142,6 +179,14 @@ class KeyDetecThread(threading.Thread):
             k = self.stdscr.getch()
 
 def main():
+    global src
+    global dab_dabplus_audio_decoder_ff_0
+    global dab_ofdm_demod_0
+    global c2f
+    global f2c
+    global audio_sink_0
+    global fg
+    global xrun_monitor
     frequency=220.352e6
     rf_gain=25
     if_gain=0
@@ -153,15 +198,12 @@ def main():
     dab_subch_size=64
     dab_protect_level=1
     use_zeromq=True
-    from gnuradio import gr, blocks, audio
     if use_zeromq:
         from gnuradio import zeromq
     else:
         import osmosdr
-    import grdab
     import time
 
-    samp_rate = samp_rate = 2000000
 
     print("Setting frequency: %0.3f MHz" % (frequency/1e6))
 
@@ -213,7 +255,7 @@ def main():
     dab_dabplus_audio_decoder_ff_0 = grdab.dabplus_audio_decoder_ff(grdab.parameters.dab_parameters(mode=1, sample_rate=samp_rate, verbose=False), dab_bit_rate, dab_address, dab_subch_size, dab_protect_level, True)
 
     xrun_monitor = grdab.xrun_monitor_cc(100000)
-    xrun_monitor.set_report_fill(False)
+    #xrun_monitor.set_report_fill(False)
     f2c = blocks.float_to_complex()
     c2f = blocks.complex_to_float()
 
