@@ -296,7 +296,7 @@ def main(rf_gain, if_gain, bb_gain, ppm, use_zeromq_in=False):
     dab_dabplus_audio_decoder_ff_0 = grdab.dabplus_audio_decoder_ff(grdab.parameters.dab_parameters(mode=1, sample_rate=samp_rate, verbose=False), ch['bit_rate'], ch['address'], ch['subch_size'], ch['protect_level'], True)
 
     xrun_monitor = grdab.xrun_monitor_cc(100000)
-    #xrun_monitor.set_report_fill(False)
+    xrun_monitor.set_report_fill(False)
     f2c = blocks.float_to_complex()
     c2f = blocks.complex_to_float()
 
