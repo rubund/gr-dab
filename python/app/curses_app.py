@@ -5,8 +5,16 @@ import curses
 import threading
 import time
 #import queue
+import yaml
 
 print(dir(curses))
+
+channel_list_filename = "".join([os.getenv("HOME"),"/.grdab/channels.yaml"])
+
+channel_list = []
+if os.path.isfile(channel_list_filename):
+    with open(channel_list_filename, "r") as fp:
+        channel_list = yaml.load(fp)
 
 def draw_menu(stdscr):
     k = 0
@@ -29,7 +37,7 @@ def draw_menu(stdscr):
 
     selected = 0
     active = 0
-    nelem = 20
+    nelem = len(channel_list)
     # Loop where k is the last character pressed
     while (k != ord('q')):
 
@@ -79,13 +87,13 @@ def draw_menu(stdscr):
 
         # Rendering some text
         whstr = "Width: {}, Height: {}".format(width, height)
-        for i in range(0, nelem):
+        for i in range(0, len(channel_list)):
             if i == selected:
-                stdscr.addstr(i, 0, whstr, curses.color_pair(3))
+                stdscr.addstr(i, 0, str(channel_list[i]['name']), curses.color_pair(3))
             elif i == active:
-                stdscr.addstr(i, 0, whstr, curses.color_pair(2))
+                stdscr.addstr(i, 0, str(channel_list[i]['name']), curses.color_pair(2))
             else:
-                stdscr.addstr(i, 0, whstr, curses.color_pair(1))
+                stdscr.addstr(i, 0, str(channel_list[i]['name']), curses.color_pair(1))
 
         # Render status bar
         stdscr.attron(curses.color_pair(3))
