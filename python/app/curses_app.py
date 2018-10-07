@@ -1,4 +1,21 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
+#
+# Copyright 2018 by Ruben Undheim
+#
+# This is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# This software is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this software; see the file COPYING.  If not, write to
+# the Free Software Foundation, Inc., 51 Franklin Street,
+# Boston, MA 02110-1301, USA.
 
 import sys,os
 import curses
@@ -141,20 +158,8 @@ def draw_menu(stdscr):
         cursor_y = max(0, cursor_y)
         cursor_y = min(height-1, cursor_y)
 
-        ## Declaration of strings
-        #title = "Curses example"[:width-1]
-        #subtitle = "Written by Clay McLeod"[:width-1]
-        #if k != -1:
-        #  keystr = "Last key pressed: {}".format(k)[:width-1]
         statusbarstr = "Press 'q' to exit. Select channel and push Enter to change | STATUS BAR | Selected: {}".format(cursor_y)
-        #if k == 0:
-        #    keystr = "No key press detected..."[:width-1]
-        #k = 0
 
-        ## Centering calculations
-        #start_x_title = int((width // 2) - (len(title) // 2) - len(title) % 2)
-        #start_x_subtitle = int((width // 2) - (len(subtitle) // 2) - len(subtitle) % 2)
-        #start_x_keystr = int((width // 2) - (len(keystr) // 2) - len(keystr) % 2)
         start_y = int((height // 2) - 2)
 
         # Rendering some text
@@ -184,10 +189,6 @@ def draw_menu(stdscr):
         stdscr.attroff(curses.color_pair(2))
         stdscr.attroff(curses.A_BOLD)
 
-        # Print rest of text
-        #stdscr.addstr(start_y + 1, start_x_subtitle, subtitle)
-        #stdscr.addstr(start_y + 3, (width // 2) - 2, '-' * 4)
-        #stdscr.addstr(start_y + 5, start_x_keystr, keystr)
         stdscr.move(cursor_y, cursor_x)
 
         # Refresh the screen
