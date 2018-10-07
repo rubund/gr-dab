@@ -240,6 +240,11 @@ def main(rf_gain, if_gain, bb_gain, ppm, use_zeromq_in=False):
         import osmosdr
     import time
 
+    if len(channel_list) > 0:
+        ch = channel_list[0]
+        frequency = float(ch['frequency'])*1e6
+    else:
+        ch = {"bit_rate" : 64, "address" : 304, "subch_size" : 64, "protect_level" : 1}
 
     print("Setting frequency: %0.3f MHz" % (frequency/1e6))
 
@@ -288,7 +293,6 @@ def main(rf_gain, if_gain, bb_gain, ppm, use_zeromq_in=False):
               )
             )
 
-    ch = channel_list[0]
     dab_dabplus_audio_decoder_ff_0 = grdab.dabplus_audio_decoder_ff(grdab.parameters.dab_parameters(mode=1, sample_rate=samp_rate, verbose=False), ch['bit_rate'], ch['address'], ch['subch_size'], ch['protect_level'], True)
 
     xrun_monitor = grdab.xrun_monitor_cc(100000)
