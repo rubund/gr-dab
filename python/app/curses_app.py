@@ -158,7 +158,7 @@ def draw_menu(stdscr):
         cursor_y = max(0, cursor_y)
         cursor_y = min(height-1, cursor_y)
 
-        statusbarstr = "Press 'q' to exit. Select channel and push Enter to change | STATUS BAR | Selected: {}".format(cursor_y)
+        statusbarstr = "Press 'q' to exit. Select channel and push Enter to change | Selected: {}. Listening to: {}".format(cursor_y, active)
 
         start_y = int((height // 2) - 2)
 
