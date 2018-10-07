@@ -60,6 +60,8 @@ def draw_menu(stdscr):
         # Initialization
         stdscr.clear()
         height, width = stdscr.getmaxyx()
+        center_x = int((width // 2) - 2)
+        center_y = int((height // 2) - 2)
 
         if k == curses.KEY_DOWN:
             cursor_y = cursor_y + 1
@@ -82,6 +84,7 @@ def draw_menu(stdscr):
             active = selected
 
         if k == 10:
+            stdscr.move(center_y, center_x)
             ch = channel_list[active]
             freq = float(ch['frequency'])*1e6
             if use_zeromq:
@@ -130,6 +133,7 @@ def draw_menu(stdscr):
             fg.connect((c2f, 1), (audio_sink_0, 1))
             time.sleep(1)
             fg.start()
+            stdscr.move(cursor_y, cursor_x)
 
         cursor_x = max(0, cursor_x)
         cursor_x = min(width-1, cursor_x)
@@ -137,20 +141,20 @@ def draw_menu(stdscr):
         cursor_y = max(0, cursor_y)
         cursor_y = min(height-1, cursor_y)
 
-        # Declaration of strings
-        title = "Curses example"[:width-1]
-        subtitle = "Written by Clay McLeod"[:width-1]
-        if k != -1:
-          keystr = "Last key pressed: {}".format(k)[:width-1]
-        statusbarstr = "Press 'q' to exit | STATUS BAR | Pos: {}, {}".format(cursor_x, cursor_y)
-        if k == 0:
-            keystr = "No key press detected..."[:width-1]
-        k = 0
+        ## Declaration of strings
+        #title = "Curses example"[:width-1]
+        #subtitle = "Written by Clay McLeod"[:width-1]
+        #if k != -1:
+        #  keystr = "Last key pressed: {}".format(k)[:width-1]
+        statusbarstr = "Press 'q' to exit. Select channel and push Enter to change | STATUS BAR | Selected: {}".format(cursor_y)
+        #if k == 0:
+        #    keystr = "No key press detected..."[:width-1]
+        #k = 0
 
-        # Centering calculations
-        start_x_title = int((width // 2) - (len(title) // 2) - len(title) % 2)
-        start_x_subtitle = int((width // 2) - (len(subtitle) // 2) - len(subtitle) % 2)
-        start_x_keystr = int((width // 2) - (len(keystr) // 2) - len(keystr) % 2)
+        ## Centering calculations
+        #start_x_title = int((width // 2) - (len(title) // 2) - len(title) % 2)
+        #start_x_subtitle = int((width // 2) - (len(subtitle) // 2) - len(subtitle) % 2)
+        #start_x_keystr = int((width // 2) - (len(keystr) // 2) - len(keystr) % 2)
         start_y = int((height // 2) - 2)
 
         # Rendering some text
@@ -174,16 +178,16 @@ def draw_menu(stdscr):
         stdscr.attron(curses.A_BOLD)
 
         # Rendering title
-        stdscr.addstr(start_y, start_x_title, title)
+        #stdscr.addstr(start_y, start_x_title, title)
 
         # Turning off attributes for title
         stdscr.attroff(curses.color_pair(2))
         stdscr.attroff(curses.A_BOLD)
 
         # Print rest of text
-        stdscr.addstr(start_y + 1, start_x_subtitle, subtitle)
-        stdscr.addstr(start_y + 3, (width // 2) - 2, '-' * 4)
-        stdscr.addstr(start_y + 5, start_x_keystr, keystr)
+        #stdscr.addstr(start_y + 1, start_x_subtitle, subtitle)
+        #stdscr.addstr(start_y + 3, (width // 2) - 2, '-' * 4)
+        #stdscr.addstr(start_y + 5, start_x_keystr, keystr)
         stdscr.move(cursor_y, cursor_x)
 
         # Refresh the screen
@@ -197,7 +201,9 @@ def draw_menu(stdscr):
         # Wait for next input
         #queue.
         if k == -1:
+            stdscr.move(center_y, center_x)
             time.sleep(0.1)
+            stdscr.move(cursor_y, cursor_x)
 
 class KeyDetecThread(threading.Thread):
 
