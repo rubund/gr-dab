@@ -28,6 +28,8 @@ def draw_menu(stdscr):
     global audio_sink_0
     global xrun_monitor
     global fg
+    global use_zeromq
+    global rpc_mgr_server
 
     k = 0
     cursor_x = 0
@@ -78,8 +80,12 @@ def draw_menu(stdscr):
             active = selected
 
         if previous_active != active:
-
             ch = channel_list[active]
+            freq = float(ch['frequency'])*1e6
+            if use_zeromq:
+                rpc_mgr_server.request("set_frequency",[freq])
+            else:
+                src.set_center_freq(freq, 0)
             new = grdab.dabplus_audio_decoder_ff(grdab.parameters.dab_parameters(mode=1, sample_rate=samp_rate, verbose=False), ch['bit_rate'], ch['address'], ch['subch_size'], ch['protect_level'], True)
             newaudio = audio.sink(48000, '', True)
             fg.stop()
@@ -179,7 +185,7 @@ class KeyDetecThread(threading.Thread):
         while self.running:
             k = self.stdscr.getch()
 
-def main():
+def main(use_zeromq_in=False):
     global src
     global dab_dabplus_audio_decoder_ff_0
     global dab_ofdm_demod_0
@@ -188,6 +194,8 @@ def main():
     global audio_sink_0
     global fg
     global xrun_monitor
+    global use_zeromq
+    global rpc_mgr_server
     frequency=220.352e6
     rf_gain=25
     if_gain=0
@@ -198,7 +206,7 @@ def main():
     dab_address=304
     dab_subch_size=64
     dab_protect_level=1
-    use_zeromq=True
+    use_zeromq=use_zeromq_in
     if use_zeromq:
         from gnuradio import zeromq
     else:
