@@ -194,7 +194,7 @@ def draw_menu(stdscr):
         # Refresh the screen
         stdscr.refresh()
 
-        
+
         stdscr.timeout(0)
         kn = stdscr.getch()
         k = kn
