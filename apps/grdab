@@ -95,7 +95,7 @@ def adjust_handler(res):
 
 def curses_handler(res):
   import grdab.app.curses_app
-  grdab.app.curses_app.main(use_zeromq_in=res.zeromq)
+  grdab.app.curses_app.main(rf_gain=rf_gain, if_gain=if_gain, bb_gain=bb_gain, ppm=ppm, use_zeromq_in=res.zeromq)
 
 parser_receive.set_defaults(func=receive_handler)
 parser_info.set_defaults(func=info_handler)
